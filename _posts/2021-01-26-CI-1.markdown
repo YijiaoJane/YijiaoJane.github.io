@@ -138,12 +138,14 @@ $$
 e(x)=\frac{1}{N(x)} \sum_{i: X_{i}=x} p_{i}(\mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))
 $$
 
-其中$N(x)=\#\left\{i=1, \ldots, N \mid X_{i}=x\right\}$。
+其中$N(x)=\left\{i=1, \ldots, N \mid X_{i}=x\right\}$。
 
 #### Restrictions on the Assignment Mechanism
 给出了分配机制的正式的定义，下面就可以进一步考虑需要对分配机制加一些什么样的假定，使得因果推断问题便于处理了。通常有这样的三条假定或称限制：
 
--Individualistic assignment
+- Individualistic assignment
+- Probabilistic assignment
+- Unconfounded Assignment
 
 称一个分配机制是个体性（Individualistic）的，如果存在一个取值在$\[0,1\]$上的函数$q$，使得
 
@@ -163,9 +165,7 @@ $$
 e(x)=\frac{1}{N_{x}} \sum_{i: X_{i}=x} q\left(X_{i}, Y_{i}(0), Y_{i}(1)\right)
 $$
 
-下面介绍另一个概率性的分配假定。
-
-- Probabilistic assignment
+下面介绍另一个概率性的分配假定（Probabilistic assignment）。
 
 称一个分配机制是概率性（Probabilistic）的，如果分配机制对应的函数取值严格在0到1之间，即：
 
@@ -177,9 +177,7 @@ $$
 
 概率性的分配机制假定每个个体都有正的概率被分到处理组以及控制组。对于这一个假定，我个人的理解是，正如开篇提到过的*/no causation without manipulation/*，如果我们所研究的对象总是以1的概率被分到处理组或者控制组，那么此时我们无法将同一个体在两种处理水平下的潜在结果进行比较，此时定义因果效应也是没有意义的了。
 
-最后一个假定是很多因果推断方法中很重要的一个假定，即无混杂分配。
-
-- Unconfounded Assignment
+最后一个假定是很多因果推断方法中很重要的一个假定，即无混杂分配（Unconfounded Assignment）。
 
 称一个分配机制是无混杂的（Unconfounded），如果处理变量不依赖于潜在结果的取值，即：
 
