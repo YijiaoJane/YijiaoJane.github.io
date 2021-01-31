@@ -213,7 +213,7 @@ $$
 
 分别为$Y_i(0)$、$Y_i(1)$以及$Y_i(1)-Y_i(0)$的样本方差。
 
-那么如何对$ \mathbb{V}_{W}(\hat{\tau}^{\mathrm{dif}}) $进行估计呢？从上面的式子中不难看出，$S_{t}^{2}$以及$S_{c}^{2}$我们可以分别用从处理组和控制组观测结果的样本方差进行估计，但$S_{t c}^{2}$中同时包含同一个体在两种处理水平下的潜在结果，无法对其直接进行计算。但注意到，**当个体水平的因果效应$Y_{i}(1)-Y_{i}(0) \equiv \tau$时，$S_{t c}^{2}=0$**，此时，
+那么如何对样本方差进行估计呢？从上面的式子中不难看出，$S_{t}^{2}$以及$S_{c}^{2}$我们可以分别用从处理组和控制组观测结果的样本方差进行估计，但$S_{t c}^{2}$中同时包含同一个体在两种处理水平下的潜在结果，无法对其直接进行计算。但注意到，**当个体水平的因果效应$Y_{i}(1)-Y_{i}(0) \equiv \tau$时，$S_{t c}^{2}=0$**，此时，
 
 $$
 \mathbb{V}_{W}(\hat{\tau}^{\mathrm{dif}})=\frac{S_{c}^{2}}{N_{\mathrm{c}}}+\frac{S_{t}^{2}}{N_{\mathrm{t}}}
@@ -280,14 +280,21 @@ $$
 为了介绍回归的方法，我们先引入一些新的记号。在给定协变量取值为$x$的情况下，定义处理组以及控制组的潜在结果的条件均值以及条件平均处理效应为
 
 $$
-\mu_{c}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid X_{i}=x\right], \quad \mu_{t}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1) \mid X_{i}=x\right], \quad
+\mu_{c}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid X_{i}=x\right], \quad \mu_{t}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1) \mid X_{i}=x\right],
+$$
+
+$$
 \tau(x)=\mathbb{E}_{\mathrm{sp}}\left(Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right)
 $$
 
 记相应的条件方差为：
 
 $$
-\sigma_{c}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(0) \mid X_{i}=x\right), \quad \text { and } \quad \sigma_{t}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1) \mid X_{i}=x\right) \quad \sigma_{c t}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right)
+\sigma_{c}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(0) \mid X_{i}=x\right), \quad \text { and } \quad \sigma_{t}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1) \mid X_{i}=x\right),
+$$
+
+$$
+ \sigma_{c t}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right)
 $$
 
 先考虑除处理变量外不含其他协变量的情形，假定回归函数为以下形式：
