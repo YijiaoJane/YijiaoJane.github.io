@@ -99,7 +99,7 @@ $$
 
 为了对上面四种实验进行一个比较，我们考虑总体个数为$N=16$时分别进行上述四种实验。其中伯努利实验有$2^{16}=65536$种不同的分配可能，而取$N_t=N/2$时的完全随机化实验有$\left(\begin{array}{c}N \\\\ N / 2\end{array}\right)=12870$种，而一个两层的分层随机化实验（每层处理组数量为该层人数的$1/2$）有$\left(\begin{array}{l}N / 2 \\\\ N / 4\end{array}\right)^{2}=4900$种，而最后一种配对随机化实验只有$256$种。可见上述四种实验机制种，可能实现的不同分配形式的种类数在不断降低。
 
-对此我的理解是，*通过设计更加严格的实验机制，我们可以限制对于推断因果效应帮助不大的分配形式发生，使得发生的实验所包含的关于因果效应的有用信息尽可能多*。
+对此我的理解是，**通过设计更加严格的实验机制，我们可以限制对于推断因果效应帮助不大的分配形式发生，使得发生的实验所包含的关于因果效应的有用信息尽可能多**。
 
 ---
 
@@ -163,7 +163,7 @@ Neyman关心的基本问题主要有以下三个：
 - 如果所有的个体都进入控制组，那么潜在结果的平均值$\bar{Y}(0)$为多少？
 - 两种处理水平下潜在结果均值的差异$\bar{Y}(1) - \bar{Y}(0)$有多大？
 
-而Neyman提出的方法即为建立平均因果效应的估计量，并给出其均值以及方差的估计。那么这里的`重复抽样（Repeated Sampling）`是什么含义呢？我的个人认为重复抽样包含了两个层面的含义：首先它主要指分配形式是根据分配机制随机抽取的，此外在无限总体下，也指观测样本是从一个更大的总体中抽取的简单随机样本。而Neyman构造的估计量在重复抽样的意义下是无偏的。
+而Neyman提出的方法即为建立平均因果效应的估计量，并给出其均值以及方差的估计。那么这里的`重复抽样（Repeated Sampling）`是什么含义呢？我的个人认为重复抽样包含了两个层面的含义：首先它主要指**分配形式是根据分配机制随机抽取的**，此外在无限总体下，也指**观测样本是从一个更大的总体中抽取的简单随机样本**。而**Neyman构造的估计量在重复抽样的意义下是无偏的**。
 
 这里我们先考虑有限总体下平均因果效应的估计，此时将$Y_i(1)$以及$Y_i(0)$视为固定值。假定我们有一个含有$N$个个体的总体，Neyman感兴趣的估计量为该总体的平均因果效应：
 
@@ -213,7 +213,7 @@ $$
 
 分别为$Y_i(0)$、$Y_i(1)$以及$Y_i(1)-Y_i(0)$的样本方差。
 
-那么如何对$ \mathbb{V}_{W}(\hat{\tau}^{\mathrm{dif}}) $进行估计呢？从上面的式子中不难看出，$S_{t}^{2}$以及$S_{c}^{2}$我们可以分别用从处理组和控制组观测结果的样本方差进行估计，但$S_{t c}^{2}$中同时包含同一个体在两种处理水平下的潜在结果，无法对其直接进行计算。但注意到，当个体水平的因果效应$Y_{i}(1)-Y_{i}(0) \equiv \tau$时，$S_{t c}^{2}=0$，此时，
+那么如何对$ \mathbb{V}_{W}(\hat{\tau}^{\mathrm{dif}}) $进行估计呢？从上面的式子中不难看出，$S_{t}^{2}$以及$S_{c}^{2}$我们可以分别用从处理组和控制组观测结果的样本方差进行估计，但$S_{t c}^{2}$中同时包含同一个体在两种处理水平下的潜在结果，无法对其直接进行计算。但注意到，**当个体水平的因果效应$Y_{i}(1)-Y_{i}(0) \equiv \tau$时，$S_{t c}^{2}=0$**，此时，
 
 $$
 \mathbb{V}_{W}(\hat{\tau}^{\mathrm{dif}})=\frac{S_{c}^{2}}{N_{\mathrm{c}}}+\frac{S_{t}^{2}}{N_{\mathrm{t}}}
@@ -225,11 +225,20 @@ $$
 \hat{\mathbb{V}}^{\text {neyman }}=\frac{s_{c}^{2}}{N_{\mathrm{c}}}+\frac{s_{t}^{2}}{N_{\mathrm{t}}}
 $$
 
-若个体水平的因果效应不为常数，由于$S_{t c}^{2} \geq 0$，上述估计量仍可给出$\hat{\tau}^{\mathrm{dif}}$的样本方差的一个上界。此外，也有一些改进的估计量，具体可参考[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)P95。
+其中，
+$$
+s_{t}^{2}=\frac{1}{N_{\mathrm{t}}-1} \sum_{i: W_{i}=1}\left(Y_{i}(1)-\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}\right)^{2}=\frac{1}{N_{\mathrm{t}}-1} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}\right)^{2}
+$$
+
+$$
+s_{c}^{2}=\frac{1}{N_{\mathrm{c}}-1} \sum_{i: W_{i}=0}\left(Y_{i}(0)-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\right)^{2}=\frac{1}{N_{\mathrm{c}}-1} \sum_{i: W_{i}=0}\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\right)^{2}
+$$
+
+若个体水平的因果效应不为常数，由于$S_{t c}^{2} \geq 0$，上述估计量仍可给出$\hat{\tau}^{\mathrm{dif}}$的样本方差的一个**上界**。此外，也有一些改进的估计量，具体可参考[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)P95。
 
 在此基础上，我们也可以进一步给出平均因果效应的区间估计并进行假设检验。
 
-同理，也可以将有限总体的情形推广到无限总体的情形。此时，我们将观测到的$N$个个体视为来自一个`超总体（super-population）`的简单随机样本。此时$Y_i(1)$以及$Y_i(0)$不再视为固定的值，而应看作随机变量。我们估计的目标为：
+同理，也可以将有限总体的情形推广到无限总体的情形。此时，我们将观测到的$N$个个体视为来自一个`超总体（super-population）`的简单随机样本。**此时$Y_i(1)$以及$Y_i(0)$不再视为固定的值，而应看作随机变量**。我们估计的目标为：
 
 $$
 \tau_{\mathrm{sp}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]
@@ -263,8 +272,104 @@ $$
 \hat{\mathrm{V}}^{\mathrm{sp}}=\frac{s_{c}^{2}}{N_{\mathrm{c}}}+\frac{s_{t}^{2}}{N_{\mathrm{t}}}
 $$
 
-注意到上述样本方差的估计量与有限总体情形下是一致的，但在无限总体下，该估计量的无偏性并不需要假设个体水平的因果效应为常数，即不要求其总体方差为$0$。
+**注意到上述样本方差的估计量与有限总体情形下是一致的，但在无限总体下，该估计量的无偏性并不需要假设个体水平的因果效应为常数**，即不要求其总体方差为$0$。
 
 #### Regression Methods
+除了上述两种比较经典的因果效应的估计方法以外，回归方法也是实验以及观测性研究中更为常用的一种估计因果效应的方法。在这一部分，我们都将观测样本视为来自无限总体的一个随机样本，此外仍然假定为完全随机化实验的情形。
+
+为了介绍回归的方法，我们先引入一些新的记号。在给定协变量取值为$x$的情况下，定义处理组以及控制组的潜在结果的条件均值以及条件平均处理效应为
+
+$$
+\mu_{c}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid X_{i}=x\right], \quad \mu_{t}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1) \mid X_{i}=x\right], \quad
+\tau(x)=\mathbb{E}_{\mathrm{sp}}\left(Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right)
+$$
+
+记相应的条件方差为：
+
+$$
+\sigma_{c}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(0) \mid X_{i}=x\right), \quad \text { and } \quad \sigma_{t}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1) \mid X_{i}=x\right) \quad \sigma_{c t}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right)
+$$
+
+先考虑除处理变量外不含其他协变量的情形，假定回归函数为以下形式：
+
+$$
+Y_{i}^{\mathrm{obs}}=\alpha+\tau \cdot W_{i}+\varepsilon_{i}
+$$
+
+我们可以给出回归系数$\alpha,\tau,\beta$的最小二乘估计：
+
+$$
+\left(\hat{\tau}^{\mathrm{ols}}, \hat{\alpha}^{\mathrm{ols}}\right)=\arg \min _{\tau, \alpha} \sum_{i=1}^{N}\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}\right)^{2}
+$$
+
+计算可得：
+
+$$
+\hat{\tau}^{\mathrm{ols}}=\frac{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right) \cdot\left(Y_{i}^{\mathrm{obs}}-\bar{Y}^{\mathrm{obs}}\right)}{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right)^{2}}, \quad \text { and } \quad \hat{\alpha}^{\mathrm{ols}}=\bar{Y}^{\mathrm{obs}}-\hat{\tau}^{\mathrm{ols}} \cdot \bar{W}
+$$
+
+其中，
+
+$$
+\bar{Y}^{\mathrm{obs}}=\frac{1}{N} \sum_{i=1}^{N} Y_{i}^{\mathrm{obs}} \quad \text { and } \quad \bar{W}=\frac{1}{N} \sum_{i=1}^{N} W_{i}=\frac{N_{t}}{N}
+$$
+
+通过简单的计算不难发现
+
+$$
+\hat{\tau}^{\mathrm{ols}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}=\hat{\tau}^{\mathrm{dif}}
+$$
+
+即在上述回归模型中，**回归系数$\tau$的最小二乘估计与Neyman所提出的平均因果效应的估计量是一致的**，因此我们可以利用回归系数$tau$的最小二乘估计来解释因果效应。此外，定义
+
+$$
+\begin{aligned}
+\left(\alpha^{\star}, \tau^{\star}\right) &=\arg \min _{\alpha, \tau} \mathbb{E}_{\mathrm{sp}}\left[\frac{1}{N} \sum_{i=1}^{N}\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}\right)^{2}\right] \\
+&=\arg \min _{\alpha, \tau} \mathbb{E}_{\mathrm{sp}}\left[\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}\right)^{2}\right]
+\end{aligned}
+$$
+
+可以验证$\tau^{\star}=\tau_{\mathrm{sp}}$。在一定条件下，随着样本量增大，$\hat{\tau}^{\mathrm{ols}}$将收敛于$\tau^{\star}=\tau_{\mathrm{sp}}$。此外，我们也可以给出$\hat{\tau}^{\mathrm{ols}}$的样本方差的稳健估计：
+
+$$
+\hat{\mathrm{V}}^{\mathrm{sp}}=\frac{\sum_{i=1}^{N} \hat{\varepsilon}_{i}^{2} \cdot\left(W_{i}-\bar{W}\right)^{2}}{\left(\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right)^{2}\right)^{2}}
+$$
+
+计算可知，
+
+$$
+\hat{\mathrm{V}}^{\mathrm{sp}}=\frac{s_{c}^{2}}{N_{\mathrm{c}}}+\frac{s_{t}^{2}}{N_{\mathrm{t}}}
+$$
+
+**与Neyman对其提出的估计量所给出的样本方差的估计一致**。
+
+下面考虑含有其他协变量的情形，假定回归函数为以下形式：
+
+$$
+Y_{i}^{\mathrm{obs}}=\alpha+\tau \cdot W_{i}+X_{i} \beta+\varepsilon_{i}
+$$
+
+其中$X_i$为个体$i$所对应的一行协变量（预处理变量）。我们可以给出回归系数$\alpha,\tau,\beta$的最小二乘估计：
+
+$$
+\left(\hat{\tau}^{\mathrm{ols}}, \hat{\alpha}^{\mathrm{ols}}, \hat{\beta}^{\mathrm{ols}}\right)=\arg \min _{\tau, \alpha, \beta} \sum_{i=1}^{N}\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}-X_{i} \beta\right)^{2}
+$$
+
+我们关心的是回归系数$\tau$与我们所感兴趣的估计量总体平均因果效应${\tau}_{\mathrm{sp}}$之间的关系。同样可以定义：
+
+$$
+\left(\alpha^{\star}, \tau^{\star}, \beta^{\star}\right)=\underset{\alpha, \beta, \tau}{\arg \min } \mathbb{E}\left[\left(Y_{i}^{\text {obs }}-\alpha-\tau \cdot W_{i}-X_{i} \beta\right)^{2}\right]
+$$
+
+可以验证$\tau^{\star}=\tau_{\mathrm{sp}}$。在一定条件下，随着样本量增大，$\left(\hat{\alpha}^{\mathrm{ols }}, \hat{\tau}^{\mathrm{ols }}, \hat{\beta}^{\mathrm{ols }}\right)$可以收敛到$\left(\alpha^{\star}, \tau^{\star}, \beta^{\star}\right)$。注意到在无限总体下，$\hat{\tau}^{\mathrm{ols}}$不再是$\tau_{\mathrm{sp}}$的无偏估计，但他依然是**渐进无偏**的，具体地，我们有以下结论：
+
+$$
+\sqrt{N} \cdot\left(\hat{\tau}^{\mathrm{ols}}-\tau_{\mathrm{sp}}\right) \stackrel{d}{\longrightarrow} \mathcal{N}\left(0, \frac{\mathbb{E}\left[\left(W_{i}-p\right)^{2} \cdot\left(Y_{i}^{\mathrm{obs}}-\alpha^{\star}-\tau_{\mathrm{sp}} \cdot W_{i}-X_{i} \beta^{\star}\right)^{2}\right]}{p^{2} \cdot(1-p)^{2}}\right)
+$$
+
+需要注意的是，基于回归的方法所得到的结论**不要求回归模型一定是指定正确的**，只要是在完全随机化实验的情形下即可成立。
+
+进一步也可以计算上述最小二乘估计量的样本方差并给出相应的估计，此外也可以对于处理变量与预处理变量之间的交互效应以及对潜在结果进行变换进行讨论，具体可参考[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)第7章第5、6、7节。
 
 #### Model-Based Inference
+
