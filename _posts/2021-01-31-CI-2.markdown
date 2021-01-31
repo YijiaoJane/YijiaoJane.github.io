@@ -1,0 +1,142 @@
+---
+layout:     post
+title:      "Causal Inference (2)"
+subtitle:   "Classical Randomized Experiments"
+date:       2021-01-31
+author:     "Yijiao"
+header-img: "img/post-bg-ci.png"
+catalog: true
+tags:
+    - Causal Inference
+---
+
+这一篇将具体介绍`经典随机化实验的几种类别`以及相应的四种`因果效应的推断方法`。
+
+## A Taxonomy of Classical Randomized Experiments
+
+在上一篇中，我们讲到了经典随机化实验的分配机制，即分配函数需满足**个体性**、**概率性**以及**无混杂性**的假定，此外该**分配函数需要有一个已知的形式**，可以由研究者所控制。在个体性以及无混杂性满足的条件下，分配机制对应的函数可以写为以下形式：
+
+$$
+\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=c \cdot \prod_{i=1}^{N} e\left(X_{i}\right)^{W_{i}} \cdot\left(1-e\left(X_{i}\right)\right)^{1-W_{i}}
+$$
+
+其中$\mathbf{W} \in \mathbb{W}^{+}$，$\mathbb{W}^{+} \subset \mathbb{W}$为所有$\mathbb{W}$的可能取值中概率为正值的部分所构成的子集，$e(x)$为倾向性得分，$c$为正则化常数。由于分配函数形式需要有一个已知的形式，这里的$e(x)$需要为协变量的一个已知函数。
+
+四种常见的满足以上条件的随机化实验有：
+#### 伯努利实验
+
+最简单的`伯努利试验（Bernoulli trials）`可以看为对每个个体分配哪一种处理都由抛硬币决定，即每个个体都有各1/2的概率进入处理组和控制组，且个体被分配哪一种处理是相互独立的。此时分配函数可以写为：
+
+$$
+\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=0.5^{N}
+$$
+
+其中$\mathbf{W} \in \mathbb{W}^{+}=\{0,1\}^{N}=\mathbb{W}$。
+
+更一般的伯努利试验允许每个个体的分配概率随个体协变量的取值变化，此时的分配函数可以写为：
+
+$$
+\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\prod_{i=1}^{N}\left[e\left(X_{i}\right)^{W_{i}} \cdot\left(1-e\left(X_{i}\right)\right)^{1-W_{i}}\right]
+$$
+
+其中$\mathbf{W} \in \mathbb{W}^{+}=\\{0,1\\}^{N}=\mathbb{W}$。
+
+注意到在伯努利实验的分配机制中，由于个体之间的分配是相互独立的，因此**可能出现所有个体同时进入处理组或者同时进入控制组的情形**，此时我们无法了解到未出现的处理水平所对应的潜在结果的信息，从而难以对因果效应做出推断。这也是伯努利实验的一个常见的缺点所在。为了保证一次实验中同时有个体进入处理组和控制组，我们进一步考虑其他的分配机制，下面要介绍的完全随机化实验就是其中的一种。
+
+#### 完全随机化实验
+
+在`完全随机化实验（completely randomized experiments）`中，研究者会事先确定好进入处理组的个体数$N_t$，然后随机选择$N_t$个个体进入处理组，剩下的个体进行控制组，从而其对应的分配机制为：
+
+$$
+\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\left\{\begin{array}{ll}
+\left(\begin{array}{c}
+N \\
+N_{\mathrm{t}}
+\end{array}\right)^{-1} & \text {if } \sum_{i=1}^{N} W_{i}=N_{\mathrm{t}} \\
+0 & \text { otherwise }
+\end{array}\right.
+$$
+
+其中$N_{\mathrm{t}} \in \\{1,2, \ldots, N-1\\}$。
+每个个体的倾向性的得分都相同且等于$N_t/N$，即有$q=N_t/N$的概率被分配进入处理组，但需要注意的是，**完全随机化实验中个体的分配之间并非相互独立的**，因为总的进入处理组的个体数是确定的，一个个体进入处理组自然会降低剩下的个体被分配进入处理组的概率。此外，完全随机化实验也并非完美的，**尤其是在潜在结果与某些协变量之间存在较强的相关关系时**。例如，在某个随机化实验中，潜在结果可能与性别存在较强的相关关系，然而完全随机化实验将所有的男性分配进入了处理组，所有女性分配进入了控制组，这个时候我们**很难分辨两组潜在结果之间的差异到底是来自处理变量还是性别变量**。为了改善这个问题，分层的随机化实验就要上场了。
+
+#### 分层随机化实验
+
+`分层随机化实验（stratified randomized experiments）`将总体按照协变量的不同取值划分为不同的`块（block）`或`层（strata）`，然后在每一层中进行完全随机化实验，层与层之间的实验是相互独立的。比如，用上面提到的例子来说，我们可以将总体按照性别分为两层，即男性子总体和女性子总体，在每一层里面单独地进行完全随机化实验，这样即可保证进入处理组以及控制组的个体中既有男性也有女性。一般来说，假设我们将总体分为了$J$层，记$B_i(J)$为第$i$个个体是否在第$J$层的指示变量，$B_i \in \\{1,\ldots, J\\}$表示第$i$个个体所在层数，$N_t(j)$表示在第$j$层中的完全随机化实验所确定的进入处理组的个体数量，那么分层随机化实验的分配机制可以写为：
+
+$$
+\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\left\{\begin{array}{ll}
+\prod_{j=1}^{J}\left(\begin{array}{c}
+N(j) \\
+N_{\mathrm{t}}(j)
+\end{array}\right)^{-1} & \text {if } \mathbf{W} \in \mathbb{W}^{+}, \\
+0 & \text { otherwise }
+\end{array}\right.
+$$
+
+其中
+
+$$
+\mathbf{W} \in \mathbb{W}^{+}=\left\{\mathbf{W} \in \mathbb{W} \mid \sum_{i: B_{i}=j}^{N} W_{i}=N_{\mathrm{t}}(j), \text { for } j=1,2, \ldots, J\right\}$$
+
+每一层中的个体倾向性得分相同且等于$N_t(j)/N(j)$，其中$j$代表个体所在层数。完全随机化实验也可以看作为分层随机化实验的特例，即层数为1。当潜在结果与协变量之间存在较强的相关关系时，利用这些协变量对总体进行分层再进行分层的随机化实验可以排除掉因为协变量的差异所带来的潜在结果之间的差异，从而使得因果效应的估计更加准确。
+
+#### 配对随机化实验
+
+`配对随机化实验（pairwise randomized experiments）`是分层随机化实验的一种特例，即在每一层中只有两个个体，一个被分配进入处理组，另一个进入控制组，其分配机制可以表示为：
+
+$$
+\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\left\{\begin{array}{ll}
+2^{-N / 2} & \text { if } \mathbf{W} \in \mathbb{W}^{+}, \\
+0 & \text { otherwise }
+\end{array}\right.
+$$
+
+其中，
+
+$$
+\mathbf{W} \in \mathbb{W}^{+}=\left\{\mathbf{W} \in \mathbb{W} \mid \sum_{i: B_{i}=j}^{N} W_{i}=1,\right.$ for $\left.j=1,2, \ldots, N / 2\right\}
+$$
+
+为了对上面四种实验进行一个比较，我们考虑总体个数为$N=16$时分别进行上述四种实验。其中伯努利实验有$2^16=65536$种不同的分配可能，而取$N_t=N/2$时的完全随机化实验有$\left(\begin{array}{c}N \\ N / 2\end{array}\right)=12870$种，而一个两层的分层随机化实验（每层处理组数量为该层人数的1/2）有$\left(\begin{array}{l}N / 2 \\ N / 4\end{array}\right)^{2}=4900$种，而最后一种配对随机化实验只有$256$种。可见上述四种实验机制种，可能实现的不同分配形式的种类数在不断降低。
+
+对此我的理解是，通过设计更加严格的实验机制，我们可以限制对于推断因果效应帮助不大的分配形式发生，使得发生的实验所包含的关于因果效应的有用信息尽可能多。
+
+---
+
+介绍完四种常见的实验设计机制后，可以进一步考虑每一种机制下如何对因果效应进行估计和推断。这里只介绍完全随机化实验的情形，分层以及配对随机化实验的情形可以类推。
+
+## Methods for estimation and inference of causal effects
+常见的对因果效应进行估计和推断的方法有以下四种：
+
+- Fisher的精确$P$值法（Fisher’s Exact P-Values）
+- Neyman的重复抽样方法（Neyman’s Repeated Sampling Approach）
+- 基于回归的方法（Regression Methods）
+- 基于模型的方法（Model-Based Inference）
+
+#### Fisher’s Exact P-Values(FEP)
+给定完全随机化实验的数据，Fisher的思想是对`精确原假设（sharp null hypothesis or exact null hypothesis)`进行检验，其中精确原假设指：任一个体在两种处理水平下的潜在结果都相同。Fisher给出了在精确原假设成立的情况下如何计算$p$值，我们称之为`Fisher精确$p$值（Fisher Exact P-values，FEPs）`。
+
+不难看出，在精确原假设成立的情况下，我们可以根据已有数据填补出每个个体未观测到的潜在结果值。假定所选的检验统计量为$T$，$T$为个体观测到的结果以及协变量的函数。由于在精确原假设下，每个个体在两种处理水平下的潜在结果都已知，通过随机化的方法，我们可以由此得到在不同的处理分配方式下$T$的所有取值可能，我们称之为$T$的随机化分布。那么通过观察实际观测到的$T^{obs}$在$T$的随机化分布中的极端情况，我们便可以得到相应的$p$值。
+
+在此用一个简单的例子来说明。表1展示了在一个研究蜂蜜对于治疗咳嗽效用的完全随机化实验的数据，个体总数为6，其中1、2、3号个体在处理组，4、5、6号个体在控制组。
+
+![Public License](http://dl2.iteye.com/upload/attachment/0047/4142/d770c85a-49b7-3c7f-8ae2-cbb6451e00d8.png)
+
+
+
+注：
+
+- 在Fisher最原始的版本中，精确原假设就是我们上文提到的任一个体的两种处理水平下的潜在结果都相同。但其实不难将其推广到更一般的情形，即若在该假设成立的情况下，我们可以填补出所有为观测到的潜在结果的值，我们就可以将其视为一个精确原假设。
+
+- 通常在实际中我们关心的是所有个体的平均因果效应是否为0，并非每个个体的因果效应是否为0，因此Fisher所考虑的的精确原假设其实是一个更强的原假设。
+
+-
+
+
+
+#### Neyman’s Repeated Sampling Approach
+
+#### Regression Methods
+
+#### Model-Based Inference
