@@ -92,11 +92,7 @@ $$
 \end{array}\right.
 $$
 
-其中，
-
-$$
-\mathbf{W} \in \mathbb{W}^{+}=\left\{\mathbf{W} \in \mathbb{W} \mid \sum_{i: B_{i}=j}^{N} W_{i}=1,\right.$ for $\left.j=1,2, \ldots, N / 2\right\}
-$$
+其中，$\mathbf{W} \in \mathbb{W}^{+}=\\{\mathbf{W} \in \mathbb{W} \mid \sum_{i: B_{i}=j}^{N} W_{i}=1,\right.\$ for \$\left.j=1,2, \ldots, N / 2\\}$
 
 为了对上面四种实验进行一个比较，我们考虑总体个数为$N=16$时分别进行上述四种实验。其中伯努利实验有$2^16=65536$种不同的分配可能，而取$N_t=N/2$时的完全随机化实验有$\left(\begin{array}{c}N \\ N / 2\end{array}\right)=12870$种，而一个两层的分层随机化实验（每层处理组数量为该层人数的1/2）有$\left(\begin{array}{l}N / 2 \\ N / 4\end{array}\right)^{2}=4900$种，而最后一种配对随机化实验只有$256$种。可见上述四种实验机制种，可能实现的不同分配形式的种类数在不断降低。
 
@@ -121,7 +117,7 @@ $$
 
 在此用一个简单的例子来说明。表1展示了在一个研究蜂蜜对于治疗咳嗽效用的完全随机化实验的数据，个体总数为6，其中1、2、3号个体在处理组，4、5、6号个体在控制组。
 
-![Public License](http://dl2.iteye.com/upload/attachment/0047/4142/d770c85a-49b7-3c7f-8ae2-cbb6451e00d8.png)
+![Table 1](https://yijiaojane.github.io/img/in-post/CI-2/pre.png)
 
 
 
