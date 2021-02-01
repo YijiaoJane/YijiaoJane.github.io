@@ -393,7 +393,7 @@ $$
 
 首先，我们需要指定两种潜在结果变量的关于未知参数$\theta$的联合分布$f(\mathbf{Y}(0), \mathbf{Y}(1) \mid \theta)$，并给出$\theta$的先验分布$p(\theta)$。利用这两个信息，我们可以建立缺失结果变量的后验分布。主要过程包括以下四步。
 
-- Step 1 求出$f\left(\mathbf{Y}^{\mathrm{mis}} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}, \theta\right)$
+- **Step 1 ：** 求出$f\left(\mathbf{Y}^{\mathrm{mis}} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}, \theta\right)$
 
 由于
 
@@ -411,7 +411,7 @@ $$
 f(\mathbf{Y}(0), \mathbf{Y}(1) \mid \mathbf{W}, \theta)=\frac{f(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W} \mid \theta)}{\operatorname{Pr}(\mathbf{W} \mid \theta)}=\frac{f(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W} \mid \theta)}{\int f(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W} \mid \theta) \mathrm{d} \mathbf{Y}(0) \mathrm{d} \mathbf{Y}(1)}
 $$
 
-- Step 2 求出$\theta$的后验分布$p\left(\theta \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)$
+- **Step 2 ：** 求出$\theta$的后验分布$p\left(\theta \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)$
 
 首先可以通过对Step 1中求得的条件联合分布进行积分得到观测结果$\mathbf{Y}^{\text {obs }}$以及处理变量$\mathbf{W}$的边际分布：
 
@@ -425,7 +425,7 @@ $$
 p\left(\theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right)=\frac{p(\theta) \cdot \mathcal{L}\left(\theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right)}{\int_{\theta} p(\theta) \cdot \mathcal{L}\left(\theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right) \mathrm{d} \theta}
 $$
 
-- Step 3 求出缺失结果变量的后验分布$f\left(\mathbf{Y}^{\text {mis }} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)$
+- **Step 3 ：** 求出缺失结果变量的后验分布$f\left(\mathbf{Y}^{\text {mis }} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)$
 
 根据Step 1和Step 2中的结果，我们可以得到：
 
@@ -439,7 +439,7 @@ $$
 f\left(\mathbf{Y}^{\mathrm{mis}} \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right)=\int_{\theta} f\left(\mathbf{Y}^{\mathrm{mis}}, \theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right) \mathrm{d} \theta
 $$
 
-- Step 4 求出估计目标$\tau=\tau(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W})$的后验分布
+- **Step 4：** 求出估计目标$\tau=\tau(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W})$的后验分布
 
 同样的，根据$\mathbf{Y}^{\operatorname{obs}}$以及$\mathbf{Y}^{\operatorname{mis}}$的[定义](https://yijiaojane.github.io/2021/01/26/CI-1/#pre-treatment-variables)，我们可以将$(\mathbf{Y}(0), \mathbf{Y}(1))$表示为$(\mathbf{Y}^{\text {mis }}, \mathbf{Y}^{\text {obs }}, \mathbf{W})$的函数，从而可以根据Step 3中的结果得到$\tau$的后验分布：
 
@@ -455,4 +455,4 @@ $$
 
 简单小结一下，原书中提到，**从某种意义上来说，所有处理因果推断问题的方法都可以视为一种填补缺失数据的方法**，只是有的比较显然，有的比较隐晦，因为因果效应的估计本身就涉及到一部分未观测到的数据。上面提到的四种方法都可以看为用不同的方式对缺失观测结果值进行填补，并在此基础上对因果效应做出推断。这里我们讨论都是在完全随机化实验的情形下，也可以将上述四种方法稍作调整应用到分层随机化实验以及配对随机化实验的情形，具体可参考[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)第8、9章。
 
-关于随机化实验的部分就暂且介绍到这里吧，下一篇会介绍规则分配机制下观测性研究的研究方法。
+关于随机化实验的部分暂时就介绍到这里吧，下一篇会介绍规则分配机制下的观测性研究中因果效应的推断方法。
