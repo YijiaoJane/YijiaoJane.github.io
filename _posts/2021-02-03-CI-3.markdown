@@ -26,7 +26,7 @@ tags:
 
 $$
 \begin{array}{lll|l}
-W_{i} & \Vbar & X_{i} & b\left(X_{i}\right)
+W_{i} & \Perp & X_{i} & b\left(X_{i}\right)
 \end{array}
 $$
 
@@ -34,7 +34,7 @@ $$
 
 $$
 \begin{array}{lll|l}
-W_{i} & \Vbar & X_{i} & e\left(X_{i}\right)
+W_{i} & \Perp & X_{i} & e\left(X_{i}\right)
 \end{array}
 $$
 
@@ -94,7 +94,7 @@ $$
 有了倾向性得分的估计值之后，我们就可以来对样本进行分层了。这里主要依据的就是倾向性得分的这个重要性质：
 
 $$
-W_{i} \Vbar X_{i} \mid e\left(X_{i}\right)
+W_{i} \Perp X_{i} \mid e\left(X_{i}\right)
 $$
 
 当协变量只取少数离散值时，我们可以直接根据协变量的取值进行分层，这里我们主要关注的是协变量取值可能性较多的情形。在这种情况下，倾向性得分取值相同的个体很少，为了使每一层中的样本个数不至于太少，我们可以把倾向性得分相近的个体放到一层。
@@ -118,7 +118,13 @@ $$
 \underline{e}_{t}=\min _{i: W_{i}=1} \hat{e}\left(X_{i}\right),\quad \bar{e}_{c}=\max _{i: W_{i}=0} \hat{e}\left(X_{i}\right)
 $$
 
-然后将控制组中倾向性得分估计值小于$\\underline{e}_{t}$的个体以及处理组中大于$\bar{e}_{c}$的个体去掉，由此可初始化：
+若
+
+$$
+\hat{e}\left(X_{i}\right)<\underline{e}_{t} \text { or } \hat{e}\left(X_{i}\right)>\bar{e}_{c}
+$$
+
+则个体$i$无法找到对应的匹配，可将其去掉，由此可初始化：
 
 $$
 b_0=\underline{e}_{t},\quad J=1, \quad b_1=b_J=\bar{e}_{c}
@@ -142,7 +148,7 @@ $$
 对样本进行分层的目的就是为了使得每一层中的两组协变量的分布尽量均衡，那么在分好层后，我们需要对分层后每层中的两组协变量分布的均衡性进行一个评估，即评估下式是否（近似）成立：
 
 $$
-W_{i} \Vbar X_{i} \quad \mid \quad B_{i}(1), \ldots, B_{i}(J).
+W_{i} \Perp X_{i} \quad \mid \quad B_{i}(1), \ldots, B_{i}(J).
 $$
 
 这里我们先考虑两组协变量均值的差异，即评估：
@@ -373,7 +379,7 @@ $$
 \mathbb{I}_{c}^{\prime}=\left\{N_{\mathrm{t}}+1, \ldots, N_{\mathrm{t}}+N_{\mathrm{c}}^{\prime}\right\}
 $$
 
-我们需要考虑的问题即为选择$\mathbb{I}_{c} \subseteq \mathbb{I}_{c}^{\prime}$，使得其对应的控制组个体的集合能够很好地和处理组的个体相匹配。这里$N_{\mathrm{c}}^{\prime}$的选择涉及到数据收集成本以及匹配精度之间的一个权衡（trade-off），简便起见，在这一部分中，对于每一个处理组的个体我们先讨论选择一个控制组的个体与其进行匹配的情况，从而$N_{\mathrm{c}}=N_{\mathrm{t}}$。
+我们需要考虑的问题即为从中选择一个子集，使得其对应的控制组个体的集合能够很好地和处理组的个体相匹配。这里$N_{\mathrm{c}}^{\prime}$的选择涉及到数据收集成本以及匹配精度之间的一个权衡（trade-off），简便起见，在这一部分中，对于每一个处理组的个体我们先讨论选择一个控制组的个体与其进行匹配的情况，从而$N_{\mathrm{c}}=N_{\mathrm{t}}$。
 
 为了衡量两个个体协变量的相似程度，首先需要定义两个协变量之间的距离$d(x,x^{\prime})$，由此可以对于每个处理组个体$i$定义与之距离最近的匹配集，$\mathcal{M}_{i}^{c} \subset \mathbb{I}_{c}^{\prime}$，其中：
 
