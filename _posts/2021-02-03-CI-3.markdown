@@ -77,11 +77,11 @@ $$
 
 在这里，我们介绍更一般的$h(x)$的选择方式，即其中可只包含一部分重要的协变量以及它们的一些高阶项。那么该**如何选择这些变量**呢？下面介绍一种逐步（stepwise）选择的方法。
 
-- **Step 1 ： **假设一共有$K$个协变量，首先可根据先验知识（研究问题背景、专家判断等）选择$K_B$个`基础协变量（basic covariates）`进入模型。这些变量一般包含和处理变量相关性较高或和潜在结果变量相关性较高的变量。
+- **Step 1 ：** 假设一共有$K$个协变量，首先可根据先验知识（研究问题背景、专家判断等）选择$K_B$个`基础协变量（basic covariates）`进入模型。这些变量一般包含和处理变量相关性较高或和潜在结果变量相关性较高的变量。
 
-- **Step 2 ： **将剩下的$K-K_B$个变量每个都单独放进Step 1已建立好的模型中，计算出加入单个变量后的似然比，将似然比最高的变量加入模型，再重复上述操作，直至所有剩余变量的似然比都小于提前设定的阈值$C_L$为止。假定Step 1和Step 2结束后，我们共选入$K_L$个变量进入模型作为一次项。
+- **Step 2 ：** 将剩下的$K-K_B$个变量每个都单独放进Step 1已建立好的模型中，计算出加入单个变量后的似然比，将似然比最高的变量加入模型，再重复上述操作，直至所有剩余变量的似然比都小于提前设定的阈值$C_L$为止。假定Step 1和Step 2结束后，我们共选入$K_L$个变量进入模型作为一次项。
 
-- **Step 3 ： **从由上面选出$K_L$个变量构成的$K_{\mathrm{L}} \cdot\left(K_{\mathrm{L}}+1\right) / 2$中选择二次项进入模型，方法与Step 2相同，只是此时的阈值为$C_Q$。假定Step 3结束后，我们选入$K_Q$个变量进入模型作为二次项。
+- **Step 3 ：** 从由上面选出$K_L$个变量构成的$K_{\mathrm{L}} \cdot\left(K_{\mathrm{L}}+1\right) / 2$中选择二次项进入模型，方法与Step 2相同，只是此时的阈值为$C_Q$。假定Step 3结束后，我们选入$K_Q$个变量进入模型作为二次项。
 
 原书中选择的阈值分别为$C_L=1$和$C_Q=2.71$，分别对应$z$统计量的取值为$1$和$1.65$。
 
@@ -115,7 +115,7 @@ $$
 \underline{e}_{t}=\min _{i: W_{i}=1} \hat{e}\left(X_{i}\right),\quad \bar{e}_{c}=\max _{i: W_{i}=0} \hat{e}\left(X_{i}\right)
 $$
 
-然后将控制组中$\hat{e}\left(X_{i}\right)$小于$\underline{e}_{t}$的个体以及处理组中$\hat{e}\left(X_{i}\right)$大于$\bar{e}_{c}$的个体去掉，由此可初始化：
+然后将控制组中倾向性得分估计值小于$\underline{e}_{t}$的个体以及处理组中大于$\bar{e}_{c}$的个体去掉，由此可初始化：
 
 $$
 b_0=\underline{e}_{t},\quad J=1, \quad b_1=b_J=\bar{e}_{c}
@@ -123,14 +123,14 @@ $$
 
 之后的分层主要分为以下两步：
 
-- **Step 1 ： **评估当前层是否满足划分要求，主要包括以下两个
+- **Step 1 ：** 评估当前层是否满足划分要求，主要包括以下两个
 
 
    - **当前层中两组协变量分布是否已经足够平衡。**[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)中用到的方法为对每一层中的`线性化倾向性得分（linearized propensity score）`或称`对数优势比（log odds ratio）`进行两样本检验，如果拒绝原假设，则认为该层中两组协变量分布差异仍然显著，需要进行进一步划分。具体细节参见原书第13章。
 
-   - **当前层个体数量是否支持进一步划分。**由于我们分层之后需要对每层中的因果效应进行估计，其中涉及到样本方差的计算，因此即使满足第一个划分条件，我们还需保证若将第$j$层按照该层个体$\hat{e}\left(X_{i}\right)$的中位数$b_{j}^{\prime}$进行划分后，两个子层中的处理组和控制组的个体不能小于$\max \{3, K+2\}$，以便进行进一步的分析推断。
+   - **当前层个体数量是否支持进一步划分。**由于我们分层之后需要对每层中的因果效应进行估计，其中涉及到样本方差的计算，因此即使满足第一个划分条件，我们还需保证若将第$j$层按照该层个体$\hat{e}\left(X_{i}\right)$的中位数$b_{j}^{\prime}$进行划分后，两个子层中的处理组和控制组的个体不能小于$\max \\{3, K+2\\}$，以便进行进一步的分析推断。
  
-- **Step 2 ： **根据当前层个体$\hat{e}\left(X_{i}\right)$的中位数对该层进行划分。
+- **Step 2 ：** 根据当前层个体$\hat{e}\left(X_{i}\right)$的中位数对该层进行划分。
 
 重复上述步骤，直至所有层都不能继续划分，即可得到最后的分层结果。
 
@@ -182,6 +182,7 @@ $$
 $$
 
 从而原假设$\tau_{k}^{X}=0$对应的$z-$value为
+
 $$
 z_{k}=\frac{\hat{\tau}_{k}^{X}}{\sqrt{\hat{\mathbb{V}}_{k}^{X}}}
 $$
@@ -369,7 +370,7 @@ $$
 \mathbb{I}_{c}^{\prime}=\left\{N_{\mathrm{t}}+1, \ldots, N_{\mathrm{t}}+N_{\mathrm{c}}^{\prime}\right\}
 $$
 
-我们需要考虑的问题即为选择$\mathbb{I}_{c} \subseteq \mathbb{I}_{c}^{\prime}$，使得其对应的控制组个体的集合能够很好地和处理组的个体相匹配。这里$N_{\mathrm{c}}^{\prime}$的选择涉及到数据收集成本以及匹配精度之间的一个权衡（trade-off），简便起见，在这一部分中，对于每一个处理组的个体我们先讨论选择一个控制组的个体与其进行匹配的情况，从而$N_{\mathrm{c}}=N_{\mathrm{t}}$。
+我们需要考虑的问题即为选择$\mathbb{I}_{c} \subset \mathbb{I}_{c}^{\prime}$，使得其对应的控制组个体的集合能够很好地和处理组的个体相匹配。这里$N_{\mathrm{c}}^{\prime}$的选择涉及到数据收集成本以及匹配精度之间的一个权衡（trade-off），简便起见，在这一部分中，对于每一个处理组的个体我们先讨论选择一个控制组的个体与其进行匹配的情况，从而$N_{\mathrm{c}}=N_{\mathrm{t}}$。
 
 为了衡量两个个体协变量的相似程度，首先需要定义两个协变量之间的距离$d(x,x^{\prime})$，由此可以对于每个处理组个体$i$定义与之距离最近的匹配集，$\mathcal{M}_{i}^{c} \subset \mathbb{I}_{c}^{\prime}$，其中：
 
