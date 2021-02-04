@@ -157,16 +157,11 @@ $$
 \mathbb{E}\left[X_{i} \mid W_{i}=1, B_{i}(j)=1\right]=\mathbb{E}\left[X_{i} \mid W_{i}=0, B_{i}(j)=1\right]
 $$
 
-对于任意$j=1,\ldots,J$是否成立。这里我们主要介绍三种方法，分别是（这里为了不引起歧义就不翻译了）：
+对于任意$j=1,\ldots,J$是否成立。这里我们主要介绍三种方法。
 
 - Assessing Global Balance for Each Covariate across Strata
 
-- Assessing Balance for Each Covariate within All Blocks
-
-- Assessing Balance within Strata for Each Covariate
-
-###### Global Balance
-首先来看第一种，评估每个协变量在各层整体的均衡性。记第$i$个个体的第$k$个协变量为$X_{ik}$，$k=1,\ldots,K$，我们这里将其视为一个`伪结果变量（pseudo-outcome）`，对应地将$\tau_{k}^{X}$视为`伪平均效应（pseudo-average effect）`，从而可以根据上一篇中介绍的[Neyman重复抽样方法](https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach)给出每一层中$\tau_{k}^{X}(j)$的估计：
+首先来看第一种，评估每个协变量在各层整体的均衡性（Global Balance）。记第$i$个个体的第$k$个协变量为$X_{ik}$，$k=1,\ldots,K$，我们这里将其视为一个`伪结果变量（pseudo-outcome）`，对应地将$\tau_{k}^{X}$视为`伪平均效应（pseudo-average effect）`，从而可以根据上一篇中介绍的[Neyman重复抽样方法](https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach)给出每一层中$\tau_{k}^{X}(j)$的估计：
 
 $$
 \hat{\tau}_{k}^{X}(j)=\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)
@@ -198,7 +193,7 @@ $$
 
 若其绝对值较大，我们则拒绝原假设，认为分层后协变量$X_{ik}$在两组之间分布的总体差异依然显著。
 
-###### Balance within All Blocks
+- Assessing Balance for Each Covariate within All Blocks
 
 注意到$\tau_{k}^{X}=0$其实是一个相对较弱的假设，因为所有层伪平均效应的均值为$0$不代表每一层的伪平均效应都为$0$，它们可能是正负抵消掉了。因此第二个检验的原假设为：$\tau_{k}^{X}(j)=0,j=1,\ldots,J$，其方法主要是依据上一篇中提到的[回归方法](https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods)建立$F$统计量。
 
@@ -236,7 +231,8 @@ $$
 
 若$F$统计量取较大的正值，则拒绝原假设，认为分层后协变量$X_{ik}$在两组之间分布的总体差异依然显著。
 
-###### Balance within Strata
+- Assessing Balance within Strata for Each Covariate
+
 第三个检验方法在第二个的基础上更加细致了一些，它对每一个协变量在每一层都做了两组之间的两样本检验，由此可以得到第$k$个协变量（$k=1,\ldots,K$）在第$j$层（$j=1,\ldots,J$）的两样本检验的$z-$value：
 
 $$
@@ -449,7 +445,13 @@ $$
 
 #### Simple case with a Single Binary Covariate
 
-首先考虑只有一个二元取值变量的情形，这里选为性别变量，即$X_i \in \\{f,m\\}$，记$q$为超总体中男性的比例，记给定$X_i=x$的条件下平均因果效应为$\tau_{\mathrm{sp}}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right]$，则超总体的平均因果效应可以表示为：
+首先考虑只有一个二元取值变量的情形，这里选为性别变量，即$X_i \in \\{f,m\\}$，记$q$为超总体中男性的比例，记给定$X_i=x$的条件下平均因果效应为
+
+$$
+\tau_{\mathrm{sp}}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right]
+$$
+
+则超总体的平均因果效应可以表示为：
 
 $$
 \tau_{\mathrm{sp}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]=(1-q) \cdot \tau_{\mathrm{sp}}(f)+q \cdot \tau_{\mathrm{sp}}(m)
@@ -603,4 +605,4 @@ $$
 
 ---
 
-简单小结一下，这一篇我们主要介绍了在观测性研究的设计阶段做的一些工作，包括处理组和控制组两组协变量的均衡性评估，其中倾向性得分提供了一种简便的方式。当两组协变量的分布差异较大时，我们介绍了**分层（Blocking）、匹配（Matching）以及修剪（Trimming）**的方法对原样本的协变量分布进行调整。介绍完了设计阶段的工作，下一篇我们就正式开始对因果效应的估计和推断。
+简单小结一下，这一篇我们主要介绍了在观测性研究的设计阶段做的一些工作，包括处理组和控制组两组协变量的均衡性评估，其中倾向性得分提供了一种简便的方式。当两组协变量的分布差异较大时，我们介绍了**分层（Blocking）、匹配（Matching）以及修剪（Trimming）**的方法对原样本的协变量分布进行调整。介绍完了设计阶段的工作，下一篇我们就正式开始对观测性研究的因果效应的进行估计和推断。
