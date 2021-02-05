@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Causal Inference (2)"
+title:      "Causal Inference Ⅱ"
 subtitle:   "Classical Randomized Experiments"
 date:       2021-01-31
 author:     "Yijiao"

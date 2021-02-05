@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Causal Inference (3)"
+title:      "Causal Inference Ⅲ"
 subtitle:   "Regular Assignment Mechanisms: Design"
 date:       2021-02-02
 author:     "Yijiao"
@@ -135,7 +135,7 @@ $$
 - **Step 1 ：** 评估当前层是否满足划分要求，主要包括以下两个
 
 
-   - **当前层中两组协变量分布是否已经足够平衡。**[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)中用到的方法为对每一层中的`线性化倾向性得分（linearized propensity score）`或称`对数优势比（log odds ratio）`进行两样本检验，如果拒绝原假设，则认为该层中两组协变量分布差异仍然显著，需要进行进一步划分。具体细节参见原书第13章。
+   - **当前层中两组协变量分布是否已经足够平衡。**[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)中用到的方法为对每一层中的`线性化倾向性得分（linearized propensity score）`或称`对数优势比（log odds ratio）`进行**两样本均值$t$检验**，如果拒绝原假设，则认为该层中两组协变量分布差异仍然显著，需要进行进一步划分。具体细节参见原书第13章。
 
    - **当前层个体数量是否支持进一步划分。**由于我们分层之后需要对每层中的因果效应进行估计，其中涉及到样本方差的计算，因此即使满足第一个划分条件，我们还需保证若将第$j$层按照该层个体$\hat{e}\left(X_{i}\right)$的中位数$b_{j}^{\prime}$进行划分后，两个子层中的处理组和控制组的个体不能小于$\max \\{3, K+2\\}$，以便进行进一步的分析推断。
  
@@ -368,8 +368,31 @@ $$
 ## Matching to Improve Balance in Covariate Distributions
 先来看第一种`匹配（Matching）`的方法。通常我们考虑的是处理组的个体数量较小，控制组的个体数量较多的情形。匹配的方法，顾名思义，就是从所有控制组的样本中选择一个子样本与处理组的样本配对，使得两组协变量分布之间的差异尽量均衡。
 
+类似于配对随机化实验，匹配的想法在于，既然对于同一个个体我们无法观测到其在两种处理水平下的潜在结果，那是否可以找到一个协变量取值与之相同但处理状态与之相反的个体，通过比较两者潜在结果的差异来估计该个体的因果效应呢？
+
+想法总是美好的，现实总是骨感的，通常来说想要让每一个处理组的个体都找到一个精确的匹配是非常困难的。难点有二：
+
+- 尽管根据距离的定义，我们可以找到距离相近的匹配个体，但这并不意味着两者的协变量的取值是完全相同的。
+
+- 实际中满足要求的匹配可能数量很少，可能会出现同一个控制组的个体同时为多个处理组个体的最佳匹配的情况。
+
+对于第二个问题，一般有下面两种解决方式：
+
+- 同一个控制组的个体只允许与$1$个处理组的个体相匹配，即`无放回的匹配（matching without replacement）`，其执行方式一般分为两种：
+
+  - 所有处理组个体同时进行匹配，即选择控制组中的匹配子集，使其与处理组个体距离之和最小，即求以下优化问题：
+
+	$$
+	\operatorname{argmin}_{m_{1}^{c}, \ldots, m_{N_{t}}^{c} \in \mathbb{I}_{c}} \sum_{i=1}^{N_{t}}\left\|X_{i}-X_{m_{m_{i}}^{c}}\right\|, \quad \text { subject to } m_{i} \neq m_{i^{\prime}}, \text { for } i \neq i^{\prime}
+	$$
+
+  - 对处理组个体逐个进行匹配，此时匹配估计量依赖于匹配顺序的选取。可选择一个特定的顺序，按照该顺序对处理组的个体进行匹配，比如，可以先将倾向性得分较高的个体进行匹配，因为这一部分的个体找到合适匹配的难度更大。
+
+- 允许同一个控制组的个体与多个处理组的个体相匹配，即`有放回的匹配（matching with replacement）`，此时用到的控制组的个体变少，会一定程度上增大匹配估计量的样本方差。
+
 #### Mechanics of matching without replacement
-假定处理组有$N_{\mathrm{t}}$个个体，控制组有$N_{\mathrm{c}}^{\prime}$个个体，$N_{\mathrm{c}}^{\prime}$远大于$N_{\mathrm{t}}$，我们希望从$N_{\mathrm{c}}^{\prime}$个控制组的个体中选择$N_{\mathrm{c}} < N_{\mathrm{c}}^{\prime}$个个体与处理组的$N_{\mathrm{t}}$个个体组成一个包含$N=N_{\mathrm{c}}+N_{\mathrm{t}}$个个体的样本。可选择的控制组个体的下标的集合为：
+
+下面我们具体来介绍无放回的匹配机制。假定处理组有$N_{\mathrm{t}}$个个体，控制组有$N_{\mathrm{c}}^{\prime}$个个体，$N_{\mathrm{c}}^{\prime}$远大于$N_{\mathrm{t}}$，我们希望从$N_{\mathrm{c}}^{\prime}$个控制组的个体中选择$N_{\mathrm{c}} < N_{\mathrm{c}}^{\prime}$个个体与处理组的$N_{\mathrm{t}}$个个体组成一个包含$N=N_{\mathrm{c}}+N_{\mathrm{t}}$个个体的样本。可选择的控制组个体的下标的集合为：
 
 $$
 \mathbb{I}_{c}^{\prime}=\left\{N_{\mathrm{t}}+1, \ldots, N_{\mathrm{t}}+N_{\mathrm{c}}^{\prime}\right\}
@@ -377,7 +400,7 @@ $$
 
 我们需要考虑的问题即为从中选择一个子集，使得其对应的控制组个体的集合能够很好地和处理组的个体相匹配。这里$N_{\mathrm{c}}^{\prime}$的选择涉及到数据收集成本以及匹配精度之间的一个权衡（trade-off），简便起见，在这一部分中，对于每一个处理组的个体我们先讨论选择一个控制组的个体与其进行匹配的情况，从而$N_{\mathrm{c}}=N_{\mathrm{t}}$。
 
-为了衡量两个个体协变量的相似程度，首先需要定义两个协变量之间的距离$d(x,x^{\prime})$，由此可以对于每个处理组个体$i$定义与之距离最近的匹配集，$\mathcal{M}_{i}^{c} \subset \mathbb{I}_{c}^{\prime}$，其中：
+为了衡量两个个体协变量的相似程度，首先需要定义两个协变量之间的距离$d(x,x^{\prime})$，由此可以对于每个处理组个体$i$定义与之距离最近的匹配集，$\mathcal{M}_{i}^{c}$，其中：
 
 $$
 \mathcal{M}_{1}^{c}=\left\{j \in \mathbb{I}_{c}^{\prime} \mid d\left(X_{1}, X_{j}\right)=\min _{j^{\prime} \in \mathbb{I}_{c}^{\prime}} d\left(X_{1}, X_{j^{\prime}}\right)\right\}
@@ -387,7 +410,7 @@ $$
 \mathcal{M}_{i}^{c}=\left\{j \in \mathbb{I}_{c}^{\prime}-\cup_{i^{\prime}=1}^{i-1} \mathcal{M}_{i^{\prime}}^{c} \mid d\left(X_{i}, X_{j}\right)=\min _{j^{\prime} \in \mathbb{I}_{c}^{\prime}-U_{i^{\prime}=1}^{i-1} \mathcal{M}_{i^{\prime}}^{c}} d\left(X_{i}, X_{j^{\prime}}\right)\right\}
 $$
 
-注意到，在一般情况下，个体$i$的匹配集$\mathcal{M}_{i}^{c}$中可以包含多个元素，但在这里我们讨论的是单个匹配的情形，因此当有多个控制组个体满足与处理组个体$i$距离最短的条件时，我们随机选择一个$m_i$进去匹配集。此外，由于这里的匹配是不放回的，从而匹配的结果与匹配的顺序也有关系。
+由于这里强调的是用控制组的个体对处理组个体进行匹配，上标$c$代表的是$control$。注意到，在一般情况下，个体$i$的匹配集$\mathcal{M}_{i}^{c}$中可以包含多个元素，但在这里我们讨论的是单个匹配的情形，因此当有多个控制组个体满足与处理组个体$i$距离最短的条件时，我们随机选择一个$m_{i}^{c}$进去匹配集。
 
 #### Choice of distance metric
 下面介绍$d(x,x^{\prime})$的两种常用选择：
@@ -400,7 +423,7 @@ $$
 d_{M}\left(x, x^{\prime}\right)=\left(x-x^{\prime}\right)\left(\frac{N_{\mathrm{c}} \cdot \hat{\Sigma}_{c}+N_{\mathrm{t}} \cdot \hat{\Sigma}_{t}}{N_{\mathrm{c}}+N_{\mathrm{t}}}\right)^{-1}\left(x-x^{\prime}\right)^{T}
 $$
 
-其中\hat{\Sigma}_{t}}、$\hat{\Sigma}_{c}$分别为处理组和控制组的样本协方差矩阵。马氏距离的优点在于，**对于协变量进行任一线性变换，马氏距离是保持不变的**。但马氏距离也存在一定的缺点，因为它非常强调匹配那些预期中的分布已经完全匹配的协变量，这不仅有可能降低其他均衡性较差的变量的匹配效果，而且还有可能破坏那些原本就相对均衡的变量的均衡性。
+其中\hat{\Sigma}_{t}}、$\hat{\Sigma}_{c}$分别为处理组和控制组的样本协方差矩阵。相对于欧氏距离而言，马氏距离的优点在于，**对于协变量进行任一线性变换，马氏距离是保持不变的**。但马氏距离也存在一定的缺点，因为它非常强调匹配那些预期中的分布已经完全匹配的协变量，这不仅有可能降低其他均衡性较差的变量的匹配效果，而且还有可能破坏那些原本就相对均衡的变量的均衡性。
 
 - Propensity Score Matching
 
@@ -438,12 +461,23 @@ $$
 
 则去掉$X_i$这一组匹配。
 
+#### Other Matching Methods
+除了对处理组个体进行一对一无放回的匹配方法外，根据数据特点以及研究兴趣的不同，还有其他一些匹配方法，如：
+
+- 一对多无放回匹配
+
+- 有放回匹配
+
+- 同时对处理组和控制组个体进行匹配
+
+我们将在下一篇介绍匹配估计量时具体介绍，这里就不赘述了。
+
 以上我们讨论了匹配的常用方法以及距离的常用选择，对于匹配过程理论性质的讨论参见[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)第15章第5节，由于篇幅限制这里不做过多讨论。
 
 ## Trimming to Improve Balance in Covariate Distributions
 除了匹配以外，另一种常用的选取子样本的方法为`修剪（Trimming）`，即去掉一些取值较为极端的样本，通常来说，这些极端样本会使得因果效应的估计更加不稳定，样本方差更大，因此修剪的方法可以视为**在牺牲了一部分外推有效性的同时提升了内部估计的有效性**。然而在因果推断问题中，我们其实更关心的恰好就是内部估计的有效性。下面就来具体介绍一下修剪样本的方法。
 
-#### Simple case with a Single Binary Covariate
+#### Simple Case with a Single Binary Covariate
 
 首先考虑只有一个二元取值变量的情形，这里选为性别变量，即$X_i \in \\{f,m\\}$，记$q$为超总体中男性的比例，记给定$X_i=x$的条件下平均因果效应为
 
@@ -556,7 +590,7 @@ $$
 
 需要说明的是**最优子集的选择一般不依赖于估计量的形式**，尽管在上面的例子中我们给出了平均处理效应估计量的确切形式，比较的是这些具体估计量的渐近方差，但在一般情况下可以对估计`目标渐进效率的界（asymptotic efficiency bounds）`（即在某种意义下最优的估计量的渐近方差）进行比较。
 
-#### General case with multi-component and continuous covariates
+#### General Case with Multi-component and Continuous Covariates
 现在我们来看看一般情况下，即**允许协变量个数大于$1$，且可能连续取值**时如何对原样本进行修剪。
 
 首先，我们可以给出对于有限样本平均处理效应估计量的渐近有效方差：
