@@ -209,7 +209,11 @@ $$
 而我们的分层估计量也类似的可以写为加权最小二乘估计量的形式，即：
 
 $$
-\hat{\tau}^{\text {strat }}=\sum_{j=1}^{J} q(j) \cdot \hat{\tau}^{\mathrm{dif}}(j)=\sum_{j=1}^{J} q(j) \cdot\left(\bar{Y}_{t}(j)-\bar{Y}_{c}(j)\right)=\frac{1}{N} \sum_{i=1}^{N} W_{i} \cdot Y_{i}^{\text {obs }} \cdot \lambda_{i}^{\text {strat }}-\frac{1}{N} \sum_{i=1}^{N}\left(1-W_{i}\right) \cdot Y_{i}^{\text {obs }} \cdot \lambda_{i}^{\text {strat }}
+\hat{\tau}^{\text {strat }}=\sum_{j=1}^{J} q(j) \cdot \hat{\tau}^{\mathrm{dif}}(j)=\sum_{j=1}^{J} q(j) \cdot\left(\bar{Y}_{t}(j)-\bar{Y}_{c}(j)\right)
+$$
+
+$$
+=\frac{1}{N} \sum_{i=1}^{N} W_{i} \cdot Y_{i}^{\text {obs }} \cdot \lambda_{i}^{\text {strat }}-\frac{1}{N} \sum_{i=1}^{N}\left(1-W_{i}\right) \cdot Y_{i}^{\text {obs }} \cdot \lambda_{i}^{\text {strat }}
 $$
 
 其中
@@ -341,7 +345,13 @@ $$
 \mu_{\mathrm{c}}(x)=\alpha_{d}+x \beta_{d},  \quad \mu_{\mathrm{t}}(x)=\tau+\mu_{\mathrm{c}}(x)=\tau+\alpha_{d}+x \beta_{d}
 $$
 
-下面我们说明，可以通过将$\hat{\tau}_{i}^{\text {match }}=Y_{i}^{\text {obs }}-Y_{m_{i}^{c}}^{\text {obs }}$对匹配差异$D_{i}=X_{i}-X_{m_{i}^{c}}$做最小二乘回归得到$\beta_{\mathrm{d}}$进的估计。
+下面我们说明，可以通过将
+
+$$
+\hat{\tau}_{i}^{\text {match }}=Y_{i}^{\text {obs }}-Y_{m_{i}^{c}}^{\text {obs }}
+$$
+
+对匹配差异$D_{i}=X_{i}-X_{m_{i}^{c}}$做最小二乘回归得到$\beta_{\mathrm{d}}$进的估计。
 
 注意到，未做调整时个体水平因果效应的匹配估计量可以写为：
 
@@ -414,7 +424,13 @@ $$
 $$
 
 ###### Parallel Regressions on Covariates
-第三种方法的想法在于用匹配后的$2 \dot N_t$个样本同时对回归模型中的参数$\beta_{\mathrm{c}}$进行估计。此时将两组的结果变量、处理变量以及协变量记为$\tilde{Y}_{i}$、$\tilde{W}_{i}$、$\tilde{X}_{i}$，$i=1,\ldots,2 N_t$，并指定回归模型如下：
+第三种方法的想法在于用匹配后的$2 \cdot N_t$个样本同时对回归模型中的参数$\beta_{\mathrm{c}}$进行估计。此时将两组的结果变量、处理变量以及协变量分别记为：
+
+$$
+\tilde{Y}_{i},\quad \tilde{W}_{i},\quad \tilde{X}_{i},\quad i=1,\ldots,2 N_t
+$$
+
+并指定回归模型如下：
 
 $$
 \tilde{Y}_{i}=\alpha_{p}+\tau_{p} \cdot \tilde{W}_{i}+\tilde{X}_{i} \beta_{p}+v_{i}
@@ -432,7 +448,7 @@ $$
 
 注意到：
 
-- 上述三种方法调整后得到的匹配估计量的不同之处**仅在于回归系数的估计方式不同**，有相关理论证明第二种方法更好。
+- 上述三种方法调整后得到的匹配估计量的不同之处**仅在于回归系数的估计方式不同**，有相关理论证明（[参见Rubin (1973b)](https://www.jstor.org/stable/pdf/2529685.pdf)）第一种方法更好（*说明，原书中说的是第二种更好，即用控制组样本估计回归系数纠偏，但笔者查阅多处文献发现都是认为第一种方法更好，此处认为是原书笔误，如有错误，欢迎指正*）。
 
 - 这里调整的方法都是简单的线性回归，如果观测到的样本数量足够多，也可以考虑加入更高阶的项进行估计。
 
