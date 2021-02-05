@@ -159,7 +159,7 @@ $$
 
 对于任意$j=1,\ldots,J$是否成立。这里我们主要介绍三种方法。
 
-- Assessing Global Balance for Each Covariate across Strata
+- `Assessing Global Balance for Each Covariate across Strata`
 
 首先来看第一种，评估每个协变量在各层整体的均衡性（Global Balance）。记第$i$个个体的第$k$个协变量为$X_{ik}$，$k=1,\ldots,K$，我们这里将其视为一个`伪结果变量（pseudo-outcome）`，对应地将$\tau_{k}^{X}$视为`伪平均效应（pseudo-average effect）`，从而可以根据上一篇中介绍的[Neyman重复抽样方法](https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach)给出每一层中$\tau_{k}^{X}(j)$的估计：
 
@@ -193,7 +193,7 @@ $$
 
 若其绝对值较大，我们则拒绝原假设，认为分层后协变量$X_{ik}$在两组之间分布的总体差异依然显著。
 
-- Assessing Balance for Each Covariate within All Blocks
+- `Assessing Balance for Each Covariate within All Blocks`
 
 注意到$\tau_{k}^{X}=0$其实是一个相对较弱的假设，因为所有层伪平均效应的均值为$0$不代表每一层的伪平均效应都为$0$，它们可能是正负抵消掉了。因此第二个检验的原假设为：$\tau_{k}^{X}(j)=0,j=1,\ldots,J$，其方法主要是依据上一篇中提到的[回归方法](https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods)建立$F$统计量。
 
@@ -231,7 +231,7 @@ $$
 
 若$F$统计量取较大的正值，则拒绝原假设，认为分层后协变量$X_{ik}$在两组之间分布的总体差异依然显著。
 
-- Assessing Balance within Strata for Each Covariate
+- `Assessing Balance within Strata for Each Covariate`
 
 第三个检验方法在第二个的基础上更加细致了一些，它对每一个协变量在每一层都做了两组之间的两样本检验，由此可以得到第$k$个协变量（$k=1,\ldots,K$）在第$j$层（$j=1,\ldots,J$）的两样本检验的$z-$value：
 
@@ -415,7 +415,7 @@ $$
 #### Choice of distance metric
 下面介绍$d(x,x^{\prime})$的两种常用选择：
 
-- Mahalanobis Metric Matching
+- `Mahalanobis Metric Matching`
 
 第一种为马氏距离，即：
 
@@ -425,7 +425,7 @@ $$
 
 其中\hat{\Sigma}_{t}}、$\hat{\Sigma}_{c}$分别为处理组和控制组的样本协方差矩阵。相对于欧氏距离而言，马氏距离的优点在于，**对于协变量进行任一线性变换，马氏距离是保持不变的**。但马氏距离也存在一定的缺点，因为它非常强调匹配那些预期中的分布已经完全匹配的协变量，这不仅有可能降低其他均衡性较差的变量的匹配效果，而且还有可能破坏那些原本就相对均衡的变量的均衡性。
 
-- Propensity Score Matching
+- `Propensity Score Matching`
 
 第二种为根据线性化倾向性得分（lps）定义的距离：
 
@@ -464,11 +464,11 @@ $$
 #### Other Matching Methods
 除了对处理组个体进行一对一无放回的匹配方法外，根据数据特点以及研究兴趣的不同，还有其他一些匹配方法，如：
 
-- 一对多无放回匹配
+- `一对多无放回匹配`
 
-- 有放回匹配
+- `有放回匹配`
 
-- 同时对处理组和控制组个体进行匹配
+- `同时对处理组和控制组个体进行匹配`
 
 我们将在下一篇介绍匹配估计量时具体介绍，这里就不赘述了。
 
