@@ -529,7 +529,386 @@ $$
 $$
 
 到此，匹配估计量的讨论就暂告一段落了。
+
+---
 ## Estimating Sampling Variances
+上一部分我们介绍了两种常见的用于估计平均因果效应的方法，即分层和匹配。若想进一步对参数进行推断，我们还需对估计量的样本方差进行估计，并在此基础上建立置信区间。尽管上一部分在介绍估计量时也简要给出了各自样本方差的估计，但在这一部分，我们希望建立的平均因果效应样本方差估计不依赖于具体的估计量，而是**将不同的估计量用同一种形式或者结构统一起来**，介绍一种`一般化的样本方差的估计方法`。
+
+#### choice of estimand
+在讨论样本方差如何估计之前，我们首先应该明确的是我们关心的参数到底是当前观测到的有限样本的平均因果效应：
+
+$$
+\tau_{\mathrm{fs}}=\frac{1}{N} \sum_{i=1}^{N}\left(Y_{i}(1)-Y_{i}(0)\right)
+$$
 
 
-## Inference for General Causal Estimands
+还是这个样本所来自的超总体的平均因果效应：
+
+$$
+\tau_{\mathrm{sp}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]=\mathbb{E}_{\mathrm{sp}}\left[\tau_{\mathrm{fs}}\right]
+$$
+
+虽然从构造估计量的角度来说，具体关心的是哪个参数并不重要（这一点从上式的第二个等号可以看出），但是若要进一步估计这个估计量的样本方差，那么$\tau_{\mathrm{fs}}$和$\tau_{\mathrm{sp}}$的选择就重要了。因为在有限样本下，估计量$\hat_{\tau}$的随机性只来自于分配机制，此时样本方差为：
+
+$$
+\mathbb{V}_{W}(\hat{\tau})=\mathbb{E}_{W}\left[\left(\hat{\tau}-\tau_{\mathrm{fs}}\right)^{2}\right]
+$$
+
+而在超总体下，估计量$\hat_{\tau}$的随机性不仅来自于分配机制，还来自于样本的随机性，此时样本方差为：
+
+$$
+\mathbb{V}(\hat{\tau})=\mathbb{E}\left[\left(\hat{\tau}-\tau_{\mathrm{sp}}\right)^{2}\right]
+$$
+
+容易说明，这两者之间的差异如下：
+
+$$
+\mathbb{V}(\hat{\tau})-\mathbb{V}_{W}(\hat{\tau}) \approx \mathbb{V}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right) / N
+$$
+
+即超总体下估计量$\hat_{\tau}$的样本方差相较于有限总体下的样本方差还**多出了一部分个体水平平均因果效应的方差**，关于上式具体的说明可参见[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)第19章第3节。
+
+在之后的部分我们将分别给出选择两个关心参数时估计量样本方差的估计形式。但需要说明是的，由于超总体往往是难以有一个确切的定义的，因此**常常关心的还是有限样本下的平均因果效应**。
+
+#### The Common Structure of Standard Estimators
+为了对之前的估计量的样本方差给出一个一般话的估计形式，这一小节我们将对这些估计量建立一个统一的结构。
+
+仔细观察不难发现，之前我们建立的所有平均因果效应的估计量都具有一个**共同的结构**，即它们**均可表示成为处理组和控制组的潜在结果的加权平均的形式**，即：
+
+$$
+\hat{\tau}=\hat{\tau}\left(\mathbf{Y}^{\mathrm{obs}}, \mathbf{W}, \mathbf{X}\right)=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}
+$$
+
+其中处理组个体的权重为$\lambda_{i} / N_{\mathrm{t}}$，控制组个体的权重为$\lambda_{i} / N_{\mathrm{c}}$。各个估计量的不同之处只在于$\lambda_{i}$的不同。而$\lambda_{i}$都具有以下性质：
+
+1. 可写为$W_{i},X_{i},\mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}$的函数，即：
+
+$$
+\lambda_{i}=\lambda\left(W_{i}, X_{i}, \mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}\right)
+$$
+
+其中$\mathbf{W}_{(-i)}$表示处理变量构成的向量去掉第$W_i$所构成的$N-1$维向量，$\mathbf{X}_{(-i)}$表示由协变量矩阵去掉第$i$行所构成的$(N-1) \times K$维的矩阵。
+
+2. 这些权重求和满足：
+
+$$
+\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i}=1, \quad \text { and } \quad \frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \lambda_{i}=1
+$$
+
+这样的估计量具有下述三条性质，我们称之为`仿射一致性（affine consistency）`：
+
+1. 处理组观测结果值统一增加$c_t$，则估计所得平均因果效应增加$c_t$。
+
+2. 控制组观测结果值统一增加$c_c$，则估计所得平均因果效应减少$c_c$。
+
+3. 所有观测结果变为原来的$c_s$倍，则估计所得平均因果效应变为原来的$c_s$倍。
+
+为了更好地说明之前建立的估计量的结构一致性，在此我们都把他们表示为加权和的形式：
+
+- [Difference Estimator](https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach) 
+
+$$
+\hat{\tau}^{\mathrm{dif}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}
+$$
+
+其对应的权重为$\lambda_{i}^{\mathrm{dif}}=1,for all i$。
+
+- [Regression Estimator](https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods)
+
+$$
+\hat{\tau}^{\mathrm{ols}}=\frac{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right) \cdot\left(Y_{i}^{\mathrm{obs}}-\bar{Y}^{\mathrm{obs}}\right)}{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right)^{2}}, \quad \text { and } \quad \hat{\alpha}^{\mathrm{ols}}=\bar{Y}^{\mathrm{obs}}-\hat{\tau}^{\mathrm{ols}} \cdot \bar{W}
+$$
+
+其对应的权重为：
+
+$$
+\lambda_{i}^{\mathrm{ols}}=\bar{W}^{W_{i}} \cdot(1-\bar{W})^{1-W_{i}} \cdot \frac{S_{X}^{2}(N-1) / N-\left(\bar{X}_{t}-\bar{X}_{c}\right) \cdot\left(X_{i}-\bar{X}\right)}{S_{X}^{2}(N-1) / N-\bar{W} \cdot(1-\bar{W}) \cdot\left(\bar{X}_{t}-\bar{X}_{c}\right)^{2}},for all i
+$$
+
+其中$S_{X}^{2}=\sum_{i=1}^{N}\left(X_{i}-\bar{X}\right)^{2} /(N-1)$。
+
+- [Weighting Estimator](https://yijiaojane.github.io/2021/02/04/CI-4/#weighting-estimators-and-subclassification)
+
+$$
+\hat{\tau}^{\mathrm{ht}}=\sum_{i=1}^{N} \frac{W_{i} \cdot Y_{i}^{\mathrm{obs}}}{\hat{e}\left(X_{i}\right)} / \sum_{i=1}^{N} \frac{W_{i}}{\hat{e}\left(X_{i}\right)}-\sum_{i=1}^{N} \frac{\left(1-W_{i}\right) \cdot Y_{i}^{\mathrm{obs}}}{1-\hat{e}\left(X_{i}\right)} / \sum_{i=1}^{N} \frac{1-W_{i}}{1-\hat{e}\left(X_{i}\right)}
+$$
+
+其对应的权重为：
+
+$$
+\lambda_{i}^{h t}=\left\{\begin{array}{cl}
+\frac{N_{c}}{1-e\left(X_{i}\right)} / \sum_{j: W_{j}=0} \frac{1}{1-e\left(X_{j}\right)}, & \text { if } W_{i}=0 \\
+\frac{N_{t}}{e\left(X_{i}\right)} / \sum_{j: W_{j}=1} \frac{1}{e\left(X_{j}\right)}, & \text { if } W_{i}=1 .
+\end{array}\right.
+$$
+
+- [Subclassification Estimator](https://yijiaojane.github.io/2021/02/04/CI-4/#subclassification-estimator-for-the-average-treatment-effect)
+
+$$
+\hat{\tau}^{\text {strat }}=\sum_{j=1}^{J} q(j) \cdot \hat{\tau}^{\mathrm{dif}}(j),\quad \text{where} \hat{\tau}^{\mathrm{dif}}(j)=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}(j)-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}(j)
+$$
+
+其对应的权重为：
+
+$$
+\lambda_{i}^{\text {strat }}=\left\{\begin{array}{ll}
+\sum_{j=1}^{J} B_{i}(j) \cdot\left(N_{\mathrm{c}} / N_{\mathrm{c}}(j)\right) \cdot(N(j) / N), & \text { if } W_{i}=0 \\
+\sum_{j=1}^{J} B_{i}(j) \cdot\left(N_{\mathrm{t}} / N_{\mathrm{t}}(j)\right) \cdot(N(j) / N), & \text { if } W_{i}=1
+\end{array}\right.
+$$
+
+- [Matching Estimator](https://yijiaojane.github.io/2021/02/04/CI-4/#matching-estimators)
+
+$$
+\hat{\tau}^{\text {match }}=\frac{1}{N} \sum_{i=1}^{N}\left(\hat{Y}_{i}(1)-\hat{Y}_{i}(0)\right)
+$$
+
+其对应的权重为：
+
+$$
+\hat{Y}_{i}(w)=\left\{\begin{array}{ll}
+Y_{i}^{\text {obs }} & \text { if } W_{i}=w \\
+\sum_{j \in \mathcal{M}^{c}(i)} Y_{j}^{\text {obs }} / M & \text { if } W_{i}=1, w=0 \\
+\sum_{j \in \mathcal{M}^{t}(i)} Y_{j}^{\text {obs }} / M & \text { if } W_{i}=0, w=1
+\end{array}\right.
+$$
+
+若进一步对匹配估计量或者分层估计量做回归调整，仍可保证仿射一致性，但此时的权重**可能取负值**。
+
+#### A General Formula for the Conditional Sampling Variance
+
+对估计量建立了一个统一的形式，下面我们就来讨论如何对其样本方差进行估计。首先考虑**有限样本下**估计量的样本方差。
+
+沿用[第二篇回归部分中的记号](https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods)，进一步统一记个体水平潜在结果的均值和方差为：
+
+$$
+\begin{array}{l}
+\mu_{i}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}, X_{i}\right]=\left\{\begin{array}{ll}
+\mu_{c}\left(X_{i}\right), & \text { if } W_{i}=0 \\
+\mu_{t}\left(X_{i}\right), & \text { if } W_{i}=1
+\end{array}\right. \\
+\sigma_{i}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}^{\mathrm{obs}} \mid W_{i}, X_{i}\right)=\left\{\begin{array}{c}
+\sigma_{c}^{2}\left(X_{i}\right), & \text { if } W_{i}=0 \\
+\sigma_{t}^{2}\left(X_{i}\right), & \text { if } W_{i}=1 .
+\end{array}\right.
+\end{array}
+$$
+
+有了上述记号，我们可以将一般形式下估计量$\hat{\tau}$关于$\tau_{\mathrm{fs}}$的偏差拆为下述两项之和：
+
+$$
+\begin{aligned}
+\hat{\tau}-\tau_{\mathrm{fs}}=& \frac{1}{N_{t}} \sum_{i: W_{i}=1} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}} - \tau_{\mathrm{fs}} \\
+=&\left(\frac{1}{N_{t}} \sum_{i: W_{i}=1} \lambda_{i} \cdot \mu_{i}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot \mu_{i} - \tau_{\mathrm{fs}}\right) \\
+&+\left(\frac{1}{N_{t}} \sum_{i: W_{i}=1} \lambda_{i} \cdot\left(Y_{i}^{\mathrm{obs}}-\mu_{i}\right)-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot\left(Y_{i}^{\mathrm{obs}}-\mu_{i}\right)\right)
+\end{aligned}
+$$
+
+称第一项为该估计量的条件偏差（conditional bias），在一定条件下可证明这一项相对于第二项可忽略，具体证明参见[Abadie and Imbens(2006)](https://economics.mit.edu/files/11867)。第二项的期望为$0$，从而$\hat{\tau}$在有限样本下的样本方差等于第二项的方差，即：
+
+$$
+{\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}}\right)=\mathbb{V}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \sigma_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \sigma_{i}^{2}
+$$
+
+当估计量给定时，$\lambda_{i}$的值已知，从而只需构造$\sigma_{i}^{2}$的估计量$\hat_{\sigma_{i}}^{2}$，即可得上式的估计量：
+
+$$
+\hat{\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}}\right)=\widehat{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}
+$$
+
+下面就给出一种估计$\sigma_{i}^{2}$的方法。
+
+设个体$i^{\prime}$满足$W_{i^{\prime}}=W_{i}=1$，$X_{i^{\prime}}=X_{i}=x$，则：
+
+$$
+\begin{aligned}
+\mathbb{E}_{\text {sp }} &\left[Y_{i}^{\text {obs }}-Y_{i^{\prime}}^{\text {obs }} \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+&=\mathbb{E}_{\text {sp }}\left[\left(\mu_{i}+\left(Y_{i}^{\text {obs }}-\mu_{i}\right)\right)-\left(\mu_{i^{\prime}}+\left(Y_{i^{\prime}}^{\text {obs }}-\mu_{i^{\prime}}\right)\right) \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+&=\mathbb{E}_{\text {sp }}\left[\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(\left(Y_{i^{\prime}}^{\text {obs }}-\mu_{i^{\prime}}\right)\right) \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right]=0
+\end{aligned}
+$$
+
+由此容易计算得：
+
+$$
+\begin{array}{l}
+\mathbb{E}_{\text {sp }}\left[\left(Y_{i}^{\text {obs }}-Y_{i^{\prime}}^{\text {obs }}\right)^{2} \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+\qquad \begin{array}{l}
+=\mathbb{E}_{\text {sp }}\left[\left(Y_{i}^{\text {obs }}-\mu_{i}\right)^{2}+\left(Y_{i^{\prime}}^{\text {obs }}-\mu_{i^{\prime}}\right)^{2} \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+=\mathbb{V}_{\text {sp }}\left(Y_{i}^{\text {obs }} \mid X_{i}=x, W_{i}=1\right)+\mathbb{V}_{\text {sp }}\left(Y_{i^{\prime}}^{\text {obs }} \mid X_{i^{\prime}}=x, W_{i^{\prime}}=1\right)=2 \cdot \sigma_{t}^{2}(x),
+\end{array}
+\end{array}
+$$
+
+因此我们可以构造$\sigma_{i}^{2}$的无偏估计：
+
+$$
+\hat{\sigma}_{i}^{2}=\left(Y_{i}^{\mathrm{obs}}-Y_{i^{\prime}}^{\mathrm{obs}}\right)^{2} / 2
+$$
+
+在一定条件下，由上述$\hat{\sigma}_{i}^{2}$得到的$\widehat{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})$是渐进无偏的，即：
+
+$$
+\begin{array}{l}
+N \cdot\left(\widehat{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})-\mathbb{V}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})\right) \\
+=\frac{N}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot\left(\hat{\sigma}_{i}^{2}-\sigma_{i}^{2}\right)+\frac{N}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot\left(\hat{\sigma}_{i}^{2}-\sigma_{i}^{2}\right) \longrightarrow 0
+\end{array}
+$$
+
+具体证明参见[Abadie and Imbens(2006)](https://economics.mit.edu/files/11867)。
+
+在实际中，找了处理变量以及协变量取值完全相同的个体进行如上估计还是比较困难的，这里我们可以借鉴之前匹配的思想，**在同组个体之间进行匹配**，得到上述$\sigma_{i}^{2}$的估计量，具体过程在此不赘述。记每个个体的匹配结果为：
+
+$$
+\ell_{i}=\left\{\begin{array}{ll}
+m_{i}^{t} & \text { if } W_{i}=1 \\
+m_{i}^{c} & \text { if } W_{i}=0
+\end{array}\right.
+$$
+
+从而得到的$\sigma_{i}^{2}$的估计量为：
+
+$$
+\hat{\sigma}_{i}^{2}=\left(Y_{i}^{\mathrm{obs}}-Y_{\ell_{i}}^{\mathrm{obs}}\right)^{2} / 2
+$$
+
+此时由于匹配的不精确性，该估计量不再是无偏的了，容易求得上述估计量的偏差主要来自如下两个部分：
+
+$$
+\mathbb{E}_{\mathrm{sp}}\left[\hat{\sigma}_{i}^{2} \mid \mathbf{X}, \mathbf{W}\right] / 2-\sigma_{i}^{2}=\left(\mu_{i}-\mu_{\ell_{i}}\right)^{2} / 2+\left(\sigma_{\ell_{i}}^{2}-\sigma_{i}^{2}\right) / 2
+$$
+
+其中第二项可正可负，第一项始终为正，两项随着样本量的增大都趋于$0$。此外，当个体水平潜在结果的**方差异质性不大**时，**第二项相较于第一项可以忽略**，从而偏差主要来源于第一项，即匹配个体之间潜在结果条件期望的差异。为消除这部分差异，以下我们将介绍一种基于回归纠偏的方法。
+
+假定潜在结果变量的条件期望具有如下形式：
+
+$$
+\mathbb{E}_{\mathrm{sp}}\left[Y_{i}^{\mathrm{obs}} \mid X_{i}, W_{i}=1\right]=X_{i} \beta_{t}, \quad \text { and } \quad \mathbb{E}_{\mathrm{sp}}\left[Y_{i}^{\mathrm{obs}} \mid X_{i}, W_{i}=0\right]=X_{i} \beta_{c}
+$$
+
+通过对上述回归函数进行拟合，可以对拟合后的残差为：
+
+$$
+\hat{\varepsilon}_{i}=\left\{\begin{array}{ll}
+Y_{i}^{\mathrm{obs}}-X_{i} \hat{\beta}_{c} & \text { if } W_{i}=0 \\
+Y_{i}^{\mathrm{obs}}-X_{i} \hat{\beta}_{t} & \text { if } W_{i}=1
+\end{array}\right.
+$$
+
+由于**拟合后的残差减去了原潜在结果中由协变量差异带来的潜在结果的差异**，从而回归调整后的方差估计量为：
+
+$$
+\hat{\sigma}_{i}^{2, \mathrm{adj}}=\left(\hat{\varepsilon}_{i}-\hat{\varepsilon}_{\ell}\right)^{2} / 2
+$$
+
+对应调整后的平均因果效应样本方差的估计量为：
+
+$$
+\widetilde{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2, \mathrm{adj}}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2, \mathrm{adj}}
+$$
+
+除了一对一匹配估计的方法，我们也可以对每个样本进行一对多的同组匹配，得到相应的$\sigma_{i}^{2}$的估计量为：
+
+$$
+\hat{\sigma}_{i, M}^{2}=\frac{1}{2 \cdot M} \cdot \sum_{i^{\prime} \in \mathcal{M}_{i}^{t}}\left(Y_{i^{\prime}}^{\mathrm{obs}}-Y_{i}^{\mathrm{obs}}\right)^{2}
+$$
+
+一般来说，$M$的选择涉及到估计量偏差与方差之间的一个权衡。$M$越大，估计量的方差越小，但匹配个体的质量随之降低，导致估计量的偏差增大，建议选择在$1$到$4$之间。
+
+类似地，对应处理组平均因果效应：
+
+$$
+\tau_{\mathrm{fs}, \mathrm{t}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-Y_{i}(0)\right)
+$$
+
+其对应估计量：
+
+$$
+\hat{\tau}_{\mathrm{fs}, \mathrm{t}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}
+$$
+
+也可以利用上述方法估计有限样本下的样本方差：
+
+$$
+\hat{\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}, \mathrm{t}}\right)=\hat{\mathbb{V}}_{\mathrm{sp}}\left(\hat{\tau}_{\mathrm{fs}, \mathrm{t}} \mid \mathbf{X}, \mathbf{W}\right)=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}
+$$
+
+#### Sampling Variance for Population Average Treatment Effect
+介绍完了有限样本下估计量$\hat{\tau}$的样本方差的估计方法，下面我们就来看看超总体下估计量$\hat{\tau}$的样本方差如何进行估计。注意到：
+
+$$
+\mathbb{V}(\hat{\tau}) \approx \mathbb{V}_{W}(\hat{\tau}) + \mathbb{V}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right) / N
+$$
+
+因此，有了有限样本下样本方差的估计量后，我们只需对上述的第二项，即条件平均因果效应的方差，进行估计，即可得到超总体下样本方差的估计量。同样地，也可以用匹配的方法给出第二项的估计，对每个处理组（控制组）的个体匹配以一个控制组（处理组）的个体，记个体$i$的匹配个体的下标为$\ell(i)$，则可以用下式估计个体$i$的个体水平的因果效应：
+
+$$
+\hat{\tau}_{i}^{\text {match }}=\hat{Y}_{i}(1)-\hat{Y}_{i}(0)
+$$
+
+其中
+
+$$
+\hat{Y}_{i}(0)=\left\{\begin{array}{ll}
+Y_{i}^{\text {obs }} & \text { if } W_{i}=0, \\
+Y_{\ell(i)}^{\text {obs }} & \text { if } W_{i}=1,
+\end{array}\right. \text { and } \hat{Y}_{i}(1)=\left\{\begin{array}{ll}
+Y_{\ell(i)}^{\text {obs }} & \text { if } W_{i}=0 \\
+Y_{i}^{\text {obs }} & \text { if } W_{i}=1
+\end{array}\right.
+$$
+
+可将上述估计量写为如下形式：
+
+$$
+\hat{\tau}_{i}^{\text {match }}=\tau_{i}+\left(2 \cdot W_{i}-1\right) \cdot\left(\mu_{i}-\mu_{\ell(i)}\right)+\left(2 \cdot W_{i}-1\right) \cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)
+$$
+
+其中当样本量足够多时，右式第二项相较于另外两项可忽略，从而可进一步写为：
+
+$$
+\hat{\tau}_{i}^{\text {match }} \approx \tau_{i}+\left(2 \cdot W_{i}-1\right) \cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)
+$$
+
+假设我们可以观测到$\tau_i$，则可用下式对$\mathbb{V}\left(\tau\left(X_{i}\right)\right)$进行估计：
+
+$$
+\hat{\mathbb{V}}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right)=\frac{1}{N-1} \sum_{i=1}^{N}\left(\tau_{i}-\frac{1}{N} \sum_{j=1}^{N} \tau_{j}\right)^{2}=\frac{1}{N-1} \sum_{i=1}^{N}\left(\tau_{i}-\tau_{\mathrm{fs}}\right)^{2}
+$$
+
+然而由于我们并不能观测到$\tau_i$，所以是能用$\hat{\tau}_{i}^{\text {match }}$进行估计，两者之间的差异在于：
+
+$$
+\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\tau_{\mathrm{fs}}\right)^{2}\right]=\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\tau_{i}-\tau_{\mathrm{fs}}\right)^{2}\right]+\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\tau_{i}\right)^{2}\right]
+$$
+
+忽略带有的项，上面右式的第二项近似可写为：
+
+$$
+\begin{aligned}
+\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\tau_{i}\right)^{2}\right] & \approx \mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\tau_{i}+\left(2 \cdot W_{i}-1\right)\right.\right.\\
+&\left.\left.\cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)-\tau_{i}\right)^{2}\right] \\
+&=\frac{1}{N} \sum_{i=1}^{N} \mathbb{E}\left[\left(\left(2 \cdot W_{i}-1\right) \cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right) \cdot-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)\right)^{2}\right] \\
+&=\frac{1}{N} \sum_{i=1}^{N}\left(\sigma_{i}^{2}+\sigma_{\ell(i)}^{2}\right) \approx \frac{2}{N} \sum_{i=1}^{N} \sigma_{i}^{2}
+\end{aligned}
+$$
+
+从而，可以根据上式给出$\mathbb{V}\left(\tau\left(X_{i}\right)\right)$的估计量：
+
+$$
+\hat{\mathbb{V}}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right) \approx \frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\hat{\tau}\right)^{2}-\frac{2}{N} \sum_{i=1}^{N} \hat{\sigma}_{i}^{2}
+$$
+
+根据有限样本下和超总体下样本方差的关系，可以进一步给出超总体下$\hat{\tau}$样本方差的估计量：
+
+$$
+\hat{\mathbb{V}}(\hat{\tau})=\hat{\mathbb{V}}_{W}(\hat{\tau})+\frac{1}{N} \cdot \hat{\mathbb{V}}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right)=\sum_{i=1}^{N} \hat{\sigma}_{i}^{2} \cdot\left(\lambda_{i}^{2}-\frac{2}{N^{2}}\right)+ \frac{1}{N^2} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\hat{\tau}\right)^{2}
+$$
+
+此外，还有一些估计样本方差的方法，如基于最小二乘估计量的性质对样本方差进行估计、用Bootstrap的方法估计等，详见[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)第19章第10节。
+
+---
+
+简单小结一下，这一篇我们主要介绍了在结束了设计阶段的工作后如何具体的对因果效应进行估计，我们详细介绍了分层和匹配的方法，并对之前介绍的估计量建立了一个统一的结构，即加权和的形式，并在此基础上给出了估计样本方差的一般方法，包括有限总体下以及超总体下的样本方差甚至是子总体（如处理组所在子总体）下的样本方差。在此基础上，我们可建立估计参数的置信区间做出进一步的推断。
+
+到此为止，规则设计机制下一般的观测性研究的因果效应相关分析就暂告一段落了。但是在实际对处理进行分配时，往往会遇到不服从分配等情况，这是需要引入工具变量来进行分析和推断，下一篇将会对这一部分做一个简要的介绍。
