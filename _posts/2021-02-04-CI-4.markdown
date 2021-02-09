@@ -581,7 +581,7 @@ $$
 
 其中处理组个体的权重为$\lambda_{i} / N_{\mathrm{t}}$，控制组个体的权重为$\lambda_{i} / N_{\mathrm{c}}$。各个估计量的不同之处只在于$\lambda_{i}$的不同。而$\lambda_{i}$都具有以下性质：
 
-1. 可写为$W_{i},X_{i},\mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}$的函数，即：
+1. 可写为$W_{i},X_{i},{\mathbf{W}}_{(-i)}, {\mathbf{X}}_{(-i)}$的函数，即：
 
 	$$
 	\lambda_{i}=\lambda\left(W_{i}, X_{i}, \mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}\right)
@@ -611,7 +611,7 @@ $$
 \hat{\tau}^{\mathrm{dif}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}
 $$
 
-其对应的权重为$\lambda_{i}^{\mathrm{dif}}=1,for all i$。
+其对应的权重为$\lambda_{i}^{\mathrm{dif}}=1$。
 
 - [Regression Estimator](https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods)
 
@@ -746,7 +746,7 @@ $$
 \hat{\sigma}_{i}^{2}=\left(Y_{i}^{\mathrm{obs}}-Y_{i^{\prime}}^{\mathrm{obs}}\right)^{2} / 2
 $$
 
-在一定条件下，由上述$\hat{\sigma}_{i}^{2}$得到的$\widehat{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})$是渐进无偏的，即：
+在一定条件下，由上述$\hat{\sigma}_{i}^{2}$得到的条件样本方差的估计是渐进无偏的，即：
 
 $$
 \begin{array}{l}
