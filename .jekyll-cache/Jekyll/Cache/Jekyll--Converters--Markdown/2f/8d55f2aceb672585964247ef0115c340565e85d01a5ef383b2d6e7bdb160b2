@@ -1,0 +1,352 @@
+I"��<p>这一篇将具体介绍<code class="language-plaintext highlighter-rouge">经典随机化实验的几种类别</code>以及相应的四种<code class="language-plaintext highlighter-rouge">因果效应的推断方法</code>。</p>
+
+<h2 id="a-taxonomy-of-classical-randomized-experiments">A Taxonomy of Classical Randomized Experiments</h2>
+
+<p>在上一篇中，我们讲到了经典随机化实验的分配机制，即分配函数需满足<strong>个体性</strong>、<strong>概率性</strong>以及<strong>无混杂性</strong>的假定，此外该<strong>分配函数需要有一个已知的形式</strong>，可以由研究者所控制。在个体性以及无混杂性满足的条件下，分配机制对应的函数可以写为以下形式：</p>
+
+\[\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=c \cdot \prod_{i=1}^{N} e\left(X_{i}\right)^{W_{i}} \cdot\left(1-e\left(X_{i}\right)\right)^{1-W_{i}}\]
+
+<p>其中$\mathbf{W} \in \mathbb{W}^{+}$，$\mathbb{W}^{+} \subset \mathbb{W}$为所有$\mathbb{W}$的可能取值中概率为正值的部分所构成的子集，$e(x)$为倾向性得分，$c$为正则化常数。由于分配函数形式需要有一个已知的形式，这里的$e(x)$需要为协变量的一个已知函数。</p>
+
+<p>四种常见的满足以上条件的随机化实验有：</p>
+<h4 id="bernoulli-trials">Bernoulli trials</h4>
+
+<p>最简单的<code class="language-plaintext highlighter-rouge">伯努利试验（Bernoulli trials）</code>可以看为对每个个体分配哪一种处理都由抛硬币决定，即每个个体都有各$1/2$的概率进入处理组和控制组，且个体被分配哪一种处理是相互独立的。此时分配函数可以写为：</p>
+
+\[\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=0.5^{N}\]
+
+<p>更一般的伯努利试验允许每个个体的分配概率随个体协变量的取值变化，此时的分配函数可以写为：</p>
+
+\[\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\prod_{i=1}^{N}\left[e\left(X_{i}\right)^{W_{i}} \cdot\left(1-e\left(X_{i}\right)\right)^{1-W_{i}}\right]\]
+
+<p>其中$\mathbf{W} \in \mathbb{W}^{+}=\{0,1\}^{N}=\mathbb{W}$。</p>
+
+<p>注意到在伯努利实验的分配机制中，由于个体之间的分配是相互独立的，因此<strong>可能出现所有个体同时进入处理组或者同时进入控制组的情形</strong>，此时我们无法了解到未出现的处理水平所对应的潜在结果的信息，从而难以对因果效应做出推断。这也是伯努利实验的一个常见的缺点所在。为了保证一次实验中同时有个体进入处理组和控制组，我们进一步考虑其他的分配机制，下面要介绍的完全随机化实验就是其中的一种。</p>
+
+<h4 id="completely-randomized-experiments">Completely Randomized Experiments</h4>
+
+<p>在<code class="language-plaintext highlighter-rouge">完全随机化实验（completely randomized experiments）</code>中，研究者会事先确定好进入处理组的个体数$N_t$，然后随机选择$N_t$个个体进入处理组，剩下的个体进行控制组，从而其对应的分配机制为：</p>
+
+\[\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\left\{\begin{array}{ll}
+\left(\begin{array}{c}
+N \\
+N_{\mathrm{t}}
+\end{array}\right)^{-1} &amp; \text {if } \sum_{i=1}^{N} W_{i}=N_{\mathrm{t}} \\
+0 &amp; \text { otherwise }
+\end{array}\right.\]
+
+<p>其中$N_{\mathrm{t}} \in \{1,2, \ldots, N-1\}$。
+每个个体的倾向性的得分都相同且等于$N_t/N$，即有$q=N_t/N$的概率被分配进入处理组，但需要注意的是，<strong>完全随机化实验中个体的分配之间并非相互独立的</strong>，因为总的进入处理组的个体数是确定的，一个个体进入处理组自然会降低剩下的个体被分配进入处理组的概率。此外，完全随机化实验也并非完美的，<strong>尤其是在潜在结果与某些协变量之间存在较强的相关关系时</strong>。例如，在某个随机化实验中，潜在结果可能与性别存在较强的相关关系，然而完全随机化实验将所有的男性分配进入了处理组，所有女性分配进入了控制组，这个时候我们<strong>很难分辨两组潜在结果之间的差异到底是来自处理变量还是性别变量</strong>。为了改善这个问题，分层的随机化实验就要上场了。</p>
+
+<h4 id="stratified-randomized-experiments">Stratified Randomized Experiments</h4>
+
+<p><code class="language-plaintext highlighter-rouge">分层随机化实验（stratified randomized experiments）</code>将总体按照协变量的不同取值划分为不同的<code class="language-plaintext highlighter-rouge">块（block）</code>或<code class="language-plaintext highlighter-rouge">层（strata）</code>，然后在每一层中进行完全随机化实验，层与层之间的实验是相互独立的。比如，用上面提到的例子来说，我们可以将总体按照性别分为两层，即男性子总体和女性子总体，<strong>在每一层里面单独地进行完全随机化实验</strong>，这样即可保证进入处理组以及控制组的个体中既有男性也有女性。一般来说，假设我们将总体分为了$J$层，记$B_i(J)$为第$i$个个体是否在第$J$层的指示变量，$B_i \in \{1,\ldots, J\}$表示第$i$个个体所在层数，$N_t(j)$表示在第$j$层中的完全随机化实验所确定的进入处理组的个体数量，那么分层随机化实验的分配机制可以写为：</p>
+
+\[\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\left\{\begin{array}{ll}
+\prod_{j=1}^{J}\left(\begin{array}{c}
+N(j) \\
+N_{\mathrm{t}}(j)
+\end{array}\right)^{-1} &amp; \text {if } \mathbf{W} \in \mathbb{W}^{+}, \\
+0 &amp; \text { otherwise }
+\end{array}\right.\]
+
+<p>其中</p>
+
+\[\mathbf{W} \in \mathbb{W}^{+}=\left\{\mathbf{W} \in \mathbb{W} \mid \sum_{i: B_{i}=j}^{N} W_{i}=N_{\mathrm{t}}(j), \text { for } j=1,2, \ldots, J\right\}\]
+
+<p>每一层中的个体倾向性得分相同且等于$N_t(j)/N(j)$，其中$j$代表个体所在层数。完全随机化实验也可以看作为分层随机化实验的特例，即层数为1。当潜在结果与协变量之间存在较强的相关关系时，利用这些协变量对总体进行分层再进行分层的随机化实验可以<strong>排除掉因为协变量的差异所带来的潜在结果之间的差异</strong>，从而使得因果效应的估计更加准确。</p>
+
+<h4 id="pairwise-randomized-experiments">Pairwise Randomized Experiments</h4>
+
+<p><code class="language-plaintext highlighter-rouge">配对随机化实验（pairwise randomized experiments）</code>是分层随机化实验的一种特例，即在每一层中只有两个个体，一个被分配进入处理组，另一个进入控制组，其分配机制可以表示为：</p>
+
+\[\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\left\{\begin{array}{ll}
+2^{-N / 2} &amp; \text { if } \mathbf{W} \in \mathbb{W}^{+}, \\
+0 &amp; \text { otherwise }
+\end{array}\right.\]
+
+<p>其中，</p>
+
+\[\mathbf{W} \in \mathbb{W}^{+}=\left\{\mathbf{W} \in \mathbb{W} \mid \sum_{i: B_{i}=j}^{N} W_{i}=1, \text { for } j=1,2, \ldots, N / 2\right\}\]
+
+<p>为了对上面四种实验进行一个比较，我们考虑总体个数为$N=16$时分别进行上述四种实验。其中伯努利实验有$2^{16}=65536$种不同的分配可能，而取$N_t=N/2$时的完全随机化实验有$\left(\begin{array}{c}N \\ N / 2\end{array}\right)=12870$种，而一个两层的分层随机化实验（每层处理组数量为该层人数的$1/2$）有$\left(\begin{array}{l}N / 2 \\ N / 4\end{array}\right)^{2}=4900$种，而最后一种配对随机化实验只有$256$种。可见上述四种实验机制种，可能实现的不同分配形式的种类数在不断降低。</p>
+
+<p>对此我的理解是，<strong>通过设计更加严格的实验机制，我们可以限制对于推断因果效应帮助不大的分配形式发生，使得发生的实验所包含的关于因果效应的有用信息尽可能多</strong>。</p>
+
+<hr />
+
+<p>介绍完四种常见的实验设计机制后，可以进一步考虑每一种机制下如何对因果效应进行估计和推断。<strong>下面的部分都是在完全随机化实验的情形下进行讨论的</strong>，分层以及配对随机化实验的情形可以类推。</p>
+
+<h2 id="methods-for-estimation-and-inference-of-causal-effects">Methods for estimation and inference of causal effects</h2>
+<p>常见的对因果效应进行估计和推断的方法有以下四种：</p>
+
+<ul>
+  <li>Fisher的精确$P$值法（Fisher’s Exact P-Values）</li>
+  <li>Neyman的重复抽样方法（Neyman’s Repeated Sampling Approach）</li>
+  <li>基于回归的方法（Regression Methods）</li>
+  <li>基于模型的方法（Model-Based Inference）</li>
+</ul>
+
+<h4 id="fishers-exact-p-valuesfep">Fisher’s Exact P-Values(FEP)</h4>
+<p>给定完全随机化实验的数据，Fisher的思想是对<code class="language-plaintext highlighter-rouge">精确原假设（sharp null hypothesis or exact null hypothesis)</code>进行检验，其中精确原假设指：任一个体在两种处理水平下的潜在结果都相同。Fisher给出了在精确原假设成立的情况下如何计算$p$值，我们称之为<code class="language-plaintext highlighter-rouge">Fisher精确$p$值（Fisher Exact P-values，FEPs）</code>。</p>
+
+<p>不难看出，在精确原假设成立的情况下，我们可以根据已有数据填补出每个个体未观测到的潜在结果值。假定所选的检验统计量为$T$，$T$为个体观测到的结果以及协变量的函数。由于在精确原假设下，每个个体在两种处理水平下的潜在结果都已知，通过随机化的方法，我们可以由此得到在不同的处理分配方式下$T$的所有取值可能，我们称之为$T$的随机化分布。那么通过观察实际观测到的$T^{obs}$在$T$的随机化分布中的极端情况，我们便可以得到相应的$p$值。</p>
+
+<p>在此用一个简单的例子来说明。表1展示了在一个研究蜂蜜对于治疗咳嗽效用的完全随机化实验的数据，个体总数为6，其中1、2、3号个体在处理组，4、5、6号个体在控制组。</p>
+
+<p><img src="https://yijiaojane.github.io/img/in-post/CI-2/pre.png" alt="Table 1" /></p>
+
+<p>在这个问题中的精确原假设为：</p>
+
+\[H_{0}: Y_{i}(0)=Y_{i}(1) \text { for } i=1, \ldots, 6\]
+
+<p>在该原假设下，我们可以填补出缺失的潜在结果值，得到表2如下：</p>
+
+<p><img src="https://yijiaojane.github.io/img/in-post/CI-2/post.png" alt="Table 2" /></p>
+
+<p>我们选择两个处理组潜在结果的平均差异作为检验统计量，即：</p>
+
+\[T\left(\mathbf{W}, \mathbf{Y}^{\text {obs }}\right)=T^{\text {dif }}=\left|\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\right|\]
+
+<p>其中</p>
+
+\[\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}=\sum_{i: W_{i}=1} Y_{i}^{\mathrm{obs}} / N_{\mathrm{t}},\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}=\sum_{i: W_{i}=0} Y_{i}^{\mathrm{obs}} / N_{\mathrm{c}}\]
+
+\[N_{\mathrm{c}}=\sum_{i=1}^{N}\left(1-W_{i}\right),N_{\mathrm{t}}=\sum_{i=1}^{N}\left(W_{i}\right)\]
+
+<p>通过随机化的方法，我们可以得到在不同分配形式下$T$的随机化分布，在这个例子中，共有$\left(\begin{array}{l}6 \\ 3\end{array}\right)=20$种不同的分配方式，具体结果如表3：</p>
+
+<p><img src="https://yijiaojane.github.io/img/in-post/CI-2/randomization.png" alt="Table 3" /></p>
+
+<p>其中粗体部分为$T$在这次实验中的实际取值$T^{obs}$。</p>
+
+<p>从上表中我们可以看出，$20$种分配形式中，有$16$种形式下$T$的取值大于等于$T^{obs}=1$，从而该检验问题对应的$p$值为$16/20 = 0. 80$。根据$T$的随机化分布，我们也可以给出相应的区间估计。</p>
+
+<p>在这个例子中，选取的检验统计量为两组潜在结果的均值差异，在实际问题中可根据具体问题选择不同的检验统计量，如可选择分位数、两样本均值检验的T-统计量、秩统计量等等，也可对潜在结果进行对数变换等得到不同形式的检验统计量。此外，由于这个例子中的总体个数较少，随机化的所有分配形式的可能性也较少，计算$T$的随机化分布相对容易，但在实际问题中，总体数量通常较多，此时要穷举出所有分配形式下的$T$的取值<strong>计算消耗较大</strong>，这是我们可以通过随机选取一部分分配方案计算出一个近似的$p$值，当随机模拟次数重复足够多次时，得到的$p$值的精度也可以得到保证。</p>
+
+<h4 id="neymans-repeated-sampling-approach">Neyman’s Repeated Sampling Approach</h4>
+<p>Neyman关心的基本问题主要有以下三个：</p>
+
+<ul>
+  <li>如果所有的个体都进入处理组，那么潜在结果的平均值$\bar{Y}(1)$为多少？</li>
+  <li>如果所有的个体都进入控制组，那么潜在结果的平均值$\bar{Y}(0)$为多少？</li>
+  <li>两种处理水平下潜在结果均值的差异$\bar{Y}(1) - \bar{Y}(0)$有多大？</li>
+</ul>
+
+<p>而Neyman提出的方法即为建立平均因果效应的估计量，并给出其均值以及方差的估计。那么这里的<code class="language-plaintext highlighter-rouge">重复抽样（Repeated Sampling）</code>是什么含义呢？我的个人认为重复抽样包含了两个层面的含义：首先它主要指<strong>分配形式是根据分配机制随机抽取的</strong>，此外在无限总体下，也指<strong>观测样本是从一个更大的总体中抽取的简单随机样本</strong>。而<strong>Neyman构造的估计量在重复抽样的意义下是无偏的</strong>。</p>
+
+<p>这里我们先考虑有限总体下平均因果效应的估计，此时将$Y_i(1)$以及$Y_i(0)$视为固定值。假定我们有一个含有$N$个个体的总体，Neyman感兴趣的估计量为该总体的平均因果效应：</p>
+
+\[\tau_{\mathrm{fs}}=\frac{1}{N} \sum_{i=1}^{N}\left(Y_{i}(1)-Y_{i}(0)\right)=\bar{Y}(1)-\bar{Y}(0)\]
+
+<p>其中，</p>
+
+\[\bar{Y}(0)=\frac{1}{N} \sum_{i=1}^{N} Y_{i}(0),  \quad \bar{Y}(1)=\frac{1}{N} \sum_{i=1}^{N} Y_{i}(1)\]
+
+<p>$\mathrm{fs}$代表有限总体（finite sample）。</p>
+
+<p>假定在完全随机化实验中，进入处理组的个体数固定为$N_t$，控制组个体数为$N_c$，由于随机机制的设定，可以给出$\tau_{\mathrm{fs}}$的一个无偏估计量为：</p>
+
+\[\hat{\tau}^{\mathrm{dif}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\]
+
+<p>其中，</p>
+
+\[\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}=\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} Y_{i}^{\mathrm{obs}} ,\quad \bar{Y}_{\mathrm{t}}^{\mathrm{obs}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} Y_{i}^{\mathrm{obs}}\]
+
+<p>可以计算得到$\hat{\tau}^{\mathrm{dif}}$的样本方差为：</p>
+
+\[\mathbb{V}_{W}\left(\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\right)=\frac{S_{c}^{2}}{N_{\mathrm{c}}}+\frac{S_{t}^{2}}{N_{\mathrm{t}}}-\frac{S_{t c}^{2}}{N}\]
+
+<p>其中，</p>
+
+\[S_{c}^{2}=\frac{1}{N-1} \sum_{i=1}^{N}\left(Y_{i}(0)-\bar{Y}(0)\right)^{2},  \quad S_{t}^{2}=\frac{1}{N-1} \sum_{i=1}^{N}\left(Y_{i}(1)-\bar{Y}(1)\right)^{2},\]
+
+\[\begin{aligned}
+S_{t c}^{2} &amp;=\frac{1}{N-1} \sum_{i=1}^{N}\left(Y_{i}(1)-Y_{i}(0)-(\bar{Y}(1)-\bar{Y}(0))\right)^{2} \\
+&amp;=\frac{1}{N-1} \sum_{i=1}^{N}\left(Y_{i}(1)-Y_{i}(0)-\tau_{\mathrm{fs}}\right)^{2}
+\end{aligned}\]
+
+<p>分别为$Y_i(0)$、$Y_i(1)$以及$Y_i(1)-Y_i(0)$的样本方差。</p>
+
+<p>那么如何对样本方差进行估计呢？从上面的式子中不难看出，$S_{t}^{2}$以及$S_{c}^{2}$我们可以分别用从处理组和控制组观测结果的样本方差进行估计，但$S_{t c}^{2}$中同时包含同一个体在两种处理水平下的潜在结果，无法对其直接进行计算。但注意到，<strong>当个体水平的因果效应$Y_{i}(1)-Y_{i}(0) \equiv \tau$时，$S_{t c}^{2}=0$</strong>，此时，</p>
+
+\[\mathbb{V}_{W}(\hat{\tau}^{\mathrm{dif}})=\frac{S_{c}^{2}}{N_{\mathrm{c}}}+\frac{S_{t}^{2}}{N_{\mathrm{t}}}\]
+
+<p>我们可以给出它的一个无偏估计：</p>
+
+\[\hat{\mathbb{V}}^{\text {neyman }}=\frac{s_{c}^{2}}{N_{\mathrm{c}}}+\frac{s_{t}^{2}}{N_{\mathrm{t}}}\]
+
+<p>其中，</p>
+
+\[s_{t}^{2}=\frac{1}{N_{\mathrm{t}}-1} \sum_{i: W_{i}=1}\left(Y_{i}(1)-\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}\right)^{2}=\frac{1}{N_{\mathrm{t}}-1} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}\right)^{2}\]
+
+\[s_{c}^{2}=\frac{1}{N_{\mathrm{c}}-1} \sum_{i: W_{i}=0}\left(Y_{i}(0)-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\right)^{2}=\frac{1}{N_{\mathrm{c}}-1} \sum_{i: W_{i}=0}\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\right)^{2}\]
+
+<p>若个体水平的因果效应不为常数，由于$S_{t c}^{2} \geq 0$，上述估计量仍可给出$\hat{\tau}^{\mathrm{dif}}$的样本方差的一个<strong>上界</strong>。此外，也有一些改进的估计量，具体可参考<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>P95。</p>
+
+<p>在此基础上，我们也可以进一步给出平均因果效应的区间估计并进行假设检验。</p>
+
+<p>同理，也可以将有限总体的情形推广到无限总体的情形。此时，我们将观测到的$N$个个体视为来自一个<code class="language-plaintext highlighter-rouge">超总体（super-population）</code>的简单随机样本。<strong>此时$Y_i(1)$以及$Y_i(0)$不再视为固定的值，而应看作随机变量</strong>。我们估计的目标为：</p>
+
+\[\tau_{\mathrm{sp}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]\]
+
+<p>由于样本的随机性，我们可以得到：</p>
+
+\[\mathbb{E}_{\mathrm{sp}}\left[\tau_{\mathrm{fs}}\right]=\mathbb{E}_{\mathrm{sp}}[\bar{Y}(1)-\bar{Y}(0)]=\frac{1}{N} \sum_{i=1}^{N} \mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]=\tau_{\mathrm{sp}}\]
+
+<p>即总体平均因果效应即为样本平均因果效应的期望值。进一步，记$\sigma_{t}^{2}$、$\sigma_{c}^{2}$分别为处理组以及控制组潜在结果的总体方差：</p>
+
+\[\sigma_{t}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1)\right)=\mathbb{E}_{\mathrm{sp}}\left[\left(Y_{i}(1)-\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)\right)^{2}\right]\right.\]
+
+\[\sigma_{c}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(0)\right)=\mathbb{E}_{\mathrm{sp}}\left[\left(Y_{i}(0)-\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0)\right)^{2}\right]\right.\]
+
+<p>下面我们考查平均因果效应估计量的样本方差，计算可得：</p>
+
+\[\mathbb{V}_{\mathrm{sp}}=\mathbb{V}_{\mathrm{sp}}\left(\hat{\tau}^{\mathrm{dif}}\right)=\frac{\sigma_{c}^{2}}{N_{\mathrm{c}}}+\frac{\sigma_{t}^{2}}{N_{\mathrm{t}}}\]
+
+<p>由此，可以给出$\mathbb{V}_{\mathrm{sp}}$的一个无偏估计：</p>
+
+\[\hat{\mathrm{V}}_{\mathrm{sp}}=\frac{s_{c}^{2}}{N_{\mathrm{c}}}+\frac{s_{t}^{2}}{N_{\mathrm{t}}}\]
+
+<p><strong>注意到上述样本方差的估计量与有限总体情形下是一致的，但在无限总体下，该估计量的无偏性并不需要假设个体水平的因果效应为常数</strong>，即不要求其总体方差为$0$。</p>
+
+<h4 id="regression-methods">Regression Methods</h4>
+<p>除了上述两种比较经典的因果效应的估计方法以外，回归方法也是实验以及观测性研究中更为常用的一种估计因果效应的方法。在这一部分，我们都将观测样本视为来自无限总体的一个随机样本，此外仍然假定为完全随机化实验的情形。</p>
+
+<p>为了介绍回归的方法，我们先引入一些新的记号。在给定协变量取值为$x$的情况下，定义处理组以及控制组的潜在结果的条件均值以及条件平均处理效应为</p>
+
+\[\mu_{c}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid X_{i}=x\right], \quad \mu_{t}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1) \mid X_{i}=x\right],\]
+
+\[\tau(x)=\mathbb{E}_{\mathrm{sp}}\left(Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right)\]
+
+<p>记相应的条件方差为：</p>
+
+\[\sigma_{c}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(0) \mid X_{i}=x\right), \quad \sigma_{t}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1) \mid X_{i}=x\right),\]
+
+\[\sigma_{c t}^{2}(x)=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right)\]
+
+<p>先考虑除处理变量外不含其他协变量的情形，假定回归函数为以下形式：</p>
+
+\[Y_{i}^{\mathrm{obs}}=\alpha+\tau \cdot W_{i}+\varepsilon_{i}\]
+
+<p>我们可以给出回归系数$\alpha,\tau,\beta$的最小二乘估计：</p>
+
+\[\left(\hat{\tau}^{\mathrm{ols}}, \hat{\alpha}^{\mathrm{ols}}\right)=\arg \min _{\tau, \alpha} \sum_{i=1}^{N}\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}\right)^{2}\]
+
+<p>计算可得：</p>
+
+\[\hat{\tau}^{\mathrm{ols}}=\frac{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right) \cdot\left(Y_{i}^{\mathrm{obs}}-\bar{Y}^{\mathrm{obs}}\right)}{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right)^{2}}, \quad \text { and } \quad \hat{\alpha}^{\mathrm{ols}}=\bar{Y}^{\mathrm{obs}}-\hat{\tau}^{\mathrm{ols}} \cdot \bar{W}\]
+
+<p>其中，</p>
+
+\[\bar{Y}^{\mathrm{obs}}=\frac{1}{N} \sum_{i=1}^{N} Y_{i}^{\mathrm{obs}} \quad \text { and } \quad \bar{W}=\frac{1}{N} \sum_{i=1}^{N} W_{i}=\frac{N_{t}}{N}\]
+
+<p>通过简单的计算不难发现</p>
+
+\[\hat{\tau}^{\mathrm{ols}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}=\hat{\tau}^{\mathrm{dif}}\]
+
+<p>即在上述回归模型中，<strong>回归系数$\tau$的最小二乘估计与Neyman所提出的平均因果效应的估计量是一致的</strong>，因此我们可以利用回归系数$tau$的最小二乘估计来解释因果效应。此外，定义</p>
+
+\[\begin{aligned}
+\left(\alpha^{\star}, \tau^{\star}\right) &amp;=\arg \min _{\alpha, \tau} \mathbb{E}_{\mathrm{sp}}\left[\frac{1}{N} \sum_{i=1}^{N}\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}\right)^{2}\right] \\
+&amp;=\arg \min _{\alpha, \tau} \mathbb{E}_{\mathrm{sp}}\left[\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}\right)^{2}\right]
+\end{aligned}\]
+
+<p>可以验证$\tau^{\star}=\tau_{\mathrm{sp}}$。在一定条件下，随着样本量增大，$\hat{\tau}^{\mathrm{ols}}$将收敛于$\tau^{\star}=\tau_{\mathrm{sp}}$。此外，我们也可以给出$\hat{\tau}^{\mathrm{ols}}$的样本方差的稳健估计：</p>
+
+\[\hat{\mathrm{V}}^{\mathrm{sp}}=\frac{\sum_{i=1}^{N} \hat{\varepsilon}_{i}^{2} \cdot\left(W_{i}-\bar{W}\right)^{2}}{\left(\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right)^{2}\right)^{2}}\]
+
+<p>计算可知，</p>
+
+\[\hat{\mathrm{V}}^{\mathrm{sp}}=\frac{s_{c}^{2}}{N_{\mathrm{c}}}+\frac{s_{t}^{2}}{N_{\mathrm{t}}}\]
+
+<p><strong>与Neyman对其提出的估计量所给出的样本方差的估计一致</strong>。</p>
+
+<p>下面考虑含有其他协变量的情形，假定回归函数为以下形式：</p>
+
+\[Y_{i}^{\mathrm{obs}}=\alpha+\tau \cdot W_{i}+X_{i} \beta+\varepsilon_{i}\]
+
+<p>其中$X_i$为个体$i$所对应的一行协变量（预处理变量）。我们可以给出回归系数$\alpha,\tau,\beta$的最小二乘估计：</p>
+
+\[\left(\hat{\tau}^{\mathrm{ols}}, \hat{\alpha}^{\mathrm{ols}}, \hat{\beta}^{\mathrm{ols}}\right)=\arg \min _{\tau, \alpha, \beta} \sum_{i=1}^{N}\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}-X_{i} \beta\right)^{2}\]
+
+<p>我们关心的是回归系数$\tau$与我们所感兴趣的估计量总体平均因果效应${\tau}_{\mathrm{sp}}$之间的关系。同样可以定义：</p>
+
+\[\left(\alpha^{\star}, \tau^{\star}, \beta^{\star}\right)=\underset{\alpha, \beta, \tau}{\arg \min } \mathbb{E}\left[\left(Y_{i}^{\text {obs }}-\alpha-\tau \cdot W_{i}-X_{i} \beta\right)^{2}\right]\]
+
+<p>可以验证$\tau^{\star}=\tau_{\mathrm{sp}}$。在一定条件下，随着样本量增大，$\left(\hat{\alpha}^{\mathrm{ols }}, \hat{\tau}^{\mathrm{ols }}, \hat{\beta}^{\mathrm{ols }}\right)$可以收敛到$\left(\alpha^{\star}, \tau^{\star}, \beta^{\star}\right)$。注意到在无限总体下，$\hat{\tau}^{\mathrm{ols}}$不再是$\tau_{\mathrm{sp}}$的无偏估计，但它依然是<strong>渐进无偏</strong>的，具体地，我们有以下结论：</p>
+
+\[\sqrt{N} \cdot\left(\hat{\tau}^{\mathrm{ols}}-\tau_{\mathrm{sp}}\right) \stackrel{d}{\longrightarrow} \mathcal{N}\left(0, \frac{\mathbb{E}\left[\left(W_{i}-p\right)^{2} \cdot\left(Y_{i}^{\mathrm{obs}}-\alpha^{\star}-\tau_{\mathrm{sp}} \cdot W_{i}-X_{i} \beta^{\star}\right)^{2}\right]}{p^{2} \cdot(1-p)^{2}}\right)\]
+
+<p>需要注意的是，基于回归的方法所得到的结论<strong>不要求回归模型一定是指定正确的</strong>，只要是在完全随机化实验的情形下即可成立。</p>
+
+<p>进一步也可以计算上述最小二乘估计量的样本方差并给出相应的估计，具体可参考<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>第7章第5节。这里需要说明的是，尽管在回归模型中加入协变量不影响$\hat{\tau}^{\mathrm{ols }}$的对于$\tau_{\mathrm{sp}}$渐进无偏性，但会对其样本方差的估计造成影响，此时该估计量样本方差的估计不再是无偏的了。</p>
+
+<p>此外也可以对于处理变量与预处理变量之间的交互效应以及对潜在结果进行变换进行讨论，具体可参考<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>第7章第6、7节。</p>
+
+<h4 id="model-based-inference">Model-Based Inference</h4>
+
+<p>和回归方法一样，<code class="language-plaintext highlighter-rouge">基于模型的推断方法（Model-Based Inference）</code>也是将潜在结果视为随机变量。这个方法主要是从一个贝叶斯的角度来看待因果效应的估计问题，其核心思想是<strong>建立缺失结果变量关于观测结果以及处理变量的模型</strong>，即：</p>
+
+\[f\left(\mathbf{Y}^{\text {mis }} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)\]
+
+<p>利用该模型对于缺失结果进行填补。</p>
+
+<p>首先，我们需要指定两种潜在结果变量的关于未知参数$\theta$的联合分布$f(\mathbf{Y}(0), \mathbf{Y}(1) \mid \theta)$，并给出$\theta$的先验分布$p(\theta)$。利用这两个信息，我们可以建立缺失结果变量的后验分布。主要过程包括以下四步。</p>
+
+<ul>
+  <li><strong>Step 1 ：</strong> 求出$f\left(\mathbf{Y}^{\mathrm{mis}} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}, \theta\right)$</li>
+</ul>
+
+<p>由于</p>
+
+\[f\left(\mathbf{Y}^{\operatorname{mis}} \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}, \theta\right)=\frac{f\left(\mathbf{Y}^{\operatorname{mis}}, \mathbf{Y}^{\mathrm{obs}} \mid \mathbf{W}, \theta\right)}{f\left(\mathbf{Y}^{\mathrm{obs}} \mid \mathbf{W}, \theta\right)}=\frac{f\left(\mathbf{Y}^{\mathrm{mis}}, \mathbf{Y}^{\mathrm{obs}} \mid \mathbf{W}, \theta\right)}{\int_{\mathbf{y}^{\operatorname{mis}}} f\left(\mathbf{y}^{\mathrm{mis}}, \mathbf{Y}^{\mathrm{obs}} \mid \mathbf{W}, \theta\right) \mathrm{d} \mathbf{y}^{\mathrm{mis}}}\]
+
+<p>这等价于求$f\left(\mathbf{Y}^{\operatorname{mis}}, \mathbf{Y}^{\mathrm{obs}} \mid \mathbf{W}, \theta\right)$。根据$\mathbf{Y}^{\operatorname{obs}}$以及$\mathbf{Y}^{\operatorname{mis}}$的<a href="https://yijiaojane.github.io/2021/01/26/CI-1/#pre-treatment-variables">定义</a>，我们可将$\left(\mathbf{Y}^{\text {mis }}, \mathbf{Y}^{\text {obs }}\right)$表示为$(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W})$的函数，从而只需求出$\mathbf{Y}(0)$和$\mathbf{Y}(1)$关于$\mathbf{W}$和$\theta$的条件联合分布即可，而这个分布可由以下二式得到：</p>
+
+\[f(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W} \mid \theta)=\operatorname{Pr}(\mathbf{W} \mid \mathbf{Y}(0), \mathbf{Y}(1)) \cdot f(\mathbf{Y}(0), \mathbf{Y}(1) \mid \theta)\]
+
+\[f(\mathbf{Y}(0), \mathbf{Y}(1) \mid \mathbf{W}, \theta)=\frac{f(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W} \mid \theta)}{\operatorname{Pr}(\mathbf{W} \mid \theta)}=\frac{f(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W} \mid \theta)}{\int f(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W} \mid \theta) \mathrm{d} \mathbf{Y}(0) \mathrm{d} \mathbf{Y}(1)}\]
+
+<ul>
+  <li><strong>Step 2 ：</strong> 求出$\theta$的后验分布$p\left(\theta \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)$</li>
+</ul>
+
+<p>首先可以通过对Step 1中求得的条件联合分布进行积分得到观测结果$\mathbf{Y}^{\text {obs }}$以及处理变量$\mathbf{W}$的边际分布：</p>
+
+\[\mathcal{L}\left(\theta \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right) \equiv f\left(\mathbf{Y}^{\text {obs }}, \mathbf{W} \mid \theta\right)=\int_{\mathbf{y}^{\text {mis }}} f\left(\mathbf{y}^{\text {mis }}, \mathbf{Y}^{\text {obs }}, \mathbf{W} \mid \theta\right) \mathrm{d} \mathbf{y}^{\text {mis }}\]
+
+<p>再结合$\theta$的先验分布$p(\theta)$，即可得到$\theta$的后验分布：</p>
+
+\[p\left(\theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right)=\frac{p(\theta) \cdot \mathcal{L}\left(\theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right)}{\int_{\theta} p(\theta) \cdot \mathcal{L}\left(\theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right) \mathrm{d} \theta}\]
+
+<ul>
+  <li><strong>Step 3 ：</strong> 求出缺失结果变量的后验分布$f\left(\mathbf{Y}^{\text {mis }} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)$</li>
+</ul>
+
+<p>根据Step 1和Step 2中的结果，我们可以得到：</p>
+
+\[f\left(\mathbf{Y}^{\text {mis }}, \theta \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)=f\left(\mathbf{Y}^{\text {mis }} \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}, \theta\right) \cdot p\left(\theta \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)\]
+
+<p>将$\theta$积分积掉即可得：</p>
+
+\[f\left(\mathbf{Y}^{\mathrm{mis}} \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right)=\int_{\theta} f\left(\mathbf{Y}^{\mathrm{mis}}, \theta \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}\right) \mathrm{d} \theta\]
+
+<ul>
+  <li><strong>Step 4：</strong> 求出估计目标$\tau=\tau(\mathbf{Y}(0), \mathbf{Y}(1), \mathbf{W})$的后验分布</li>
+</ul>
+
+<p>同样的，根据$\mathbf{Y}^{\operatorname{obs}}$以及$\mathbf{Y}^{\operatorname{mis}}$的<a href="https://yijiaojane.github.io/2021/01/26/CI-1/#pre-treatment-variables">定义</a>，我们可以将$(\mathbf{Y}(0), \mathbf{Y}(1))$表示为$(\mathbf{Y}^{\text {mis }}, \mathbf{Y}^{\text {obs }}, \mathbf{W})$的函数，从而可以根据Step 3中的结果得到$\tau$的后验分布：</p>
+
+\[f\left(\tau \mid \mathbf{Y}^{\text {obs }}, \mathbf{W}\right)\]
+
+<p>利用后验分布的信息，我们就可以进一步对$\tau$做出均值、方差等推断。</p>
+
+<p>需要注意的是，$f(\mathbf{Y}(0), \mathbf{Y}(1) \mid \theta)$以及先验分布$p(\theta)$的指定是比较困难的，需要对具体问题进行分析和判断。此外，实际中我们很难求出后验分布的解析解，因此可以用数值模拟的方法如MCMC等求进行近似。</p>
+
+<hr />
+
+<p>简单小结一下，原书中提到，<strong>从某种意义上来说，所有处理因果推断问题的方法都可以视为一种填补缺失数据的方法</strong>，只是有的比较显然，有的比较隐晦，因为因果效应的估计本身就涉及到一部分未观测到的数据。上面提到的四种方法都可以看为用不同的方式对缺失观测结果值进行填补，并在此基础上对因果效应做出推断。这里我们讨论都是在完全随机化实验的情形下，也可以将上述四种方法稍作调整应用到分层随机化实验以及配对随机化实验的情形，具体可参考<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>第8、9章。</p>
+
+<p>关于随机化实验的部分暂时就介绍到这里吧，下一篇会介绍规则分配机制下的观测性研究中因果效应的推断方法。</p>
+:ET

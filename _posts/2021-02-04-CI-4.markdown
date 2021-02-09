@@ -581,13 +581,13 @@ $$
 
 其中处理组个体的权重为$\lambda_{i} / N_{\mathrm{t}}$，控制组个体的权重为$\lambda_{i} / N_{\mathrm{c}}$。各个估计量的不同之处只在于$\lambda_{i}$的不同。而$\lambda_{i}$都具有以下性质：
 
-1. 可写为$W_{i},X_{i},{\mathbf{W}}_{(-i)}, {\mathbf{X}}_{(-i)}$的函数，即：
+1. 可写为$W_{i},X_{i},{\mathbf{W}}^{(-i)}, {\mathbf{X}}^{(-i)}$的函数，即：
 
 	$$
-	\lambda_{i}=\lambda\left(W_{i}, X_{i}, \mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}\right)
+	\lambda_{i}=\lambda\left(W_{i}, X_{i}, \mathbf{W}^{(-i)}, \mathbf{X}^{(-i)}\right)
 	$$
 
-	其中$\mathbf{W}_{(-i)}$表示处理变量构成的向量去掉第$W_i$所构成的$N-1$维向量，$\mathbf{X}_{(-i)}$表示由协变量矩阵去掉第$i$行所构成的$(N-1) \times K$维的矩阵。
+	其中$\mathbf{W}^{(-i)}$表示处理变量构成的向量去掉第$W_i$所构成的$N-1$维向量，$\mathbf{X}^{(-i)}$表示由协变量矩阵去掉第$i$行所构成的$(N-1) \times K$维的矩阵。
 
 2. 这些权重求和满足：
 

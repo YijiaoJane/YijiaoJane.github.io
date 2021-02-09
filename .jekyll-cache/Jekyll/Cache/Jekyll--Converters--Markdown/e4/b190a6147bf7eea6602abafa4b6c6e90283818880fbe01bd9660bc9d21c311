@@ -1,4 +1,4 @@
-I"�Z<p>这一篇将主要介绍<code class="language-plaintext highlighter-rouge">因果推断中的基本概念</code>以及<code class="language-plaintext highlighter-rouge">分配机制的几种类型</code>。</p>
+I"'[<p>这一篇将主要介绍<code class="language-plaintext highlighter-rouge">因果推断中的基本概念</code>以及<code class="language-plaintext highlighter-rouge">分配机制的几种类型</code>。</p>
 
 <h2 id="causality-the-basic-framework">Causality: The Basic Framework</h2>
 
@@ -101,7 +101,7 @@ Y_{i}(0) &amp; \text { if } W_{i}=1
 
 <h4 id="causal-estimands">Causal Estimands</h4>
 
-<p>下面我们更加正式地来定义一下我们所关心的因果效应。假设每个个体的处理水平都为两种，即$W_i \in \left{ 0,1 \right}$。我们可以通过比较两种处理水平下的潜在结果$Y_i(1)$和$Y_i(0)$来定义个体水平上的<code class="language-plaintext highlighter-rouge">因果效应（unit-level causal effects)</code>，如两者简单做差$Y_i(1)-Y_i(0)$或求比值$Y_{i}(1) / Y_{i}(0)$。通常来说用的更多的是做差的形式。</p>
+<p>下面我们更加正式地来定义一下我们所关心的因果效应。假设每个个体的处理水平都为两种，即$W_i \in \{ 0,1 \}$。我们可以通过比较两种处理水平下的潜在结果$Y_i(1)$和$Y_i(0)$来定义<code class="language-plaintext highlighter-rouge">个体水平上的因果效应（unit-level causal effects)</code>，如两者简单做差$Y_i(1)-Y_i(0)$或求比值$Y_{i}(1) / Y_{i}(0)$。通常来说用的更多的是做差的形式。</p>
 
 <p>一个典型的因果估计目标（Causal Estimand）的例子为，整个总体的两个处理水平下的潜在结果差异的均值：</p>
 
@@ -132,7 +132,7 @@ Y_{i}(0) &amp; \text { if } W_{i}=1
 
 \[e(x)=\frac{1}{N(x)} \sum_{i: X_{i}=x} p_{i}(\mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))\]
 
-<p>其中$N(x)=#\left{ i=1, \ldots, N \mid X_{i}=x \right}$。</p>
+<p>其中$N(x)=\# \{ i=1, \ldots, N \mid X_{i}=x \}$。</p>
 
 <h4 id="restrictions-on-the-assignment-mechanism">Restrictions on the Assignment Mechanism</h4>
 <p>给出了分配机制的正式的定义，下面就可以进一步考虑需要对分配机制加一些什么样的假定，使得因果推断问题便于处理了。通常有这样的三条假定或称限制：</p>
@@ -199,7 +199,7 @@ Y_{i}(0) &amp; \text { if } W_{i}=1
   <li>无混杂性（unconfounded）</li>
 </ul>
 
-<p>经典的随机化实验中最为常见的一种是完全随机化实验，假定总体数量为$N$，可实现确定处理组的个体数量$N_t$（从而控制组的数量为$N_c=N-N_t$），从$N$个个体中随机抽取$N_t$个个体进入处理组，其余进入控制组。在这个实验中，每个个体都有$q=N_t/N$的概率被分配到处理组，从而该实验的分配机制为：</p>
+<p>经典的随机化实验中最为常见的一种是<code class="language-plaintext highlighter-rouge">完全随机化实验（completely randomized experiment）</code>，假定总体数量为$N$，可实现确定处理组的个体数量$N_t$（从而控制组的数量为$N_c=N-N_t$），从$N$个个体中随机抽取$N_t$个个体进入处理组，其余进入控制组。在这个实验中，每个个体都有$q=N_t/N$的概率被分配到处理组，从而该实验的分配机制为：</p>
 
 \[\operatorname{Pr}(\mathbf{W} \mid \mathbf{X}, \mathbf{Y}(0), \mathbf{Y}(1))=\left\{\begin{array}{ll}
 1 /\left(\begin{array}{c}
