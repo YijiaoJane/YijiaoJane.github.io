@@ -548,13 +548,13 @@ $$
 \tau_{\mathrm{sp}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]=\mathbb{E}_{\mathrm{sp}}\left[\tau_{\mathrm{fs}}\right]
 $$
 
-虽然从构造估计量的角度来说，具体关心的是哪个参数并不重要（这一点从上式的第二个等号可以看出），但是若要进一步估计这个估计量的样本方差，那么$\tau_{\mathrm{fs}}$和$\tau_{\mathrm{sp}}$的选择就重要了。因为在有限样本下，估计量$\hat_{\tau}$的随机性只来自于分配机制，此时样本方差为：
+虽然从构造估计量的角度来说，具体关心的是哪个参数并不重要（这一点从上式的第二个等号可以看出），但是若要进一步估计这个估计量的样本方差，那么$\tau_{\mathrm{fs}}$和$\tau_{\mathrm{sp}}$的选择就重要了。因为在有限样本下，估计量$\hat{\tau}$的随机性只来自于分配机制，此时样本方差为：
 
 $$
 \mathbb{V}_{W}(\hat{\tau})=\mathbb{E}_{W}\left[\left(\hat{\tau}-\tau_{\mathrm{fs}}\right)^{2}\right]
 $$
 
-而在超总体下，估计量$\hat_{\tau}$的随机性不仅来自于分配机制，还来自于样本的随机性，此时样本方差为：
+而在超总体下，估计量$\hat{\tau}$的随机性不仅来自于分配机制，还来自于样本的随机性，此时样本方差为：
 
 $$
 \mathbb{V}(\hat{\tau})=\mathbb{E}\left[\left(\hat{\tau}-\tau_{\mathrm{sp}}\right)^{2}\right]
@@ -566,7 +566,7 @@ $$
 \mathbb{V}(\hat{\tau})-\mathbb{V}_{W}(\hat{\tau}) \approx \mathbb{V}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right) / N
 $$
 
-即超总体下估计量$\hat_{\tau}$的样本方差相较于有限总体下的样本方差还**多出了一部分个体水平平均因果效应的方差**，关于上式具体的说明可参见[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)第19章第3节。
+即超总体下估计量$\hat{\tau}$的样本方差相较于有限总体下的样本方差还**多出了一部分个体水平平均因果效应的方差**，关于上式具体的说明可参见[原书](https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ)第19章第3节。
 
 在之后的部分我们将分别给出选择两个关心参数时估计量样本方差的估计形式。但需要说明是的，由于超总体往往是难以有一个确切的定义的，因此**常常关心的还是有限样本下的平均因果效应**。
 
@@ -583,11 +583,11 @@ $$
 
 1. 可写为$W_{i},X_{i},\mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}$的函数，即：
 
-$$
-\lambda_{i}=\lambda\left(W_{i}, X_{i}, \mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}\right)
-$$
+	$$
+	\lambda_{i}=\lambda\left(W_{i}, X_{i}, \mathbf{W}_{(-i)}, \mathbf{X}_{(-i)}\right)
+	$$
 
-其中$\mathbf{W}_{(-i)}$表示处理变量构成的向量去掉第$W_i$所构成的$N-1$维向量，$\mathbf{X}_{(-i)}$表示由协变量矩阵去掉第$i$行所构成的$(N-1) \times K$维的矩阵。
+	其中$\mathbf{W}_{(-i)}$表示处理变量构成的向量去掉第$W_i$所构成的$N-1$维向量，$\mathbf{X}_{(-i)}$表示由协变量矩阵去掉第$i$行所构成的$(N-1) \times K$维的矩阵。
 
 2. 这些权重求和满足：
 
@@ -710,7 +710,7 @@ $$
 {\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}}\right)=\mathbb{V}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \sigma_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \sigma_{i}^{2}
 $$
 
-当估计量给定时，$\lambda_{i}$的值已知，从而只需构造$\sigma_{i}^{2}$的估计量$\hat_{\sigma_{i}}^{2}$，即可得上式的估计量：
+当估计量给定时，$\lambda_{i}$的值已知，从而只需构造$\sigma_{i}^{2}$的估计量$\hat{\sigma_{i}}^{2}$，即可得上式的估计量：
 
 $$
 \hat{\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}}\right)=\widehat{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}
@@ -909,6 +909,6 @@ $$
 
 ---
 
-简单小结一下，这一篇我们主要介绍了在结束了设计阶段的工作后如何具体的对因果效应进行估计，我们详细介绍了分层和匹配的方法，并对之前介绍的估计量建立了一个统一的结构，即加权和的形式，并在此基础上给出了估计样本方差的一般方法，包括有限总体下以及超总体下的样本方差甚至是子总体（如处理组所在子总体）下的样本方差。在此基础上，我们可建立估计参数的置信区间做出进一步的推断。
+简单小结一下，这一篇我们主要介绍了在结束了设计阶段的工作后如何具体的对因果效应进行估计，我们详细介绍了**分层**和**匹配**的方法，并对之前介绍的估计量建立了一个统一的结构，即**加权和**的形式，并在此基础上给出了估计样本方差的一般方法，包括有限总体下以及超总体下的样本方差甚至是子总体（如处理组所在子总体）下的样本方差。在此基础上，我们可建立估计参数的置信区间做出进一步的推断。
 
-到此为止，规则设计机制下一般的观测性研究的因果效应相关分析就暂告一段落了。但是在实际对处理进行分配时，往往会遇到不服从分配等情况，这是需要引入工具变量来进行分析和推断，下一篇将会对这一部分做一个简要的介绍。
+到此为止，规则设计机制下一般的观测性研究的因果效应相关分析就暂告一段落了。但是在实际对处理进行分配时，往往会遇到**不服从分配**等情况，这是需要引入**工具变量**来进行分析和推断，下一篇将会对这一部分做一个简要的介绍。
