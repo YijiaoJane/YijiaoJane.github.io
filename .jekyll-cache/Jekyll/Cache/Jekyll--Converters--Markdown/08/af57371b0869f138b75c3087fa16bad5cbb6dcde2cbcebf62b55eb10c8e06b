@@ -1,4 +1,6 @@
-I"'[<p>这一篇将主要介绍<code class="language-plaintext highlighter-rouge">因果推断中的基本概念</code>以及<code class="language-plaintext highlighter-rouge">分配机制的几种类型</code>。</p>
+I""_<p>这一系列主要为Imbens和Rubin关于因果推断这本书<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">CAUSAL INFERENCE for Statistics, Social, and Biomedical Sciences An Introduction</a>的读书笔记，笔者在整理的过程中加入了一些自己的思考和理解，不一定完全正确，欢迎交流讨论。</p>
+
+<p>这一篇将主要介绍<code class="language-plaintext highlighter-rouge">因果推断中的基本概念</code>以及<code class="language-plaintext highlighter-rouge">分配机制的几种类型</code>。</p>
 
 <h2 id="causality-the-basic-framework">Causality: The Basic Framework</h2>
 

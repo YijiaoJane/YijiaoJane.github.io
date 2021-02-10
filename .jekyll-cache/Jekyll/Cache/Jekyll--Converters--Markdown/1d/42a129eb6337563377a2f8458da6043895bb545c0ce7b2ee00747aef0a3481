@@ -1,4 +1,4 @@
-I"�<p>上一篇中我们介绍了规则分配机制下观测性研究中设计阶段的一些工作，这一篇我们将进一步介绍在这种情形下如何对因果效应进行估计和推断。</p>
+I"��<p>上一篇中我们介绍了规则分配机制下观测性研究中设计阶段的一些工作，这一篇我们将进一步介绍在这种情形下如何对因果效应进行估计和推断。</p>
 
 <h2 id="subclassification-on-the-propensity-score">Subclassification on the Propensity Score</h2>
 
@@ -511,7 +511,7 @@ S_{c t}(j)^{2}=\frac{1}{N(j)-1} \sum_{i=1}^{N} B_{i}(j) \cdot\left(Y_{i}(1)-Y_{i
 
 <p>其对应的权重为：</p>
 
-\[\lambda_{i}^{\mathrm{ols}}=\bar{W}^{W_{i}} \cdot(1-\bar{W})^{1-W_{i}} \cdot \frac{S_{X}^{2}(N-1) / N-\left(\bar{X}_{t}-\bar{X}_{c}\right) \cdot\left(X_{i}-\bar{X}\right)}{S_{X}^{2}(N-1) / N-\bar{W} \cdot(1-\bar{W}) \cdot\left(\bar{X}_{t}-\bar{X}_{c}\right)^{2}},for all i\]
+\[\lambda_{i}^{\mathrm{ols}}=\bar{W}^{W_{i}} \cdot(1-\bar{W})^{1-W_{i}} \cdot \frac{S_{X}^{2}(N-1) / N-\left(\bar{X}_{t}-\bar{X}_{c}\right) \cdot\left(X_{i}-\bar{X}\right)}{S_{X}^{2}(N-1) / N-\bar{W} \cdot(1-\bar{W}) \cdot\left(\bar{X}_{t}-\bar{X}_{c}\right)^{2}}\]
 
 <p>其中$S_{X}^{2}=\sum_{i=1}^{N}\left(X_{i}-\bar{X}\right)^{2} /(N-1)$。</p>
 
@@ -735,5 +735,4 @@ Y_{i}^{\text {obs }} &amp; \text { if } W_{i}=1
 
 <p>简单小结一下，这一篇我们主要介绍了在结束了设计阶段的工作后如何具体的对因果效应进行估计，我们详细介绍了<strong>分层</strong>和<strong>匹配</strong>的方法，并对之前介绍的估计量建立了一个统一的结构，即<strong>加权和</strong>的形式，并在此基础上给出了估计样本方差的一般方法，包括有限总体下以及超总体下的样本方差甚至是子总体（如处理组所在子总体）下的样本方差。在此基础上，我们可建立估计参数的置信区间做出进一步的推断。</p>
 
-<p>到此为止，规则设计机制下一般的观测性研究的因果效应相关分析就暂告一段落了。但是在实际对处理进行分配时，往往会遇到<strong>不服从分配</strong>等情况，这是需要引入<strong>工具变量</strong>来进行分析和推断，下一篇将会对这一部分做一个简要的介绍。</p>
 :ET

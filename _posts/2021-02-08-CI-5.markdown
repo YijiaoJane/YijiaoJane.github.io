@@ -12,6 +12,7 @@ tags:
 
 回顾前两篇中关于因果效应的的估计和推断，都是建立在`无混杂性（Unconfoundedness）`的假设上的。由于每一个个体只能观测到一种处理水平下的潜在结果，这个假设是**无法对其进行验证的**。但为了使得由此建立的估计和推断有一定的可信度，我们仍因对该假设的合理性进行一定的分析，因此这一篇我们将主要介绍一下**如何对无混杂假设合理性进行评估，以及如何对该假设进行敏感性分析并给出在放松该假设的条件下估计量的取值范围**，统称以上为`支持或补充分析（supporting or supplementary analyses）`。
 
+---
 ## Assessing Unconfoundedness
 
 这里介绍三种对无混杂假设进行合理性分析的方法。
@@ -56,7 +57,13 @@ $$
 \mathbb{E}\left[\mathbb{E}\left[g\left(X_{i}^{\mathrm{p}}\right) \mid W_{i}=1, X_{i}^{\mathrm{r}}\right]-\mathbb{E}\left[g\left(X_{i}^{\mathrm{p}}\right) \mid W_{i}=0, X_{i}^{\mathrm{r}}\right] \mid X_{i}^{\mathrm{r}} \in \mathbb{X}_{j}^{\mathrm{r}}\right]=0
 $$
 
-其中$\left\{\mathbb{X}_{j}^{r}\right\}_{j=1}^{J}$为剩余协变量$X_{i}^{\mathrm{r}}$所在支撑的某个划分。
+其中
+
+$$
+\mathbb{X}_j^r,\quad j=1,\ldots,J
+$$
+
+为剩余协变量$X_{i}^{\mathrm{r}}$所在支撑的某个划分。
 
 因此，可通过对上式进行检验，来评估伪结果无混杂性的假设是否合理，并在此基础上对无混杂性的合理性做出判断。
 
@@ -74,11 +81,11 @@ $$
 考虑如下两组类似于无混杂性的假设：
 
 $$
-W_{i} ⊥ Y_i(0),Y_i(1) \mid X_{i},G_i \in \\{c_1,t \\}
+W_{i} ⊥ Y_i(0),Y_i(1) \mid X_{i},G_i \in \{c_1,t \}
 $$
 
 $$
-W_{i} ⊥ Y_i(0),Y_i(1) \mid X_{i},G_i \in \\{c_2,t \\}
+W_{i} ⊥ Y_i(0),Y_i(1) \mid X_{i},G_i \in \{c_2,t \}
 $$
 
 第一个假设可以看作为处理组个体和第一组控制组的个体组成的样本中的无混杂性假设，若该假设成立，我们则可以只用第一组控制组的个体进行因果效应的估计。类似的若第二个假设成立，则可以只用第二组控制组的个体进行因果效应的估计。而需要说明的是，一般来说很难预想一个无混杂性假定成立而上述两个限制条件下的无混杂性不成立的场景。一般来说，若无混杂性假定成立，那么比起更强一点的`组内无混杂性（Group Unconfoundedness）`的假定也会成立，即：
@@ -105,7 +112,7 @@ $$
 \mathbb{E}\left[\mathbb{E}\left[g\left(Y_{i}^{\mathrm{obs}}\right) \mid G_{i}=c_{1}, X_{i}\right]-\mathbb{E}\left[g\left(Y_{i}^{\mathrm{obs}}\right) \mid G_{i}=c_{2}, X_{i}\right]\right]=0
 $$
 
-更进一步可检验对于给定$X_{i}$所在支撑的一个划分$\left\{\mathbb{X}_{j}^{r}\right\}_{j=1}^{J}$，下式是否成立：
+更进一步可检验对于给定$X_{i}$所在支撑的一个划分，下式是否成立：
 
 $$
 \mathbb{E}\left[\mathbb{E}\left[g\left(Y_{i}^{\text {obs }}\right) \mid W_{i}=1, X_{i}\right]-\mathbb{E}\left[g\left(Y_{i}^{\text {obs }}\right) \mid W_{i}=0, X_{i}\right] \mid X_{i} \in \mathbb{X}_{j}\right]=0
@@ -132,7 +139,7 @@ $$
 $$
 \begin{aligned}
 \mathbb{E}\left[\mathbb{E}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}=1, X_{i}\right]-\mathbb{E}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}=0, X_{i}\right]\right] \\
-&=\mathbb{E}\left[\mathbb{E}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}=1, X_{i}^{\mathrm{r}}\right]-\mathbb{E}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}=0, X_{i}^{\mathrm{r}}\right]\right]
+=\mathbb{E}\left[\mathbb{E}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}=1, X_{i}^{\mathrm{r}}\right]-\mathbb{E}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}=0, X_{i}^{\mathrm{r}}\right]\right]
 \end{aligned}
 $$
 
@@ -148,8 +155,10 @@ $$
 
 $$
 \begin{aligned}
-f_{Y_{i}^{\mathrm{obs}} \mid W_{i}=w, X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(y \mid w, x^{\mathrm{r}}\right)=f_{Y_{i}(w) \mid W_{i}=w, X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(y \mid w, x^{\mathrm{r}}\right)=f_{Y_{i}(w) \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(y \mid  x^{\mathrm{r}}\right)\\
-&=\int f_{Y_{i}(w) \mid X_{i}=x}(y \mid x) \cdot f_{X_{i} \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(x \mid x^{\mathrm{r}}\right) d x=\int f_{Y_{i}(w) \mid W_i=w,X_{i}=x}(y \mid w,x) \cdot f_{X_{i} \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(x \mid x^{\mathrm{r}}\right) d x=\int f_{Y_{i}^{\mathrm{obs}} \mid W_i=w,X_{i}=x}(y \mid w,x) \cdot f_{X_{i} \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(x \mid x^{\mathrm{r}}\right) d x
+f_{Y_{i}^{\mathrm{obs}} \mid W_{i}=w, X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(y \mid w, x^{\mathrm{r}}\right)&=f_{Y_{i}(w) \mid W_{i}=w, X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(y \mid w, x^{\mathrm{r}}\right)=f_{Y_{i}(w) \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(y \mid  x^{\mathrm{r}}\right)\\
+&=\int f_{Y_{i}(w) \mid X_{i}=x}(y \mid x) \cdot f_{X_{i} \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(x \mid x^{\mathrm{r}}\right) d x\\
+&=\int f_{Y_{i}(w) \mid W_i=w,X_{i}=x}(y \mid w,x) \cdot f_{X_{i} \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(x \mid x^{\mathrm{r}}\right) d x\\
+&=\int f_{Y_{i}^{\mathrm{obs}} \mid W_i=w,X_{i}=x}(y \mid w,x) \cdot f_{X_{i} \mid X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(x \mid x^{\mathrm{r}}\right) d x
 \end{aligned}
 $$
 
@@ -159,7 +168,7 @@ $$
 \int f_{Y_{i}^{\text {obs }} \mid W_{i}=w, X_{i}=x}(y \mid w, x) \cdot\left(f_{X_{i} \mid W_{i}, X_{i}^{r}=x^{r}}\left(x \mid w=1, x^{r}\right)-f_{X_{i} \mid W_{i}, X_{i}^{r}=x^{r}}\left(x \mid w=0, x^{r}\right)\right) d x=0
 $$
 
-但是直接对两个条件分布作比较是相对困难的，我们可以采用一些曲线救国的方式。类似于前面介绍的两种方法，我们可以检验对于任意函数$g(\cdot)$以及$X_{i}^{\mathrm{r}}$所在支撑的某个划分$\left\{\mathbb{X}_{j}^{r}\right\}_{j=1}^{J}$下式是否成立：
+但是直接对两个条件分布作比较是相对困难的，我们可以采用一些曲线救国的方式。类似于前面介绍的两种方法，我们可以检验对于任意函数$g(\cdot)$以及$X_{i}^{\mathrm{r}}$所在支撑的某个划分，下式是否成立：
 
 $$
 \begin{array}{l}
@@ -191,7 +200,7 @@ $$
 W_{i} ⊥ X_{i}^{\mathrm{p}} \mid X_{i}^{\mathrm{r}}
 $$
 
-因此这一方法通常用在协变量中包含了较多滞后结果变量（lagged outcomes）的情形，因为这些变量所包含的信息基本相同，只在测量时间上有差异，。
+因此这一方法通常用在协变量中包含了较多滞后结果变量（lagged outcomes）的情形，因为这些变量所包含的信息基本相同，只在测量时间上有差异。
 
 
 ## Sensitivity Analysis and Bounds
@@ -274,7 +283,10 @@ $$
 为简便起见，假定$Y_i(0)$与$Y_i(1)$关于$U_i$条件独立，进而可对$U_i$与处理变量以及潜在结果变量之间的关系进行建模：
 
 $$
-f\left(W_{i}, Y_{i}(0), Y_{i}(1) \mid U_{i}\right) = f\left(W_{i} \mid U_{i}\right) \cdot f\left(Y_{i}(0), Y_{i}(1) \mid U_{i}\right)=f\left(W_{i} \mid U_{i}\right) \cdot f\left(Y_{i}(0)\mid U_{i}\right) \cdot f\left(Y_{i}(1)\mid U_{i}\right)
+\begin{aligned}
+f\left(W_{i}, Y_{i}(0), Y_{i}(1) \mid U_{i}\right) &= f\left(W_{i} \mid U_{i}\right) \cdot f\left(Y_{i}(0), Y_{i}(1) \mid U_{i}\right)\\
+&=f\left(W_{i} \mid U_{i}\right) \cdot f\left(Y_{i}(0)\mid U_{i}\right) \cdot f\left(Y_{i}(1)\mid U_{i}\right)
+\end{aligned}
 $$
 
 分别对右式的三项进行建模（这里依然假定结果变量为二元取值）：
@@ -287,7 +299,7 @@ $$
 \end{array}
 $$
 
-可见上述模型中的参数$\theta=\left(q, \gamma_{1}, \alpha_{1}, \beta_{1}, \gamma_{0}, \alpha_{0}, \beta_{0}\right)$分为两部分，即`敏感性参数（Sensitivity Parameters）`${\theta}_s=\left(q, \gamma_{1}, \alpha_{1}, \beta_{1}\right)$以及`可估参数（Estimable Parameters）`${\theta}_e=\left(\gamma_{0}, \alpha_{0}, \beta_{0}\right)$。
+可见上述模型中的参数$\theta=\left(q, \gamma_{1}, \alpha_{1}, \beta_{1}, \gamma_{0}, \alpha_{0}, \beta_{0}\right)$分为两部分，即`敏感性参数（Sensitivity Parameters）`$\theta_s=\left(q, \gamma_{1}, \alpha_{1}, \beta_{1}\right)$以及`可估参数（Estimable Parameters）`$\theta_e=\left(\gamma_{0}, \alpha_{0}, \beta_{0}\right)$。
 
 个人理解：与Manski的方法类似之处在于，Rosenbaum-Rubin方法也是**将参数分为了根据观测数据可估以及不可估的部分**，但不同之处在于，对于不可估的部分，Manski直接给出了它们的最大取值范围，而Rosenbaum-Rubin方法是**将不可估部分视为敏感性参数**，通过建模得到可估参数与敏感性参数之间的关系，从而进一步分析敏感参数的变化对于$\tau_{\mathrm{sp}}$取值的影响。具体来讲，由于：
 
@@ -295,7 +307,7 @@ $$
 \tau_{\mathrm{sp}}=\mu_{t}-\mu_{c}=p \cdot (\mu_{t, 1}-\mu_{c, 1})+(1-p) \cdot (\mu_{t, 0}-\mu_{c, 0})
 $$
 
-其中可估部分$p,\mu_{c, 0},\mu_{t, 1}$以及不可估部分$\mu_{c, 1},\mu_{t, 0}$根据上面指定的三个模型均可表示为$\theta$的函数。而根据参数之间的关系，当观测样本$data=(p,\mu_{c, 0},\mu_{t, 1})$给定时，对于任意一组敏感性参数${\theta}_s=\left(q, \gamma_{1}, \alpha_{1}, \beta_{1}\right)$，我们可求解出相应的可故参数${\theta}_e=\left(\gamma_{0}, \alpha_{0}, \beta_{0}\right)$的值，即：
+其中可估部分$p,\mu_{c, 0},\mu_{t, 1}$以及不可估部分$\mu_{c, 1},\mu_{t, 0}$根据上面指定的三个模型均可表示为$\theta$的函数。而根据参数之间的关系，当观测样本$data=(p,\mu_{c, 0},\mu_{t, 1})$给定时，对于任意一组敏感性参数$\theta_s=\left(q, \gamma_{1}, \alpha_{1}, \beta_{1}\right)$，我们可求解出相应的可故参数$\theta_e=\left(\gamma_{0}, \alpha_{0}, \beta_{0}\right)$的值，即：
 
 $$
 \gamma_{0}\left(q, \gamma_{1}, \alpha_{1}, \beta_{1} \mid \text { data }\right),\quad \alpha_{0}\left(q, \gamma_{1}, \alpha_{1}, \beta_{1} \mid \text { data }\right),\quad \beta_{0}\left(q, \gamma_{1}, \alpha_{1}, \beta_{1} \mid \text { data }\right)
