@@ -345,7 +345,7 @@ $$
 
 这对应于Manski方法中给出的下界。
 
-因此，Manski的方法可以视为Rosenbaum-Rubin方法的一种特殊情况，而Rosenbaum-Rubin方法可视为Manski方法的一种推广。
+**因此，Manski的方法可以视为Rosenbaum-Rubin方法的一种特殊情况，而Rosenbaum-Rubin方法可视为Manski方法的一种推广**。
 
 若给出敏感性参数的合理取值域$\Theta_s$，则也可以得到$\tau_{\mathrm{sp}}$的合理取值区间：
 
