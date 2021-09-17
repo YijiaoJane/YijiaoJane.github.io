@@ -67,7 +67,7 @@ valine_comment:
 
 # Gitalk
 gitalk:
-  enable: true   #是否开启Gitalk评论
+  enable: false   #是否开启Gitalk评论
   clientID:                             #生成的clientID
   clientSecret:     #生成的clientSecret
   repo: yijiaojane.github.io    #仓库名称
