@@ -55,15 +55,23 @@ highlighter: rouge
 kramdown:
   input: GFM                            # use Github Flavored Markdown !important
 
-
+# Valine
+valine_comment:
+  enable: true
+# app_id
+  leancloud_appid: Me84rPVUesYRCnuB7xlnX0gB-gzGzoHsz
+# app_key
+  leancloud_appkey: ARlM8zXPjQ6uW8NjBvc1J7b4
+# placeholde
+  placeholder: “Comments"
 
 # Gitalk
 gitalk:
-  enable: false    #是否开启Gitalk评论
+  enable: true   #是否开启Gitalk评论
   clientID:                             #生成的clientID
   clientSecret:     #生成的clientSecret
-  repo: leyuanheart.github.io    #仓库名称
-  owner: leyuanheart    #github用户名
+  repo: yijiaojane.github.io    #仓库名称
+  owner: yijiaojane   #github用户名
   admin: 
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
 

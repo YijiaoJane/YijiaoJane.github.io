@@ -1,5 +1,6 @@
-I"�\<p>回顾前两篇中关于因果效应的的估计和推断，都是建立在<code class="language-plaintext highlighter-rouge">无混杂性（Unconfoundedness）</code>的假设上的。由于每一个个体只能观测到一种处理水平下的潜在结果，这个假设是<strong>无法对其进行验证的</strong>。但为了使得由此建立的估计和推断有一定的可信度，我们仍因对该假设的合理性进行一定的分析，因此这一篇我们将主要介绍一下<strong>如何对无混杂假设合理性进行评估，以及如何对该假设进行敏感性分析并给出在放松该假设的条件下估计量的取值范围</strong>，统称以上为<code class="language-plaintext highlighter-rouge">支持或补充分析（supporting or supplementary analyses）</code>。</p>
+I"P\<p>回顾前两篇中关于因果效应的的估计和推断，都是建立在<code class="language-plaintext highlighter-rouge">无混杂性（Unconfoundedness）</code>的假设上的。由于每一个个体只能观测到一种处理水平下的潜在结果，这个假设是<strong>无法对其进行验证的</strong>。但为了使得由此建立的估计和推断有一定的可信度，我们仍因对该假设的合理性进行一定的分析，因此这一篇我们将主要介绍一下<strong>如何对无混杂假设合理性进行评估，以及如何对该假设进行敏感性分析并给出在放松该假设的条件下估计量的取值范围</strong>，统称以上为<code class="language-plaintext highlighter-rouge">支持或补充分析（supporting or supplementary analyses）</code>。</p>
 
+<hr />
 <h2 id="assessing-unconfoundedness">Assessing Unconfoundedness</h2>
 
 <p>这里介绍三种对无混杂假设进行合理性分析的方法。</p>
@@ -71,7 +72,7 @@
 
 \[\mathbb{E}\left[\mathbb{E}\left[g\left(Y_{i}^{\mathrm{obs}}\right) \mid G_{i}=c_{1}, X_{i}\right]-\mathbb{E}\left[g\left(Y_{i}^{\mathrm{obs}}\right) \mid G_{i}=c_{2}, X_{i}\right]\right]=0\]
 
-<p>更进一步可检验对于给定$X_{i}$所在支撑的一个划分$\left{\mathbb{X}<em>{j}^{r}\right}</em>{j=1}^{J}$，下式是否成立：</p>
+<p>更进一步可检验对于给定$X_{i}$所在支撑的一个划分，下式是否成立：</p>
 
 \[\mathbb{E}\left[\mathbb{E}\left[g\left(Y_{i}^{\text {obs }}\right) \mid W_{i}=1, X_{i}\right]-\mathbb{E}\left[g\left(Y_{i}^{\text {obs }}\right) \mid W_{i}=0, X_{i}\right] \mid X_{i} \in \mathbb{X}_{j}\right]=0\]
 
@@ -113,7 +114,7 @@ f_{Y_{i}^{\mathrm{obs}} \mid W_{i}=w, X_{i}^{\mathrm{r}}=x^{\mathrm{r}}}\left(y 
 
 \[\int f_{Y_{i}^{\text {obs }} \mid W_{i}=w, X_{i}=x}(y \mid w, x) \cdot\left(f_{X_{i} \mid W_{i}, X_{i}^{r}=x^{r}}\left(x \mid w=1, x^{r}\right)-f_{X_{i} \mid W_{i}, X_{i}^{r}=x^{r}}\left(x \mid w=0, x^{r}\right)\right) d x=0\]
 
-<p>但是直接对两个条件分布作比较是相对困难的，我们可以采用一些曲线救国的方式。类似于前面介绍的两种方法，我们可以检验对于任意函数$g(\cdot)$以及$X_{i}^{\mathrm{r}}$所在支撑的某个划分$\left{\mathbb{X}<em>{j}^{r}\right}</em>{j=1}^{J}$下式是否成立：</p>
+<p>但是直接对两个条件分布作比较是相对困难的，我们可以采用一些曲线救国的方式。类似于前面介绍的两种方法，我们可以检验对于任意函数$g(\cdot)$以及$X_{i}^{\mathrm{r}}$所在支撑的某个划分，下式是否成立：</p>
 
 \[\begin{array}{l}
 \mathbb{E}\left[\mathbb{E}\left[g\left(Y_{i}^{\text {obs }}\right) \mid W_{i}=w, X_{i}\right] \mid W_{i}=0, X_{i}^{\mathrm{r}} \in \mathbb{X}_{j}^{\mathrm{r}}\right] \\
@@ -259,7 +260,7 @@ f\left(W_{i}, Y_{i}(0), Y_{i}(1) \mid U_{i}\right) &amp;= f\left(W_{i} \mid U_{i
 
 <p>这对应于Manski方法中给出的下界。</p>
 
-<p>因此，Manski的方法可以视为Rosenbaum-Rubin方法的一种特殊情况，而Rosenbaum-Rubin方法可视为Manski方法的一种推广。</p>
+<p><strong>因此，Manski的方法可以视为Rosenbaum-Rubin方法的一种特殊情况，而Rosenbaum-Rubin方法可视为Manski方法的一种推广</strong>。</p>
 
 <p>若给出敏感性参数的合理取值域$\Theta_s$，则也可以得到$\tau_{\mathrm{sp}}$的合理取值区间：</p>
 

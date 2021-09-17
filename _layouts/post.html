@@ -81,9 +81,8 @@ layout: default
                     {% endif %}
                 </ul>
 
-
-                <!--Gitalk评论start  -->
                 {% if site.gitalk.enable %}
+                <!--Gitalk评论start  -->
                 <!-- 引入Gitalk评论插件  -->
                 <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
                 <script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
@@ -102,9 +101,24 @@ layout: default
                     id: md5(location.pathname),
                     });
                     gitalk.render('gitalk-container');
-                </script>
-                {% endif %}
+                </script>         
                 <!-- Gitalk end -->
+	{% endif %}
+
+	<!-- Valine 评论框 start -->
+	{% if site.valine_comment.enable %}
+	<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+	<script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+	<div id="vcomments"></div>
+	<script type="text/javascript">
+  	  new Valine({
+    	    el: '#comments',
+     	   app_id: {{ site.valine_comment.leancloud_appid }},   //这里变量的取值在网站配置文件里_config.yml
+      	  app_key: {{ site.valine_comment.leancloud_appkey }}, //这里变量的取值在网站配置文件里_config.yml
+      	  placeholder:{{ site.valine_comment.placeholder }}   //这里变量的取值在网站配置文件里_config.yml
+   	 });</script>
+	{% endif %}
+ 	<!-- Valine 评论框 end -->
 
                 {% if site.disqus_username %}
                 <!-- disqus 评论框 start -->
