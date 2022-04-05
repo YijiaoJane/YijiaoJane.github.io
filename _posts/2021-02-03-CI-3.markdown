@@ -309,6 +309,7 @@ $$
 #### Difference in dispersion
 
 类似地，我们可以对两组的标准差进行比较，定义指标如下：
+
 $$
 \Gamma_{c t}=\ln \left(\frac{\sigma_{t}}{\sigma_{c}}\right)
 $$
