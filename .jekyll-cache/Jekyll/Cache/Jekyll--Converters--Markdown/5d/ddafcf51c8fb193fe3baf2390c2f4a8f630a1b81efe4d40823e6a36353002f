@@ -1,0 +1,522 @@
+I"o�<p>上一篇介绍了随机化实验中常见的一些分配机制以及常用的四种估计因果效应的方法，而在实际生活中，我们遇到更多的还是观测性研究，即分配机制的具体形式未知的情形。因此，从这一篇开始，我们就来介绍一下对于<code class="language-plaintext highlighter-rouge">规则分配机制下观测性研究的数据如何对因果效应进行推断</code>。</p>
+
+<p>在对因果效应进行推断之前我们还有一件事情要做，即对观测性研究数据进行设计，我们称之为<code class="language-plaintext highlighter-rouge">设计阶段（design phase）</code>。为什么要对观测性研究进行设计呢？我们在前面介绍<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#completely-randomized-experiments">完全随机化实验</a>的缺点时也提到过，两种处理水平下潜在结果之间的差异可能不仅来源于处理变量取值的差异，也可能与协变量的取值有关。当两种处理水平下协变量的分布差异较大时，我们很难分辨两组潜在结果之间的差异到底是来自处理变量还是协变量的差异。因此，我们需要先对观测性研究的数据进行一个预分析，<strong>估计一下处理组和控制组（下称“两组”）的个体协变量的分布差异是否差距太大</strong>，如果差距较大的话，我们需要对样本进行一个分层，使得<strong>每一层中两组协变量的分布尽量均衡</strong>（<code class="language-plaintext highlighter-rouge">covariate balance</code>），或者在全样本中选取一个子样本，使得在子样本中两组协变量的分布尽量均衡，这样我们估计得到的因果效应才是具有一定可信度的。类似于分层随机化实验，对观测性研究的样本进行分层后，我们也可以将每一层的子样本近似看作来自于一个完全随机化实验，从而可以利用<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#methods-for-estimation-and-inference-of-causal-effects">上一篇</a>中介绍的方法对每一层的因果效应进行估计。</p>
+
+<p>因此这一篇，我们主要来介绍观测性研究的设计阶段的一些工作，主要包括两个方面：协变量分布均衡性的评估（Assessing Covariate Balance），子样本的选取（Subsample Selection）。需要说明的是，在设计阶段主要利用的信息为处理变量与预处理变量，因此这一篇中，我们<strong>没有用到观测到的结果变量的信息</strong>。</p>
+
+<hr />
+
+<p>首先我们来看一下如何对两组协变量分布的均衡性进行评估（Assessing Covariate Balance）。</p>
+
+<h2 id="balancing-scores-and-the-propensity-score">Balancing Scores and the Propensity Score</h2>
+
+<p>当协变量个数较多时，平衡两组协变量分布之间的差异是相对困难的，<code class="language-plaintext highlighter-rouge">平衡得分（Balancing Scores）</code>的想法就是去<strong>构造一个关于协变量的低维函数</strong>，使得可以根据平衡得分消除两组协变量之间的差异。称一个协变量的函数$b(x)$为平衡得分，如果它满足：</p>
+
+\[\begin{array}{lll|l}
+W_{i} &amp; ⊥ &amp; X_{i} &amp; b\left(X_{i}\right)
+\end{array}\]
+
+<p>因此，尽管全样本中两组协变量分布之间存在差异，但在给定平衡得分后，由于协变量与处理变量相互独立，从而两组协变量的分布相同。我们感兴趣的是低维的平衡得分，可以证明，前面我们提到的倾向性得分就是一种平衡得分，即：</p>
+
+\[\begin{array}{lll|l}
+W_{i} &amp; ⊥ &amp; X_{i} &amp; e\left(X_{i}\right)
+\end{array}\]
+
+<p>或者等价地可以写为：</p>
+
+\[\operatorname{Pr}\left(W_{i}=1 \mid X_{i}, e\left(X_{i}\right)\right)=\operatorname{Pr}\left(W_{i}=1 \mid e\left(X_{i}\right)\right)\]
+
+<p>不仅如此，可以证明倾向性得分可以表示为任意一个平衡得分的函数。</p>
+
+<p>进一步考虑倾向性得分和协变量分布差异之间的关系，记处理组和控制组协变量分布的密度函数分别为$f_{t}(x)$和$f_{c}(x)$，当分配机制满足个体性和概率性时，我们有以下式子成立：</p>
+
+\[\mathbb{V}\left(e\left(X_{i}\right)\right)=\mathbb{E}\left[\left(\frac{f_{t}\left(X_{i}\right)-f_{c}\left(X_{i}\right)}{f_{t}\left(X_{i}\right) \cdot p+f_{c}\left(X_{i}\right) \cdot(1-p)}\right)^{2}\right] \cdot p^{2} \cdot(1-p)^{2}\]
+
+\[\mathbb{E}\left[e\left(X_{i}\right) \mid W_{i}=1\right]-\mathbb{E}\left[e\left(X_{i}\right) \mid W_{i}=0\right]=\frac{\mathbb{V}\left(e\left(X_{i}\right)\right)}{p \cdot(1-p)}\]
+
+<p>上述式子说明，<strong>两组协变量的部分存在差异等价于两组的倾向性得分存在差异</strong>。因此我们可以认为<strong>倾向性得分最大程度地包含了两组协变量分布差异的信息</strong>，倾向性得分取值越相近的个体，两组协变量分布之间的差异越小，由此我们可以根据倾向性得分的差异来评估两组协变量分布之间的差异，同时可以根据倾向性得分对样本进行分层。</p>
+
+<h2 id="estimating-the-propensity-score">Estimating the Propensity Score</h2>
+
+<p>由于在观测性研究中倾向性得分往往是未知的，我们需要先对倾向性得分进行估计，再在此基础上对样本进行分层。需要注意的是，倾向性得分在因果推断中扮演着很重要的角色，除了用它分层以外，也可以直接用它对因果效应进行估计，如逆概率加权等等，在后面这种情形中，我们通常希望对倾向性得分估计得越准确越好，但在我们下面要讨论到的分层中，<strong>我们希望的是根据估计得到的倾向性得分所建立的分层中两组协变量分布尽量均衡</strong>，因此估计的准确性在这里不是我们的主要目标。</p>
+
+<h4 id="selecting-the-covariates-and-interactions">Selecting the Covariates and Interactions</h4>
+
+<p>常用的一种估计倾向性得分的方法为logistic回归，即假定进入处理组的概率的对数优势比（log odds ratio）为一些协变量的线性函数，即，：</p>
+
+\[\operatorname{Pr}\left(W_{i}=1 \mid X_{i}=x ; \phi\right)=\frac{\exp (h(x) \phi)}{1+\exp (h(x) \phi)}\]
+
+<p>其中，$\phi$为未知参数，一种简单的选择为$h(x)=x$，此时其对应的似然函数为：</p>
+
+\[\mathcal{L}\left(\phi \mid \mathbf{Y}^{\mathrm{obs}}, \mathbf{W}, \mathbf{X}\right)=\prod_{i=1}^{N} \operatorname{Pr}\left(W_{i}=1 \mid X_{i} ; \phi\right)^{W_{i}} \cdot\left(1-\operatorname{Pr}\left(W_{i}=1 \mid X_{i} ; \phi\right)\right)^{1-W_{i}}=\prod_{i=1}^{N} \frac{\exp \left(W_{i} \cdot X_{i} \phi\right)}{1+\exp \left(X_{i} \phi\right)}\]
+
+<p>然后可利用最大似然方法对未知参数进行估计。</p>
+
+<p>在这里，我们介绍更一般的$h(x)$的选择方式，即其中可只包含一部分重要的协变量以及它们的一些高阶项。那么该<strong>如何选择这些变量</strong>呢？下面介绍一种逐步（stepwise）选择的方法。</p>
+
+<ul>
+  <li>
+    <p><strong>Step 1 ：</strong> 假设一共有$K$个协变量，首先可根据先验知识（研究问题背景、专家判断等）选择$K_B$个<code class="language-plaintext highlighter-rouge">基础协变量（basic covariates）</code>进入模型。这些变量一般包含和处理变量相关性较高或和潜在结果变量相关性较高的变量。</p>
+  </li>
+  <li>
+    <p><strong>Step 2 ：</strong> 将剩下的$K-K_B$个变量每个都单独放进Step 1已建立好的模型中，计算出加入单个变量后的似然比，将似然比最高的变量加入模型，再重复上述操作，直至所有剩余变量的似然比都小于提前设定的阈值$C_L$为止。假定Step 1和Step 2结束后，我们共选入$K_L$个变量进入模型作为一次项。</p>
+  </li>
+  <li>
+    <p><strong>Step 3 ：</strong> 从由上面选出$K_L$个变量构成的$K_{\mathrm{L}} \cdot\left(K_{\mathrm{L}}+1\right) / 2$中选择二次项进入模型，方法与Step 2相同，只是此时的阈值为$C_Q$。假定Step 3结束后，我们选入$K_Q$个变量进入模型作为二次项。</p>
+  </li>
+</ul>
+
+<p>原书中选择的阈值分别为$C_L=1$和$C_Q=2.71$，分别对应$z$统计量的取值为$1$和$1.65$。</p>
+
+<p>根据选择的$K_L+K_Q$个变量，我们可以对指定的logistic回归模型进行参数估计，并求出倾向性得分的估计值$\hat{e}(x)$。</p>
+
+<h4 id="constructing-propensity-score-strata">Constructing Propensity-Score Strata</h4>
+<p>有了倾向性得分的估计值之后，我们就可以来对样本进行分层了。这里主要依据的就是倾向性得分的这个重要性质：</p>
+
+\[W_{i} ⊥ X_{i} \mid e\left(X_{i}\right)\]
+
+<p>当协变量只取少数离散值时，我们可以直接根据协变量的取值进行分层，这里我们主要关注的是协变量取值可能性较多的情形。在这种情况下，倾向性得分取值相同的个体很少，为了使每一层中的样本个数不至于太少，我们可以把倾向性得分相近的个体放到一层。</p>
+
+<p>假定我们按照$\hat{e}(x)$的取值将样本分为$J$层，对应的边界为$0=b_{0}&lt;b_{1}&lt;\ldots&lt;b_{J-1}&lt;b_{J}=1$，记$B_i(j)$表示第$i$个个体是否在第$j$层：</p>
+
+\[B_{i}(j)=\left\{\begin{array}{ll}
+1 &amp; \text { if } b_{j-1} \leq \hat{e}\left(X_{i}\right)&lt;b_{j} \\
+0 &amp; \text { otherwise }
+\end{array}\right.\]
+
+<p>for $j=1,\ldots,J$.</p>
+
+<p>那么这些边界点的值以及划分的层数该如何选择呢？</p>
+
+<p>首先，我们需要确定最小边界$b_0$以及最大边界$b_J$的值。由于控制组的倾向性得分一般来说会低于处理组的倾向性得分，因为为了两组的倾向性得分有相同的取值范围，可以将两组种倾向性得分估计值较为极端的部分舍弃。由此定义：</p>
+
+\[\underline{e}_{t}=\min _{i: W_{i}=1} \hat{e}\left(X_{i}\right),\quad \bar{e}_{c}=\max _{i: W_{i}=0} \hat{e}\left(X_{i}\right)\]
+
+<p>若</p>
+
+\[\hat{e}\left(X_{i}\right)&lt;\underline{e}_{t} \text { or } \hat{e}\left(X_{i}\right)&gt;\bar{e}_{c}\]
+
+<p>则个体$i$无法找到对应的匹配，可将其去掉，由此可初始化：</p>
+
+\[b_0=\underline{e}_{t},\quad J=1, \quad b_1=b_J=\bar{e}_{c}\]
+
+<p>之后的分层主要分为以下两步：</p>
+
+<ul>
+  <li>
+    <p><strong>Step 1 ：</strong> 评估当前层是否满足划分要求，主要包括以下两个</p>
+
+    <ul>
+      <li>
+        <p><strong>当前层中两组协变量分布是否已经足够平衡。</strong><a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>中用到的方法为对每一层中的<code class="language-plaintext highlighter-rouge">线性化倾向性得分（linearized propensity score）</code>或称<code class="language-plaintext highlighter-rouge">对数优势比（log odds ratio）</code>进行<strong>两样本均值$t$检验</strong>，如果拒绝原假设，则认为该层中两组协变量分布差异仍然显著，需要进行进一步划分。具体细节参见原书第13章。</p>
+      </li>
+      <li>
+        <p><strong>当前层个体数量是否支持进一步划分。</strong>由于我们分层之后需要对每层中的因果效应进行估计，其中涉及到样本方差的计算，因此即使满足第一个划分条件，我们还需保证若将第$j$层按照该层个体$\hat{e}\left(X_{i}\right)$的中位数$b_{j}^{\prime}$进行划分后，两个子层中的处理组和控制组的个体不能小于$\max \{3, K+2\}$，以便进行进一步的分析推断。</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Step 2 ：</strong> 根据当前层个体$\hat{e}\left(X_{i}\right)$的中位数对该层进行划分。</p>
+  </li>
+</ul>
+
+<p>重复上述步骤，直至所有层都不能继续划分，即可得到最后的分层结果。</p>
+
+<h4 id="assessing-balance-conditional-on-the-estimated-propensity-score">Assessing Balance Conditional on the Estimated Propensity Score</h4>
+
+<p>对样本进行分层的目的就是为了使得每一层中的两组协变量的分布尽量均衡，那么在分好层后，我们需要对分层后每层中的两组协变量分布的均衡性进行一个评估，即评估下式是否（近似）成立：</p>
+
+\[W_{i} ⊥ X_{i} \quad \mid \quad B_{i}(1), \ldots, B_{i}(J).\]
+
+<p>这里我们先考虑两组协变量均值的差异，即评估：</p>
+
+\[\mathbb{E}\left[X_{i} \mid W_{i}=1, B_{i}(j)=1\right]=\mathbb{E}\left[X_{i} \mid W_{i}=0, B_{i}(j)=1\right]\]
+
+<p>对于任意$j=1,\ldots,J$是否成立。这里我们主要介绍三种方法。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Assessing Global Balance for Each Covariate across Strata</code></li>
+</ul>
+
+<p>首先来看第一种，评估每个协变量在各层整体的均衡性（Global Balance）。记第$i$个个体的第$k$个协变量为$X_{ik}$，$k=1,\ldots,K$，我们这里将其视为一个<code class="language-plaintext highlighter-rouge">伪结果变量（pseudo-outcome）</code>，对应地将$\tau_{k}^{X}$视为<code class="language-plaintext highlighter-rouge">伪平均效应（pseudo-average effect）</code>，从而可以根据上一篇中介绍的<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">Neyman重复抽样方法</a>给出每一层中$\tau_{k}^{X}(j)$的估计：</p>
+
+\[\hat{\tau}_{k}^{X}(j)=\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)\]
+
+<p>同样可以给出其样本方差的估计：</p>
+
+\[\hat{\tau}_{k}^{X}(j)=\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j),\quad \hat{\mathbb{V}}_{k}^{X}(j)=s_{k}^{2}(j) \cdot\left(\frac{1}{N_{\mathrm{c}}(j)}+\frac{1}{N_{\mathrm{t}}(j)}\right)\]
+
+<p>其中</p>
+
+\[s_{k}^{2}(j)=\frac{\sum_{i: B_{i}(j)=1}^{N}\left(1-W_{i}\right) \cdot\left(X_{i k}-\bar{X}_{c, k}(j)\right)^{2}+\sum_{i: B_{i}(j)=1}^{N} W_{i} \cdot\left(X_{i k}-\bar{X}_{t, k}(j)\right)^{2}}{N(j)-2}\]
+
+<p>类似于分层随机化实验中的估计方法，我们可以得到$\tau_{k}^{X}$及其样本方差的估计：</p>
+
+\[\hat{\tau}_{k}^{X}=\sum_{j=1}^{J} \frac{N_{\mathrm{c}}(j)+N_{\mathrm{t}}(j)}{N} \cdot \hat{\tau}_{k}^{X}(j),\quad \hat{\mathbb{V}}_{k}^{X}=\sum_{j=1}^{J}\left(\frac{N_{\mathrm{c}}(j)+N_{\mathrm{t}}(j)}{N}\right)^{2} \cdot \hat{\mathbb{V}}_{k}^{X}(j)\]
+
+<p>从而原假设$\tau_{k}^{X}=0$对应的$z-$value为</p>
+
+\[z_{k}=\frac{\hat{\tau}_{k}^{X}}{\sqrt{\hat{\mathbb{V}}_{k}^{X}}}\]
+
+<p>若其绝对值较大，我们则拒绝原假设，认为分层后协变量$X_{ik}$在两组之间分布的总体差异依然显著。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Assessing Balance for Each Covariate within All Blocks</code></li>
+</ul>
+
+<p>注意到$\tau_{k}^{X}=0$其实是一个相对较弱的假设，因为所有层伪平均效应的均值为$0$不代表每一层的伪平均效应都为$0$，它们可能是正负抵消掉了。因此第二个检验的原假设为：$\tau_{k}^{X}(j)=0,j=1,\ldots,J$，其方法主要是依据上一篇中提到的<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods">回归方法</a>建立$F$统计量。</p>
+
+<p>考虑这样一个线性回归模型：</p>
+
+\[\mathbb{E}\left[X_{i k} \mid W_{i}, B_{i}(1), \ldots, B_{i}(J)\right]=\sum_{j=1}^{J} \alpha_{k j} \cdot B_{i}(j)+\sum_{j=1}^{J} \tau_{k}^{X}(j) \cdot B_{i}(j) \cdot W_{i}\]
+
+<p>我们可以分别给出在没有限制下以及在原假设限制下的最小二乘估计量：</p>
+
+\[\hat{\alpha}_{k j}^{\mathrm{ur}}=\bar{X}_{c, k}(j), \quad \text { and } \quad \hat{\tau}_{k}^{X}(j)=\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j) .\]
+
+\[\hat{\alpha}_{k j}^{\mathrm{r}}=\frac{N_{\mathrm{c}}(j)}{N_{\mathrm{c}}(j)+N_{\mathrm{t}}(j)} \cdot \bar{X}_{c, k}(j)+\frac{N_{\mathrm{t}}(j)}{N_{\mathrm{c}}(j)+N_{\mathrm{t}}(j)} \cdot \bar{X}_{t, k}(j)\]
+
+<p>从而对于每个协变量$X_{ik}$可以构造相应的$F$统计量：</p>
+
+\[F_{k}=\frac{\left(\mathrm{SSR}_{k}^{\mathrm{r}}-\mathrm{SSR}_{k}^{\mathrm{ur}}\right) / J}{\mathrm{SSR}_{k}^{\mathrm{ur}} /(N-2 J)}\]
+
+<p>其中</p>
+
+\[\operatorname{SSR}_{k}^{\mathrm{r}}=\sum_{i=1}^{N}\left(X_{i k}-\sum_{j=1}^{J} \hat{\alpha}_{k j}^{\mathrm{r}} \cdot B_{i}(j)\right)^{2}\]
+
+\[\mathrm{SSR}_{k}^{\mathrm{ur}}=\sum_{i=1}^{N}\left(X_{i k}-\sum_{j=1}^{J} \hat{\alpha}_{k j}^{\mathrm{ur}} \cdot B_{i j}-\sum_{j=1}^{J} \hat{\tau}_{k}^{X}(j) \cdot B_{i}(j) \cdot W_{i}\right)^{2}\]
+
+<p>若$F$统计量取较大的正值，则拒绝原假设，认为分层后协变量$X_{ik}$在两组之间分布的总体差异依然显著。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Assessing Balance within Strata for Each Covariate</code></li>
+</ul>
+
+<p>第三个检验方法在第二个的基础上更加细致了一些，它对每一个协变量在每一层都做了两组之间的两样本检验，由此可以得到第$k$个协变量（$k=1,\ldots,K$）在第$j$层（$j=1,\ldots,J$）的两样本检验的$z-$value：</p>
+
+\[z_{j k}=\frac{\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)}{\sqrt{s_{k}^{2}(j) \cdot\left(1 / N_{c}(j)+1 / N_{t}(j)\right)}}\]
+
+<p>通过画出上述$K \times J$个$z-$value的Q-Q图，来判断协变量的整体平衡性。</p>
+
+<hr />
+<h2 id="assessing-overlap-in-covariate-distributions">Assessing Overlap in Covariate Distributions</h2>
+
+<p>在前面的部分中，我们主要说明了倾向性得分为评估两种不同的处理水平下协变量分布的差异提供了一种较为简洁的方式，也介绍了倾向性得分的估计方法以及由估计的倾向性得分对样本进行分层的方法。需要说明的是，在前面的内容中，我们主要关注的只是两组协变量分布的均值的差异，但这对于我们评估两个分布的相似性还是不够的。尽管两个分布的均值相同，它们的方差、分布形态等的差异也会对估计因果效应带来影响。因此，在这一部分，我们将介绍四种衡量分布差异的指标，<strong>对两种处理水平下协变量分布的相似性进行更加细致的分析</strong>，根据两组协变量分布的差异情况，我们才能更好地选择用什么样的方法对两组分布进行调整。</p>
+
+<p>首先考虑只有一个协变量的情形。</p>
+<h4 id="normalized-difference">Normalized difference</h4>
+<p>记$\mu_{c}=\mathbb{E}\left[X_{i} \mid W_{i}=0\right]$，$\mu_{t}=\mathbb{E}\left[X_{i} \mid W_{i}=1\right]$分别为两种处理水平下协变量的均值，$\sigma_{c}^{2}=\mathbb{V}\left(X_{i} \mid W_{i}=0\right)$，$\sigma_{t}^{2}=\mathbb{V}\left(X_{i} \mid W_{i}=1\right)$为其对应的方差。定义两组分布均值的<code class="language-plaintext highlighter-rouge">正则化差异（Normalized Difference）</code>如下：</p>
+
+\[\Delta_{c t}=\frac{\mu_{t}-\mu_{c}}{\sqrt{\left(\sigma_{t}^{2}+\sigma_{c}^{2}\right) / 2}}\]
+
+<p>可根据相应的样本均值以及样本方差给出相应的估计：</p>
+
+\[\hat{\Delta}_{c t}=\frac{\bar{X}_{t}-\bar{X}_{c}}{\sqrt{\left(s_{c}^{2}+s_{t}^{2}\right) / 2}}\]
+
+<p>这个指标的目的在于衡量两组样本协变量均值之间的差异，这里我们关心的是这个差异是否太大以至于一般的调整方法不足以使得两组样本的分布达到一个比较均衡的状态。这里需要与常用的两样本均值检验的统计量进行一个区别，在两样本$t$检验中，我们关心的是当前的样本是否包含了足够多的信息可以拒绝两组均值相等的原假设，这与当前样本的样本量是有关的，其相应的$T$统计量为：</p>
+
+\[T_{c t}=\frac{\bar{X}_{t}-\bar{X}_{c}}{\sqrt{s_{c}^{2} / N_{c}+s_{t}^{2} / N_{t}}}\]
+
+<p>注意到，当$N_c$与$N_t$同时变为原来的$4$倍时，$T$统计量相应地变为原来的$2$倍，但$\hat{\Delta}_{c t}$的值保持不变。但在我们所关心的问题中，样本均值差异一定时，样本量越大，应该越容易对协变量的分布进行调整使其达到均衡。因此使用正则化差异进行评估更为合理。</p>
+
+<p>对于协变量个数不止一个的情形，我们可以利用马氏距离将正则化差异推广为：</p>
+
+\[\Delta_{c t}^{\mathrm{mv}}=\sqrt{\left(\mu_{t}-\mu_{c}\right)^{\prime}\left(\frac{\Sigma_{c}+\Sigma_{t}}{2}\right)^{-1}\left(\mu_{t}-\mu_{c}\right)}\]
+
+<p>类似地，可以利用样本均值以及样本协方差矩阵给出相应的估计：</p>
+
+\[\hat{\Delta}_{c t}^{\mathrm{mv}}=\sqrt{\left(\bar{X}_{t}-\bar{X}_{c}\right)^{\prime}\left(\frac{\hat{\Sigma}_{c}+\hat{\Sigma}_{t}}{2}\right)^{-1}\left(\bar{X}_{t}-\bar{X}_{c}\right)}\]
+
+<p>其中</p>
+
+\[\hat{\Sigma}_{c}=\frac{1}{N_{c}-1} \sum_{i: W_{i}=0}\left(X_{i}-\bar{X}_{c}\right) \cdot\left(X_{i}-\bar{X}_{c}\right)^{\prime}\]
+
+\[\hat{\Sigma}_{t}=\frac{1}{N_{t}-1} \sum_{i: W_{i}=1}\left(X_{i}-\bar{X}_{t}\right) \cdot\left(X_{i}-\bar{X}_{t}\right)^{\prime}\]
+
+<p>也可以利用上一节中介绍的<code class="language-plaintext highlighter-rouge">线性化倾向性得分（linearized propensity score）</code>构造正则化差异指标，并利用相应的样本均值以及样本方差给出估计：</p>
+
+\[\hat{\Delta}_{c t}^{\ell}=\frac{\bar{\ell}_{t}-\bar{\ell}_{c}}{\sqrt{\left(s_{\ell, c}^{2}+s_{\ell, t}^{2}\right) / 2}}\]
+
+<p>其中</p>
+
+\[\bar{\ell}_{c}=\frac{1}{N_{c}} \sum_{i: W_{i}=0} \ell\left(X_{i}\right),\quad \bar{\ell}_{t}=\frac{1}{N_{t}} \sum_{i: W_{i}=1} \ell\left(X_{i}\right)\]
+
+\[s_{\ell, c}^{2}=\frac{\sum_{i: W_{i}=0}\left(\ell\left(X_{i}\right)-\bar{\ell}_{c}\right)^{2}}{N_{c}-1} ,\quad s_{\ell, t}^{2}=\frac{\sum_{i: W_{i}=1}\left(\ell\left(X_{i}\right)-\bar{\ell}_{t}\right)^{2}}{N_{t}-1}\]
+
+<h4 id="difference-in-dispersion">Difference in dispersion</h4>
+
+<p>类似地，我们可以对两组的标准差进行比较，定义指标如下：</p>
+
+\[\Gamma_{c t}=\ln \left(\frac{\sigma_{t}}{\sigma_{c}}\right)\]
+
+<p>根据样本标准差可以给出其估计：</p>
+
+\[\hat{\Gamma}_{c t}=\ln \left(s_{t}\right)-\ln \left(s_{c}\right)\]
+
+<h4 id="two-overlap-measures">Two overlap measures</h4>
+<p>此外我们还可以对两个分布的重合情况进行一个评估，记$F_t$、$F_c$分别为处理组和控制组协变量的分布，定义指标如下：</p>
+
+\[\pi_{t}^{\alpha}=\left(1-F_{t}\left(F_{c}^{-1}(1-\alpha / 2)\right)\right)+F_{t}\left(F_{c}^{-1}(\alpha / 2)\right)\]
+
+\[\pi_{c}^{\alpha}=\left(1-F_{c}\left(F_{t}^{-1}(1-\alpha / 2)\right)\right)+F_{c}\left(F_{t}^{-1}(\alpha / 2)\right)\]
+
+<p>上述两个指标分别表示处理组协变量取值落在控制组的$\alpha/2$以及$1-\alpha/2$分位点之外的个体比例、控制组协变量取值落在处理组的$\alpha/2$以及$1-\alpha/2$分位点之外的个体比例。可以利用经验分布函数：</p>
+
+\[\hat{F}_{c}(x)=\frac{1}{N_{c}} \sum_{i: W_{i}=0} 1_{X_{i} \leq x}, \hat{F}_{t}(x)=\frac{1}{N_{t}} \sum_{i: W_{i}=1} 1_{X_{i} \leq x}\]
+
+\[\hat{F}_{c}^{-1}(q)=\min \{x: \hat{F}_{c}(x) \geq q\},\quad \hat{F}_{t}^{-1}(q)=\min \{x: \hat{F}_{t}(x) \geq q\}\]
+
+<p>给出相应的估计。</p>
+
+<p>上述指标越小，说明两组之间的协变量分布重合部分越多，对协变量的分布差异做调整越容易。</p>
+
+<h4 id="proportion-of-units-with-close-comparisons">Proportion of units with close comparisons</h4>
+<p>上面介绍的三个指标都不依赖于样本量，但实际上，样本量越大，我们对协变量的分布进行调整越容易，因为对于任意一个个体我们更容易找到一个和它协变量取值相近但处理水平不同的个体与其对应（以下简称为对应个体）。下面建立的这个指标就是来衡量样本中可以找到对应个体的样本的比例，定义：</p>
+
+\[\varsigma_{i}=\left\{\begin{array}{ll}
+1 &amp; \text { if } \sum_{i^{\prime}: W_{i^{\prime}} \neq W_{i}} \mathbf{1}_{\left|\hat{\ell}\left(X_{i^{\prime}}\right)-\hat{\ell}\left(X_{i}\right)\right| \leq \ell^{u}} \geq 1, \\
+0 &amp; \text { otherwise. }
+\end{array}\right.\]
+
+\[q_{c}=\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \varsigma_{i} ,\quad q_{t}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \varsigma_{i}\]
+
+<p>其中$\hat{\ell}\left(X_{i}\right)$为线性化倾向性得分的估计值，$\ell^{u}$为提前设定的阈值，例如$\ell^{u}=0.1$表示两个个体线性化倾向性得分之间的差异不超过10%。$q_{c}$和$q_{t}$的值越接近于$1$，说明样本中可以找到对应个体的个体比例越高，从而对协变量分布差异进行调整的难度越低。</p>
+
+<hr />
+
+<p>上一部分介绍了一些评估处理组和控制组之间协变量分布差异的一些方法和指标。在完全随机化实验中，两组协变量的分布是均衡的，但在观测性研究中，由于研究者无法控制分配机制，通常来说两组协变量的的分布差异是比较大的。此时，常用的一种方法是在观测到的全样本中<strong>选出一个子样本</strong>（<code class="language-plaintext highlighter-rouge">Subsample Selection</code>），使得在这个子样本中协变量的分布相对均衡，然后再在这个子样本上对因果效应进行估计。常见的选取子样本的方法为<code class="language-plaintext highlighter-rouge">匹配（Matching）</code>和<code class="language-plaintext highlighter-rouge">修剪（Trimming）</code>。</p>
+
+<h2 id="matching-to-improve-balance-in-covariate-distributions">Matching to Improve Balance in Covariate Distributions</h2>
+<p>先来看第一种<code class="language-plaintext highlighter-rouge">匹配（Matching）</code>的方法。通常我们考虑的是处理组的个体数量较小，控制组的个体数量较多的情形。匹配的方法，顾名思义，就是从所有控制组的样本中选择一个子样本与处理组的样本配对，使得两组协变量分布之间的差异尽量均衡。</p>
+
+<p>类似于配对随机化实验，匹配的想法在于，既然对于同一个个体我们无法观测到其在两种处理水平下的潜在结果，那是否可以找到一个协变量取值与之相同但处理状态与之相反的个体，通过比较两者潜在结果的差异来估计该个体的因果效应呢？</p>
+
+<p>想法总是美好的，现实总是骨感的，通常来说想要让每一个处理组的个体都找到一个精确的匹配是非常困难的。难点有二：</p>
+
+<ul>
+  <li>
+    <p>尽管根据距离的定义，我们可以找到距离相近的匹配个体，但这并不意味着两者的协变量的取值是完全相同的。</p>
+  </li>
+  <li>
+    <p>实际中满足要求的匹配可能数量很少，可能会出现同一个控制组的个体同时为多个处理组个体的最佳匹配的情况。</p>
+  </li>
+</ul>
+
+<p>对于第二个问题，一般有下面两种解决方式：</p>
+
+<ul>
+  <li>
+    <p>同一个控制组的个体只允许与$1$个处理组的个体相匹配，即<code class="language-plaintext highlighter-rouge">无放回的匹配（matching without replacement）</code>，其执行方式一般分为两种：</p>
+
+    <ul>
+      <li>
+        <p>所有处理组个体同时进行匹配，即选择控制组中的匹配子集，使其与处理组个体距离之和最小，即求以下优化问题：</p>
+
+\[\operatorname{argmin}_{m_{1}^{c}, \ldots, m_{N_{t}}^{c} \in \mathbb{I}_{c}} \sum_{i=1}^{N_{t}}\left\|X_{i}-X_{m_i}^{c}}\right\|, \quad \text { subject to } m^{c}_{i} \neq m^{c}_{i^{\prime}}, \text { for } i \neq i^{\prime}\]
+      </li>
+      <li>
+        <p>对处理组个体逐个进行匹配，此时匹配估计量依赖于匹配顺序的选取。可选择一个特定的顺序，按照该顺序对处理组的个体进行匹配，比如，可以先将倾向性得分较高的个体进行匹配，因为这一部分的个体找到合适匹配的难度更大。</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>允许同一个控制组的个体与多个处理组的个体相匹配，即<code class="language-plaintext highlighter-rouge">有放回的匹配（matching with replacement）</code>，此时用到的控制组的个体变少，会一定程度上增大匹配估计量的样本方差。</p>
+  </li>
+</ul>
+
+<h4 id="mechanics-of-matching-without-replacement">Mechanics of matching without replacement</h4>
+
+<p>下面我们具体来介绍无放回的匹配机制。假定处理组有$N_{\mathrm{t}}$个个体，控制组有$N_{\mathrm{c}}^{\prime}$个个体，$N_{\mathrm{c}}^{\prime}$远大于$N_{\mathrm{t}}$，我们希望从$N_{\mathrm{c}}^{\prime}$个控制组的个体中选择$N_{\mathrm{c}} &lt; N_{\mathrm{c}}^{\prime}$个个体与处理组的$N_{\mathrm{t}}$个个体组成一个包含$N=N_{\mathrm{c}}+N_{\mathrm{t}}$个个体的样本。可选择的控制组个体的下标的集合为：</p>
+
+\[\mathbb{I}_{c}^{\prime}=\left\{N_{\mathrm{t}}+1, \ldots, N_{\mathrm{t}}+N_{\mathrm{c}}^{\prime}\right\}\]
+
+<p>我们需要考虑的问题即为从中选择一个子集，使得其对应的控制组个体的集合能够很好地和处理组的个体相匹配。这里$N_{\mathrm{c}}^{\prime}$的选择涉及到数据收集成本以及匹配精度之间的一个权衡（trade-off），简便起见，在这一部分中，对于每一个处理组的个体我们先讨论选择一个控制组的个体与其进行匹配的情况，从而$N_{\mathrm{c}}=N_{\mathrm{t}}$。</p>
+
+<p>为了衡量两个个体协变量的相似程度，首先需要定义两个协变量之间的距离$d(x,x^{\prime})$，由此可以对于每个处理组个体$i$定义与之距离最近的匹配集，$\mathcal{M}_{i}^{c}$，其中：</p>
+
+\[\mathcal{M}_{1}^{c}=\left\{j \in \mathbb{I}_{c}^{\prime} \mid d\left(X_{1}, X_{j}\right)=\min _{j^{\prime} \in \mathbb{I}_{c}^{\prime}} d\left(X_{1}, X_{j^{\prime}}\right)\right\}\]
+
+\[\mathcal{M}_{i}^{c}=\left\{j \in \mathbb{I}_{c}^{\prime}-\cup_{i^{\prime}=1}^{i-1} \mathcal{M}_{i^{\prime}}^{c} \mid d\left(X_{i}, X_{j}\right)=\min _{j^{\prime} \in \mathbb{I}_{c}^{\prime}-U_{i^{\prime}=1}^{i-1} \mathcal{M}_{i^{\prime}}^{c}} d\left(X_{i}, X_{j^{\prime}}\right)\right\}\]
+
+<p>由于这里强调的是用控制组的个体对处理组个体进行匹配，上标$c$代表的是”control”。注意到，在一般情况下，$\mathcal{M}<em>{i}^{c}$中可以包含多个元素，但在这里我们讨论的是单个匹配的情形，因此当有多个控制组个体满足与处理组个体$i$距离最短的条件时，我们随机选择一个$m</em>{i}^{c}$进去匹配集。</p>
+
+<h4 id="choice-of-distance-metric">Choice of distance metric</h4>
+<p>下面介绍$d(x,x^{\prime})$的两种常用选择：</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Mahalanobis Metric Matching</code></li>
+</ul>
+
+<p>第一种为马氏距离，即：</p>
+
+\[d_{M}\left(x, x^{\prime}\right)=\left(x-x^{\prime}\right)\left(\frac{N_{\mathrm{c}} \cdot \hat{\Sigma}_{c}+N_{\mathrm{t}} \cdot \hat{\Sigma}_{t}}{N_{\mathrm{c}}+N_{\mathrm{t}}}\right)^{-1}\left(x-x^{\prime}\right)^{T}\]
+
+<p>其中\hat{\Sigma}<em>{t}}、$\hat{\Sigma}</em>{c}$分别为处理组和控制组的样本协方差矩阵。相对于欧氏距离而言，马氏距离的优点在于，<strong>对于协变量进行任一线性变换，马氏距离是保持不变的</strong>。但马氏距离也存在一定的缺点，因为它非常强调匹配那些预期中的分布已经完全匹配的协变量，这不仅有可能降低其他均衡性较差的变量的匹配效果，而且还有可能破坏那些原本就相对均衡的变量的均衡性。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Propensity Score Matching</code></li>
+</ul>
+
+<p>第二种为根据线性化倾向性得分（lps）定义的距离：</p>
+
+\[d_{\ell}\left(x, x^{\prime}\right)=\left(\ell(x)-\ell\left(x^{\prime}\right)\right)^{2}=\left(\ln \left(\frac{e(x)}{1-e(x)}\right)-\ln \left(\frac{e\left(x^{\prime}\right)}{1-e\left(x^{\prime}\right)}\right)\right)^{2}\]
+
+<p>前面我们提到过倾向性得分对于衡量协变量分布差异的重要作用，但通常来说，使用lps之间的差异来衡量距离比直接比较倾向性得分之间的差异更好，因为前者考虑的是相对差异，而后者只考虑了绝对差异。实际中$e(x)$往往未知，从而$\ell(x)$也未知，我们可以用估计得到的$\hat{\ell}(x)$进行替换。需要说明的是，即使$e(x)$已知，<strong>通常来说使用倾向性得分的估计值代替真实值得到的匹配的效果会更好</strong>，我的个人理解是：这是因为即使在$e(x)$已知的随机化实验中，由于随机性也可能给两组协变量分布带来一些差异，此时用估计的倾向性得分会更接近观测样本的实际情况，可以使得匹配更加精确，因果效应的估计的方差也会更小。</p>
+
+<p>此外，对于一些特殊的情况，还有一些混合的匹配方法，如有时候我们有一些先验信息，已知某一些协变量与潜在结果之间存在高度相关关系，这时候我们希望样本在这些关键变量上是完全均衡的，举个例子，比如我们事先知道潜在结果与性别高度相关，这时我们就会希望控制组合处理组中的男女比例是相同的。此时我们可以先根据重要变量对样本进行一个分层，在每一层内再对该层的处理组个体进行匹配。</p>
+
+<h4 id="caliper-matching-methods">Caliper Matching Methods</h4>
+<p>上面介绍的为单个匹配的情形，实际上也可以对每个处理组的个体进行多个匹配。这里介绍一种卡尺匹配法，这个方法也是无放回的。定义卡尺距离$$,从第$1$个个体开始进行卡尺匹配，即任一满足：</p>
+
+\[d\left(X_{1}, X_{j}\right) \leq d_{\mathrm{cal}}, j \in \mathbb{I}_{c}^{\prime}\]
+
+<p>的控制组个体$j$都进入个体$1$的匹配集$\mathcal{M}_{1}^{c}$，任一满足：</p>
+
+\[d\left(X_{2}, X_{j}\right) \leq d_{\mathrm{cal}}, j \in \mathbb{I}_{c}^{\prime}-\mathcal{M}_{1}^{c}\]
+
+<p>的控制组个体$j$都进入个体$2$的匹配集$\mathcal{M}_{2}^{c}$，以此类推。这个方法的优点为<strong>每个处理组个体有了更多的控制组个体与其匹配</strong>，但缺点是由于该方法是不放回的，后面的个体相较于前面的个体可能难以找到较多的精确的匹配，从而导致<strong>匹配不均衡</strong>。</p>
+
+<h4 id="rejecting-matches-of-poor-quality">Rejecting Matches of Poor Quality</h4>
+<p>有的时候，个体$X_i$匹配集的中的个体$X_{m_i}$可能并不是足够匹配的，当两者差异较大是，我们认为这样的匹配是低质量的，需要对此进行调整。一个简单的调整方法为舍弃掉处理组中匹配个体与其相差较远的个体，定义阈值$d_{\max}$（原书中取为$0.1$），若：</p>
+
+\[\left|\hat{\ell}\left(X_{i}\right)-\hat{\ell}\left(X_{m_{i}}\right)\right|&gt;d_{\max }\]
+
+<p>则去掉$X_i$这一组匹配。</p>
+
+<h4 id="other-matching-methods">Other Matching Methods</h4>
+<p>除了对处理组个体进行一对一无放回的匹配方法外，根据数据特点以及研究兴趣的不同，还有其他一些匹配方法，如：</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">一对多无放回匹配</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">有放回匹配</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">同时对处理组和控制组个体进行匹配</code></p>
+  </li>
+</ul>
+
+<p>我们将在下一篇介绍匹配估计量时具体介绍，这里就不赘述了。</p>
+
+<p>以上我们讨论了匹配的常用方法以及距离的常用选择，对于匹配过程理论性质的讨论参见<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>第15章第5节，由于篇幅限制这里不做过多讨论。</p>
+
+<h2 id="trimming-to-improve-balance-in-covariate-distributions">Trimming to Improve Balance in Covariate Distributions</h2>
+<p>除了匹配以外，另一种常用的选取子样本的方法为<code class="language-plaintext highlighter-rouge">修剪（Trimming）</code>，即去掉一些取值较为极端的样本，通常来说，这些极端样本会使得因果效应的估计更加不稳定，样本方差更大，因此修剪的方法可以视为<strong>在牺牲了一部分外推有效性的同时提升了内部估计的有效性</strong>。然而在因果推断问题中，我们其实更关心的恰好就是内部估计的有效性。下面就来具体介绍一下修剪样本的方法。</p>
+
+<h4 id="simple-case-with-a-single-binary-covariate">Simple Case with a Single Binary Covariate</h4>
+
+<p>首先考虑只有一个二元取值变量的情形，这里选为性别变量，即$X_i \in \{f,m\}$，记$q$为超总体中男性的比例，记给定$X_i=x$的条件下平均因果效应为</p>
+
+\[\tau_{\mathrm{sp}}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0) \mid X_{i}=x\right]\]
+
+<p>则超总体的平均因果效应可以表示为：</p>
+
+\[\tau_{\mathrm{sp}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]=(1-q) \cdot \tau_{\mathrm{sp}}(f)+q \cdot \tau_{\mathrm{sp}}(m)\]
+
+<p>记</p>
+
+\[N_{c}(x)=\sum_{i: X_{i}=x}\left(1-W_{i}\right) , \quad N_{t}(x)=\sum_{i: X_{i}=x} W_{i}, \quad e(x)=N_{t}(x)/N(x)\]
+
+<p>以及</p>
+
+\[\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}(x)=\frac{1}{N_{\mathrm{c}}(x)} \sum_{i: X_{i}=x} Y_{i}^{\mathrm{obs}} \cdot\left(1-W_{i}\right) , \quad \bar{Y}_{\mathrm{t}}^{\mathrm{obs}}(x)=\frac{1}{N_{\mathrm{t}}(x)} \sum_{i: X_{i}=x} Y_{i}^{\mathrm{obs}} \cdot W_{i}\]
+
+<p>其中$x \in \{f,m\}$。按照分层随机化实验的分析方法，可以给出$\tau_{\mathrm{sp}}(f)$、$\tau_{\mathrm{sp}}(m)$的估计，并由此给出总体平均效应$\tau_{\mathrm{sp}}$的估计：</p>
+
+\[\hat{\tau}^{\mathrm{dif}}(f)=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}(f)-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}(f), \quad \hat{\tau}^{\mathrm{dif}}(m)=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}(m)-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}(m)\]
+
+\[\hat{\tau}^{\text {strat }}=\frac{N(f)}{N(f)+N(m)} \cdot \hat{\tau}^{\operatorname{dif}}(f)+\frac{N(m)}{N(f)+N(m)} \cdot \hat{\tau}^{\mathrm{dif}}(m)\]
+
+<p>此外也很容易求出上述三个估计量的渐进方差：</p>
+
+\[\begin{aligned}
+N \cdot \mathbb{V}\left(\hat{\tau}^{\mathrm{dif}}(f)\right)=&amp; N \cdot \sigma^{2} \cdot\left(\frac{1}{N_{\mathrm{c}}(f)}+\frac{1}{N_{\mathrm{t}}(f)}\right) \\
+&amp; \longrightarrow \frac{\sigma^{2}}{(1-q)} \cdot \frac{1}{e(f) \cdot(1-e(f))}=\mathbb{A} \mathbb{V}\left(\hat{\tau}^{\mathrm{dif}}(f)\right)
+\end{aligned}\]
+
+\[\begin{aligned}
+N \cdot \mathbb{V}\left(\hat{\tau}^{\mathrm{dif}}(m)\right)=&amp; N \cdot \sigma^{2} \cdot\left(\frac{1}{N_{\mathrm{c}}(m)}+\frac{1}{N_{\mathrm{t}}(m)}\right) \\
+&amp; \longrightarrow \frac{\sigma^{2}}{(1-q)} \cdot \frac{1}{e(m) \cdot(1-e(m))}=\mathbb{A} \mathbb{V}\left(\hat{\tau}^{\mathrm{dif}}(m)\right)
+\end{aligned}\]
+
+\[N \cdot \mathbb{V}\left(\hat{\tau}^{\text {strat }}\right) \longrightarrow \sigma^{2} \cdot\left(\frac{q}{e(m) \cdot(1-e(m))}+\frac{1-q}{e(f) \cdot(1-e(f))}\right)=\mathbb{A} \mathbb{V}\left(\hat{\tau}^{\text {strat }}\right)\]
+
+<p>分析上述三个估计量的渐进方差可以发现，当$e(f)$接近于$0$h或$1$时，$\hat{\tau}^{\mathrm{dif}}(f)$估计量的渐进方差很大，<strong>此时很难给出$\tau_{\mathrm{sp}}(f)$的准确的估计</strong>，但此时$\hat{\tau}^{\mathrm{dif}}(m)$的渐进方差不受$e(f)$的影响，这是一个很自然的想法为把$X_i=f$的个体去掉，只用$X_i=m$的个体对$\tau_{\mathrm{sp}}(m)$进行估计。</p>
+
+<p>具体地来说，当：</p>
+
+\[\frac{e(m) \cdot(1-e(m))}{e(f) \cdot(1-e(f))} \leq \frac{1-q}{1-2 \cdot q}\]
+
+<p>时，我们有：</p>
+
+\[\mathbb{A} \mathbb{V}\left(\hat{\tau}^{\mathrm{dif}}(f)\right) \leq \mathbb{A} \mathbb{V}\left(\hat{\tau}^{\text {strat }}\right) \leq \mathbb{A} \mathbb{V}\left(\hat{\tau}^{\text {dif }}(m)\right)\]
+
+<p>因此，在这种情况下，估计$\tau_{\mathrm{sp}}(f)$相对于估计$\tau_{\mathrm{sp}}(m)$以及$\tau_{\mathrm{sp}}$容易。当：</p>
+
+\[\frac{1+q}{q} \leq \frac{e(m) \cdot(1-e(m))}{e(f) \cdot(1-e(f))}\]
+
+<p>时，我们有：</p>
+
+\[\mathbb{A} \mathbb{V}\left(\hat{\tau}^{\mathrm{dif}}(m)\right) \leq \mathbb{A} \mathbb{V}\left(\hat{\tau}^{\text {strat }}\right) \leq \mathbb{A} \mathbb{V}\left(\hat{\tau}^{\mathrm{dif}}(f)\right)\]
+
+<p>在这种情况下，估计$\tau_{\mathrm{sp}}(m)$相对于估计$\tau_{\mathrm{sp}}(f)$以及$\tau_{\mathrm{sp}}$容易。当：</p>
+
+\[\frac{1-q}{2-q} \leq \frac{e(m)(1-e(m))}{e(f)(1-e(f))} \leq \frac{1+q}{q}\]
+
+<p>时，我们有：</p>
+
+\[\mathbb{A} \mathbb{V}\left(\hat{\tau}^{\text {strat }}\right) \leq \min \left(\mathbb{A} \mathbb{V}\left(\hat{\tau}^{\text {dif }}(m)\right), \mathbb{A} \mathbb{V}\left(\hat{\tau}^{\text {dif }}(f)\right)\right)\]
+
+<p>为将上述结论一般化，我们可以定义一个子总体$\mathbb{C} \subset \mathbb{X}$以及其对应的平均处理效应：</p>
+
+\[\tau_{\mathbb{C}}=\mathbb{E}\left[Y_{i}(1)-Y_{i}(0) \mid X_{i} \in \mathbb{C}\right]\]
+
+<p>修剪（trimming）的目标即在于<strong>找到一个最优的子总体</strong>$\mathbb{C}^{\star}$使得该子总体下的平均处理效应最容易估计，即<strong>其估计量的渐近方差最小</strong>。在上面讨论到的只有一个二元取值变量的情形中（$X_i \in \{f,m\}$），最优子集可以表示为：</p>
+
+\[\mathbb{C}^{\star}=\left\{\begin{array}{ll}
+\{f\} &amp; \text { if } \frac{e(m) \cdot(1-e(m))}{e(f) \cdot(1-e(f))}&lt;\frac{1-q}{1-2 \cdot q} \\
+\{m\} &amp; \text { if } \frac{1+q}{q} \leq \frac{e(m) \cdot(1-e(m))}{e(f) \cdot(1-e(f))} \\
+\{f, m\} &amp; \text { otherwise. }
+\end{array}\right.\]
+
+<p>需要说明的是<strong>最优子集的选择一般不依赖于估计量的形式</strong>，尽管在上面的例子中我们给出了平均处理效应估计量的确切形式，比较的是这些具体估计量的渐近方差，但在一般情况下可以对估计<code class="language-plaintext highlighter-rouge">目标渐进效率的界（asymptotic efficiency bounds）</code>（即在某种意义下最优的估计量的渐近方差）进行比较。</p>
+
+<h4 id="general-case-with-multi-component-and-continuous-covariates">General Case with Multi-component and Continuous Covariates</h4>
+<p>现在我们来看看一般情况下，即<strong>允许协变量个数大于$1$，且可能连续取值</strong>时如何对原样本进行修剪。</p>
+
+<p>首先，我们可以给出对于有限样本平均处理效应估计量的渐近有效方差：</p>
+
+\[\mathrm{A} \mathbb{V}_{\mathrm{fs}}^{\mathrm{eff}}=\mathbb{E}_{\mathrm{sp}}\left[\frac{\sigma_{t}^{2}\left(X_{i}\right)}{e\left(X_{i}\right)}+\frac{\sigma_{c}^{2}\left(X_{i}\right)}{1-e\left(X_{i}\right)}\right]\]
+
+<p>以及子总体$\mathbb{C}$的平均处理效应估计量的渐进有效方差：</p>
+
+\[\mathbb{A} \mathbb{V}_{\mathrm{fs}}^{\mathrm{eff}}(\mathbb{C})=\frac{1}{q(\mathbb{C})} \cdot \mathbb{E}_{\mathrm{sp}}\left[\frac{\sigma_{t}^{2}\left(X_{i}\right)}{e\left(X_{i}\right)}+\frac{\sigma_{c}^{2}\left(X_{i}\right)}{1-e\left(X_{i}\right)} \mid X \in \mathbb{C}\right]\]
+
+<p>其中</p>
+
+\[q(\mathbb{C})=\operatorname{Pr}_{\mathrm{sp}}\left(X_{i} \in \mathbb{C}\right)\]
+
+<p>同样地，我们的目的为找到最优的子总体$\mathbb{C}^{\star}$使得$\mathbb{A} \mathbb{V}_{\mathrm{fs}}^{\mathrm{eff}}(\mathbb{C})$最小。可以证明，当：</p>
+
+\[\sup _{x \in \mathbb{X}} \frac{1}{e(x) \cdot(1-e(x))} \leq 2 \cdot \mathbb{E}_{\mathrm{sp}}\left[\frac{1}{e\left(X_{i}\right) \cdot\left(1-e\left(X_{i}\right)\right)}\right],\]
+
+<p>时，$\mathbb{C}^{\star}=\mathbb{X}$，否则：</p>
+
+\[\mathbb{C}^{\star}=\{x \in \mathbb{X} \mid \alpha \leq e(x) \leq 1-\alpha\}\]
+
+<p>其中：</p>
+
+\[\alpha=\frac{1}{2}-\sqrt{\frac{1}{4}-\frac{1}{\gamma}}\]
+
+<p>$\gamma$为下式的解：</p>
+
+\[\gamma=2 \cdot \mathbb{E}_{\mathrm{sp}}\left[\frac{1}{e\left(X_{i}\right) \cdot\left(1-e\left(X_{i}\right)\right)} \mid \frac{1}{e\left(X_{i}\right) \cdot\left(1-e\left(X_{i}\right)\right)} \leq \gamma\right]\]
+
+<p>具体证明参见<a href="https://www.jstor.org/stable/27798811?seq=1#metadata_info_tab_contents">Crump R K, Hotz V J, Imbens G W, et al. </a>。实际操作时可先估计出倾向性得分，再利用数值方法求解。</p>
+
+<hr />
+
+<p>简单小结一下，这一篇我们主要介绍了在观测性研究的设计阶段做的一些工作，包括处理组和控制组两组协变量的均衡性评估，其中倾向性得分提供了一种简便的方式。当两组协变量的分布差异较大时，我们介绍了<strong>分层（Blocking）、匹配（Matching）以及修剪（Trimming）</strong>的方法对原样本的协变量分布进行调整。介绍完了设计阶段的工作，下一篇我们就正式开始对观测性研究的因果效应的进行估计和推断。</p>
+:ET
