@@ -57,7 +57,7 @@ kramdown:
 
 # Valine
 valine_comment:
-  enable: true
+  enable: false
 # app_id
   leancloud_appid: Me84rPVUesYRCnuB7xlnX0gB-gzGzoHsz
 # app_key

@@ -1,4 +1,4 @@
-I"��<p>这一篇将具体介绍<code class="language-plaintext highlighter-rouge">经典随机化实验的几种类别</code>以及相应的四种<code class="language-plaintext highlighter-rouge">因果效应的推断方法</code>。</p>
+I"��<p>这一篇将具体介绍<code class="language-plaintext highlighter-rouge">经典随机化实验的几种类别</code>以及相应的四种<code class="language-plaintext highlighter-rouge">因果效应的推断方法</code>。</p>
 
 <h2 id="a-taxonomy-of-classical-randomized-experiments">A Taxonomy of Classical Randomized Experiments</h2>
 
@@ -245,7 +245,7 @@ S_{t c}^{2} &amp;=\frac{1}{N-1} \sum_{i=1}^{N}\left(Y_{i}(1)-Y_{i}(0)-(\bar{Y}(1
 
 \[\hat{\tau}^{\mathrm{ols}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}=\hat{\tau}^{\mathrm{dif}}\]
 
-<p>即在上述回归模型中，<strong>回归系数$\tau$的最小二乘估计与Neyman所提出的平均因果效应的估计量是一致的</strong>，因此我们可以利用回归系数$tau$的最小二乘估计来解释因果效应。此外，定义</p>
+<p>即在上述回归模型中，<strong>回归系数$\tau$的最小二乘估计与Neyman所提出的平均因果效应的估计量是一致的</strong>，因此我们可以利用回归系数$\tau$的最小二乘估计来解释因果效应。此外，定义</p>
 
 \[\begin{aligned}
 \left(\alpha^{\star}, \tau^{\star}\right) &amp;=\arg \min _{\alpha, \tau} \mathbb{E}_{\mathrm{sp}}\left[\frac{1}{N} \sum_{i=1}^{N}\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}\right)^{2}\right] \\

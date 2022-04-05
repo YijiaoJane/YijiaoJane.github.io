@@ -1,4 +1,4 @@
-I"|�<p>上一篇介绍了随机化实验中常见的一些分配机制以及常用的四种估计因果效应的方法，而在实际生活中，我们遇到更多的还是观测性研究，即分配机制的具体形式未知的情形。因此，从这一篇开始，我们就来介绍一下对于<code class="language-plaintext highlighter-rouge">规则分配机制下观测性研究的数据如何对因果效应进行推断</code>。</p>
+I"}�<p>上一篇介绍了随机化实验中常见的一些分配机制以及常用的四种估计因果效应的方法，而在实际生活中，我们遇到更多的还是观测性研究，即分配机制的具体形式未知的情形。因此，从这一篇开始，我们就来介绍一下对于<code class="language-plaintext highlighter-rouge">规则分配机制下观测性研究的数据如何对因果效应进行推断</code>。</p>
 
 <p>在对因果效应进行推断之前我们还有一件事情要做，即对观测性研究数据进行设计，我们称之为<code class="language-plaintext highlighter-rouge">设计阶段（design phase）</code>。为什么要对观测性研究进行设计呢？我们在前面介绍<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#completely-randomized-experiments">完全随机化实验</a>的缺点时也提到过，两种处理水平下潜在结果之间的差异可能不仅来源于处理变量取值的差异，也可能与协变量的取值有关。当两种处理水平下协变量的分布差异较大时，我们很难分辨两组潜在结果之间的差异到底是来自处理变量还是协变量的差异。因此，我们需要先对观测性研究的数据进行一个预分析，<strong>估计一下处理组和控制组（下称“两组”）的个体协变量的分布差异是否差距太大</strong>，如果差距较大的话，我们需要对样本进行一个分层，使得<strong>每一层中两组协变量的分布尽量均衡</strong>（<code class="language-plaintext highlighter-rouge">covariate balance</code>），或者在全样本中选取一个子样本，使得在子样本中两组协变量的分布尽量均衡，这样我们估计得到的因果效应才是具有一定可信度的。类似于分层随机化实验，对观测性研究的样本进行分层后，我们也可以将每一层的子样本近似看作来自于一个完全随机化实验，从而可以利用<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#methods-for-estimation-and-inference-of-causal-effects">上一篇</a>中介绍的方法对每一层的因果效应进行估计。</p>
 
@@ -245,8 +245,9 @@ W_{i} &amp; ⊥ &amp; X_{i} &amp; e\left(X_{i}\right)
 
 <h4 id="difference-in-dispersion">Difference in dispersion</h4>
 
-<p>类似地，我们可以对两组的标准差进行比较，定义指标如下：
-\(\Gamma_{c t}=\ln \left(\frac{\sigma_{t}}{\sigma_{c}}\right)\)</p>
+<p>类似地，我们可以对两组的标准差进行比较，定义指标如下：</p>
+
+\[\Gamma_{c t}=\ln \left(\frac{\sigma_{t}}{\sigma_{c}}\right)\]
 
 <p>根据样本标准差可以给出其估计：</p>
 
@@ -283,7 +284,7 @@ W_{i} &amp; ⊥ &amp; X_{i} &amp; e\left(X_{i}\right)
 
 <hr />
 
-<p>上一部分介绍了一些评估处理组和控制组之间协变量分布差异的一些方法和指标。在完全随机化实验中，两组协变量的分布是均衡的，但在观测性研究中，由于研究室无法控制分配机制，通常来说两组协变量的的分布差异是比较大的。此时，常用的一种方法是在观测到的全样本中<strong>选出一个子样本</strong>（<code class="language-plaintext highlighter-rouge">Subsample Selection</code>），使得在这个子样本中协变量的分布相对均衡，然后再在这个子样本上对因果效应进行估计。常见的选取子样本的方法为<code class="language-plaintext highlighter-rouge">匹配（Matching）</code>和<code class="language-plaintext highlighter-rouge">修剪（Trimming）</code>。</p>
+<p>上一部分介绍了一些评估处理组和控制组之间协变量分布差异的一些方法和指标。在完全随机化实验中，两组协变量的分布是均衡的，但在观测性研究中，由于研究者无法控制分配机制，通常来说两组协变量的的分布差异是比较大的。此时，常用的一种方法是在观测到的全样本中<strong>选出一个子样本</strong>（<code class="language-plaintext highlighter-rouge">Subsample Selection</code>），使得在这个子样本中协变量的分布相对均衡，然后再在这个子样本上对因果效应进行估计。常见的选取子样本的方法为<code class="language-plaintext highlighter-rouge">匹配（Matching）</code>和<code class="language-plaintext highlighter-rouge">修剪（Trimming）</code>。</p>
 
 <h2 id="matching-to-improve-balance-in-covariate-distributions">Matching to Improve Balance in Covariate Distributions</h2>
 <p>先来看第一种<code class="language-plaintext highlighter-rouge">匹配（Matching）</code>的方法。通常我们考虑的是处理组的个体数量较小，控制组的个体数量较多的情形。匹配的方法，顾名思义，就是从所有控制组的样本中选择一个子样本与处理组的样本配对，使得两组协变量分布之间的差异尽量均衡。</p>
