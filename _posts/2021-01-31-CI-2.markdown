@@ -328,7 +328,7 @@ $$
 \hat{\tau}^{\mathrm{ols}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}=\hat{\tau}^{\mathrm{dif}}
 $$
 
-即在上述回归模型中，**回归系数$\tau$的最小二乘估计与Neyman所提出的平均因果效应的估计量是一致的**，因此我们可以利用回归系数$tau$的最小二乘估计来解释因果效应。此外，定义
+即在上述回归模型中，**回归系数$\tau$的最小二乘估计与Neyman所提出的平均因果效应的估计量是一致的**，因此我们可以利用回归系数$\tau$的最小二乘估计来解释因果效应。此外，定义
 
 $$
 \begin{aligned}
