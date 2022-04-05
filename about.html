@@ -11,7 +11,9 @@ header-img: "img/home-bg-sea.jpeg"
     </blockquote>
 Hey，这里是防止脑子生锈所以来自娱自乐的Yijiao. 
 
-
+    <blockquote>
+       快来和她说几句吧~
+    </blockquote>
 
 </div>
 
@@ -38,6 +40,22 @@ Hey，这里是防止脑子生锈所以来自娱自乐的Yijiao.
 </script>
 {% endif %}
 <!-- Gitalk end -->
+
+	<!-- Valine 评论框 start -->
+	<div id="vcomments"></div>
+	{% if site.valine_comment.enable %}
+	<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+   	 <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+	<script type="text/javascript">
+  	  new Valine({
+    	    el: '#vcomments',
+     	   app_id: '{{ site.valine_comment.leancloud_appid }}',   
+      	  app_key: '{{ site.valine_comment.leancloud_appkey }}', 
+      	  placeholder:'{{ site.valine_comment.placeholder }}',
+	visitor: true
+   	 });</script>
+	{% endif %}
+ 	<!-- Valine 评论框 end -->
 
 
  <!-- disqus 评论框 start  -->
