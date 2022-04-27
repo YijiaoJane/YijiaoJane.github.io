@@ -59,7 +59,7 @@ $$
 可见分层之后由第$k$个协变量带来的估计偏差由
 
 $$
-\left(\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)\right) \cdot \beta_{k} \quad \text {变成了} \quad\left(\sum_{j=1}^{J} q(j) \cdot\left(\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)\right)\right) \cdot \beta_{k}
+\left(\bar{X}_{t, k}-\bar{X}_{c, k}\right) \cdot \beta_{k} \quad \text {变成了} \quad\left(\sum_{j=1}^{J} q(j) \cdot\left(\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)\right)\right) \cdot \beta_{k}
 $$
 
 减少的偏差的比例为：
@@ -441,7 +441,7 @@ $$
 $$
 \begin{aligned}
 \hat{\tau}_{\mathrm{t}}^{\mathrm{adj}, \mathrm{p}} &=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-\hat{Y}_{i}(0)\right) \\
-&=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{c}}^{\mathrm{obs}}-\left(X_{i}-X_{m_{i}^{c}}\right) \hat{\beta}^{p}\right)=\hat{\tau}_{t}^{\mathrm{match}}-\bar{D} \hat{\beta}_{p}
+&=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{c}}^{\mathrm{obs}}-\left(X_{i}-X_{m_{i}^{c}}\right) \hat{\beta}_{p}\right)=\hat{\tau}_{t}^{\mathrm{match}}-\bar{D} \hat{\beta}_{p}
 \end{aligned}
 $$
 
@@ -534,7 +534,7 @@ $$
 ## Estimating Sampling Variances
 上一部分我们介绍了两种常见的用于估计平均因果效应的方法，即分层和匹配。若想进一步对参数进行推断，我们还需对估计量的样本方差进行估计，并在此基础上建立置信区间。尽管上一部分在介绍估计量时也简要给出了各自样本方差的估计，但在这一部分，我们希望建立的平均因果效应样本方差估计不依赖于具体的估计量，而是**将不同的估计量用同一种形式或者结构统一起来**，介绍一种`一般化的样本方差的估计方法`。
 
-#### choice of estimand
+#### Choice of estimand
 在讨论样本方差如何估计之前，我们首先应该明确的是我们关心的参数到底是当前观测到的有限样本的平均因果效应：
 
 $$

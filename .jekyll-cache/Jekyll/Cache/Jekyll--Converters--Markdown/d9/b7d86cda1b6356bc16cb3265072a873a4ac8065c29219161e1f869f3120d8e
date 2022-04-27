@@ -1,0 +1,738 @@
+I"��<p>上一篇中我们介绍了规则分配机制下观测性研究中设计阶段的一些工作，这一篇我们将进一步介绍在这种情形下如何对因果效应进行估计和推断。</p>
+
+<h2 id="subclassification-on-the-propensity-score">Subclassification on the Propensity Score</h2>
+
+<p>首先我们介绍一种<code class="language-plaintext highlighter-rouge">分层（subclassification,或称blocking,stratification）</code>的方法。在上一篇中，我们介绍了<a href="https://yijiaojane.github.io/2021/02/02/CI-3/#constructing-propensity-score-strata">如何利用估计的倾向性得分对全样本进行分层</a>，这里我们将在分好层的基础上对每层以及总体的因果效应进行估计和推断。</p>
+
+<h4 id="subclassification-estimator-for-the-average-treatment-effect">Subclassification Estimator for the Average Treatment Effect</h4>
+<p>对于各层的平均因果效应以及总的平均效应，可分别用下式估计：</p>
+
+\[\hat{\tau}^{\mathrm{dif}}(j)=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}(j)-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}(j),\quad \hat{\tau}^{\text {strat }}=\sum_{j=1}^{J} q(j) \cdot \hat{\tau}^{\mathrm{dif}}(j)\]
+
+<p>其中$q(j)=\frac{N(j)}{N},$ for $j=1, \ldots, J$。</p>
+
+<h4 id="bias-reduction">Bias Reduction</h4>
+<p>下面我们就来讨论一下上述估计量的相关性质。首先来看一下用$\hat{\tau}^{\text {strat }}$估计$\tau_{\mathrm{fs}}$的偏差。假定在超总体中潜在结果关于协变量的条件期望为一个线性的形式：</p>
+
+\[\mathbb{E}_{\text {sp }}\left[Y_{i}(w) \mid X_{i}=x\right]=\alpha+\tau_{\mathrm{sp}} \cdot w+\beta^{\prime} x\]
+
+<p>其中$w=0,1$。</p>
+
+<p>若不对原样本进行分层，直接用$\hat{\tau}^{\mathrm{dif}}$估计$\tau_{\mathrm{fs}}$，则其条件偏差的期望为：</p>
+
+\[\begin{aligned}
+\mathbb{E}\left[\hat{\tau}^{\mathrm{dif}}-\tau_{\mathrm{fs}} \mid \mathbf{X}, \mathbf{W}\right]=&amp; \frac{N_{\mathrm{c}}}{N} \cdot\left(\mathbb{E}\left[Y_{i}(1) \mid W_{i}=1, X_{i}\right]-\mathbb{E}\left[Y_{i}(1) \mid W_{i}=0, X_{i}\right]\right) \\
+&amp;-\frac{N_{\mathrm{t}}}{N} \cdot\left(\mathbb{E}\left[Y_{i}(0) \mid W_{i}=1, X_{i}\right]-\mathbb{E}\left[Y_{i}(0) \mid W_{i}=0, X_{i}\right]\right) \\
+=&amp; \frac{N_{\mathrm{c}}}{N} \cdot\left(\bar{X}_{t}-\bar{X}_{c}\right) \beta-\frac{N_{\mathrm{t}}}{N} \cdot\left(\bar{X}_{c}-\bar{X}_{t}\right) \beta \\
+=&amp;\left(\bar{X}_{t}-\bar{X}_{c}\right) \beta
+\end{aligned}\]
+
+<p>而分层之后，第$j$层估计量$\hat{\tau}^{\mathrm{dif}}(j)$的条件偏差的期望为：</p>
+
+\[\mathbb{E}\left[\hat{\tau}^{\mathrm{dif}}(j)-\tau_{\mathrm{fs}}(j) \mid \mathbf{X}, \mathbf{W}\right]=\left(\bar{X}_{t}(j)-\bar{X}_{c}(j)\right) \beta\]
+
+<p>从而可以得到分层估计量$\hat{\tau}^{\text {strat }}$的条件偏差的期望为各层的一个加权平均：</p>
+
+\[\mathbb{E}\left[\hat{\tau}^{\mathrm{strat}}-\tau_{\mathrm{fs}} \mid \mathbf{X}, \mathbf{W}\right]=\left(\sum_{j=1}^{J} q(j) \cdot\left(\bar{X}_{t}(j)-\bar{X}_{c}(j)\right)\right) \beta\]
+
+<p>可见分层之后由第$k$个协变量带来的估计偏差由</p>
+
+\[\left(\bar{X}_{t, k}-\bar{X}_{c, k}\right) \cdot \beta_{k} \quad \text {变成了} \quad\left(\sum_{j=1}^{J} q(j) \cdot\left(\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)\right)\right) \cdot \beta_{k}\]
+
+<p>减少的偏差的比例为：</p>
+
+\[\gamma_{k}=\sum_{j=1}^{J} q(j) \cdot\left(\bar{X}_{t, k}(j)-\bar{X}_{c, k}(j)\right) /\left(\bar{X}_{t, k}-\bar{X}_{c, k}\right)\]
+
+<p>这说明，分层之后，由于各层内的样本协变量分布相对均衡，因果效应的估计的偏差也相对减小。</p>
+
+<h4 id="subclassification-with-additional-bias-reduction">Subclassification with Additional Bias Reduction</h4>
+
+<p>需要注意的是，上面提到的分层估计量并不是足够理想的，因为即使在倾向性得分已知的情形下，$\hat{\tau}^{\mathrm{dif}}(j)$也是有偏的，原因是<strong>每一层中的个体倾向性得分只是相近并非完全相同</strong>。因此，我们需要在分层的基础上再对上述估计量进行调整纠偏。两种常用的方法为<code class="language-plaintext highlighter-rouge">回归调整（Regression (covariance) adjustment）</code>和<code class="language-plaintext highlighter-rouge">基于模型的填补方法（Model-based imputation）</code>，具体细节参见我们在完全随机化实验中提到的<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods">回归方法</a>以及<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#model-based-inference">基于模型的方法</a>。</p>
+
+<p>这里我们简要介绍回归调整的方法。即在每一层中指定如下线性回归模型并对位置参数进行最小二乘估计：</p>
+
+\[Y_{i}^{\mathrm{obs}}=\alpha(j)+\tau(j) \cdot W_{i}+X_{i} \beta(j)+\varepsilon_{i}\]
+
+\[\left(\hat{\alpha}(j), \hat{\tau}^{\mathrm{adj}}(j), \hat{\beta}(j)\right)=\arg \min _{\alpha, \tau, \beta} \sum_{i=1}^{N} B_{i}(j) \cdot\left(Y_{i}^{\mathrm{obs}}-\alpha-\tau \cdot W_{i}-X_{i} \beta\right)^{2}\]
+
+<p>从而得到调整后的分层估计量：</p>
+
+\[\hat{\tau}^{\text {strat }, \mathrm{adj}}=\sum_{j=1}^{J} q(j) \cdot \hat{\tau}^{\mathrm{adj}}(j)\]
+
+<p>需要说明的是，这里的<strong>分层回归调整与对全样本进行回归建模是不同的</strong>。分层回归不太依赖于利用回归函数进行样本外推，因为在每一层中的样本协变量的分布已经比较接近了，此时的回归与完全随机化实验中的回归方法的用意比较类似，<strong>其估计的性质也不太依赖模型于指定的正确性</strong>，具体分析可以参见<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods">随机化实验中回归模型部分的介绍</a>。</p>
+
+<p>同样的，由于分层后每一层可近似看为一个随机化实验，我们也可以用第二篇中介绍的<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">Neyman重复抽样方法</a>对估计量进行推断。第$j$层的估计量$\hat{\tau}^{\mathrm{dif}}(j)$的样本方差为：</p>
+
+\[\mathbb{V}\left(\hat{\tau}^{\operatorname{dif}}(j)\right)=\frac{S_{c}(j)^{2}}{N_{\mathrm{c}}(j)}+\frac{S_{t}^{2}(j)}{N_{\mathrm{t}}(j)}-\frac{S_{c t}(j)^{2}}{N(j)}\]
+
+<p>其中：</p>
+
+\[\begin{array}{l}
+S_{c}(j)^{2}=\frac{1}{N_{c}(j)-1} \sum_{i=1}^{N} B_{i}(j) \cdot\left(Y_{i}(0)-\bar{Y}(0, j)\right)^{2} \\
+S_{t}(j)^{2}=\frac{1}{N_{t}(j)-1} \sum_{i=1}^{N} B_{i}(j) \cdot\left(Y_{i}(1)-\bar{Y}(1, j)\right)^{2} \\
+S_{c t}(j)^{2}=\frac{1}{N(j)-1} \sum_{i=1}^{N} B_{i}(j) \cdot\left(Y_{i}(1)-Y_{i}(0)-\tau(j)\right)^{2}
+\end{array}\]
+
+\[\bar{Y}(w, j)=\frac{1}{N(j)} \sum_{i=1}^{N} B_{i}(j) \cdot Y_{i}(w)\]
+
+<p>类似于完全随机化实验中的估计方法，假定$S_{c t}(j)^{2}=0$，即每层的因果效应为常数，我们可以给出$\hat{\tau}^{\mathrm{dif}}(j)$样本方差的一个估计：</p>
+
+\[\begin{aligned}
+\hat{V}\left(\hat{\tau}^{\mathrm{dif}}(j)\right)=&amp; \frac{1}{N_{\mathrm{c}}(j) \cdot\left(N_{\mathrm{c}}(j)-1\right)} \sum_{i: W_{i}=0} B_{i}(j) \cdot\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}(j)\right)^{2} \\
+&amp;+\frac{1}{N_{\mathrm{t}}(j)\left(N_{\mathrm{t}}(j)-1\right)} \sum_{i: W_{i}=1} B_{i}(j) \cdot\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}(j)\right)^{2}
+\end{aligned}\]
+
+<p>而分层估计量的样本方差可用上述估计量的加权平均进行估计：</p>
+
+\[\hat{\mathrm{V}}\left(\hat{\tau}^{\text {strat }}\right)=\sum_{j=1}^{J} \hat{\mathbb{V}}\left(\hat{\tau}^{\mathrm{dif}}(j)\right) \cdot q(j)^{2}=\sum_{j=1}^{J} \hat{\mathbb{V}}\left(\hat{\tau}^{\mathrm{dif}}(j)\right) \cdot\left(\frac{N(j)}{N}\right)^{2}\]
+
+<h4 id="weighting-estimators-and-subclassification">Weighting Estimators and Subclassification</h4>
+
+<p>为了对分层方法有一个更好的理解，这里简单介绍一下分层估计量与经典的<code class="language-plaintext highlighter-rouge">加权估计量（Weighting Estimators）</code>之间的关系。</p>
+
+<p>一种经典的因果效应的估计方法为逆概率加权方法，相关工作参见<a href="http://www.stat.cmu.edu/~brian/905-2008/papers/Horvitz-Thompson-1952-jasa.pdf">Horvitz and Thompson (1952)</a>。Horvitz-Thompson估计量（以下用ht表示）主要是利用了以下两个式子：</p>
+
+\[\mathbb{E}\left[\frac{W_{i} \cdot Y_{i}^{\text {obs }}}{e\left(X_{i}\right)}\right]=\mathbb{E}_{\text {sp }}\left[Y_{i}(1)\right] , \mathbb{E}\left[\frac{\left(1-W_{i}\right) \cdot Y_{i}^{\text {obs }}}{1-e\left(X_{i}\right)}\right]=\mathbb{E}_{\text {sp }}\left[Y_{i}(0)\right]\]
+
+<p>上述二式可利用定义以及无混杂性的假定验证，这里简要证明前半部分。根据$Y_{i}^{\mathrm{obs}}$的定义可知：</p>
+
+\[\mathbb{E}\left[\frac{W_{i} \cdot Y_{i}^{\mathrm{obs}}}{e\left(X_{i}\right)}\right]=\mathbb{E}\left[\frac{W_{i} \cdot Y_{i}(1)}{e\left(X_{i}\right)}\right]\]
+
+<p>由重期望公式可得：</p>
+
+\[\mathbb{E}\left[\frac{W_{i} \cdot Y_{i}(1)}{e\left(X_{i}\right)}\right]=\mathbb{E}\left[\mathbb{E}\left[\frac{W_{i} \cdot Y_{i}(1)}{e\left(X_{i}\right)} \mid X_{i}\right]\right]\]
+
+<p>根据无混杂性的假定，可得：</p>
+
+\[\begin{aligned}
+\mathbb{E}\left[\frac{W_{i} \cdot Y_{i}(1)}{e\left(X_{i}\right)} \mid X_{i}\right] &amp;=\frac{\mathbb{E}_{W}\left[W_{i} \mid X_{i}\right] \cdot \mathbb{E}_{\text {sp }}\left[Y_{i}(1) \mid X_{i}\right]}{e\left(X_{i}\right)}=\frac{e\left(X_{i}\right) \cdot \mathbb{E}_{\text {sp }}\left[Y_{i}(1) \mid X_{i}\right]}{e\left(X_{i}\right)} \\
+&amp;=\mathbb{E}_{\text {sp }}\left[Y_{i}(1) \mid X_{i}\right]
+\end{aligned}\]
+
+<p>从而</p>
+
+\[\mathbb{E}\left[\frac{W_{i} \cdot Y_{i}(1)}{e\left(X_{i}\right)}\right]=\mathbb{E}_{\mathrm{sp}}\left[\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1) \mid X_{i}\right]\right]=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)\right]\]
+
+<p>证毕。</p>
+
+<p>由上面的两个等式，可以很自然地给出$\mathbb{E}\left[Y_{i}(1)\right]$和$\mathbb{E}\left[Y_{i}(0)\right]$的估计：</p>
+
+\[\left.\mathbb{E}_{\text {sp }\left[Y_{i}(1)\right.}\right]=\frac{1}{N} \sum_{i=1}^{N} \frac{W_{i} \cdot Y_{i}^{\text {obs }}}{e\left(X_{i}\right)} \text { and } \left.\mathbb{E}_{\text {sp }\left[Y_{i}(0)\right.}\right]=\frac{1}{N} \sum_{i=1}^{N} \frac{\left(1-W_{i}\right) \cdot Y_{i}^{\text {obs }}}{1-e\left(X_{i}\right)}\]
+
+<p>在实际进行加权的过程中，由于$e(x)$可能接近于$0$或$1$，此时分母会趋于无穷大，因此，为了使得估计更加稳定，通常会采用一个正则化的权重进行加权，即：</p>
+
+\[\hat{\tau}^{\mathrm{ht}}=\sum_{i=1}^{N} \frac{W_{i} \cdot Y_{i}^{\mathrm{obs}}}{\hat{e}\left(X_{i}\right)} / \sum_{i=1}^{N} \frac{W_{i}}{\hat{e}\left(X_{i}\right)}-\sum_{i=1}^{N} \frac{\left(1-W_{i}\right) \cdot Y_{i}^{\mathrm{obs}}}{1-\hat{e}\left(X_{i}\right)} / \sum_{i=1}^{N} \frac{1-W_{i}}{1-\hat{e}\left(X_{i}\right)}\]
+
+<p>下面我们说明加权估计量可以有一个回归版本的表示，即可表示为一个加权最小二乘估计量。</p>
+
+<p>假定回归模型为：</p>
+
+\[Y_{i}^{\mathrm{obs}}=\alpha+\tau \cdot W_{i}+\varepsilon_{i}\]
+
+<p>则若使用：</p>
+
+\[\hat{\lambda}_{i}^{\mathrm{ht}}=\frac{1}{\left(1-\hat{e}\left(X_{i}\right)\right)^{1-W_{i}} \cdot e\left(X_{i}\right)^{W_{i}}}=\left\{\begin{array}{cl}
+\frac{1}{1-\hat{e}\left(X_{i}\right)} &amp; \text { if } W_{i}=0 \\
+\frac{1}{\hat{e}\left(X_{i}\right)} &amp; \text { if } W_{i}=1
+\end{array}\right.\]
+
+<p>作为权重对$\tau$进行加权最小二乘估计，则得到的估计量即为上面介绍的加权估计量$\hat{\tau}^{\mathrm{ht}}$。</p>
+
+<p>若进一步在回归模型中加入其他协变量进行调整：</p>
+
+\[Y_{i}^{\mathrm{obs}}=\alpha+\tau \cdot W_{i}+X_{i} \beta+\varepsilon_{i}\]
+
+<p>使用与上面同样的权重进行加权回归，也可以得到相应的$\tau_{\mathrm{fs}}$的估计量。这样得到的估计量有一个重要的性质，即<code class="language-plaintext highlighter-rouge">双稳健（Double-robustness）</code>性质。双稳健的意思是指：只要倾向性得分模型或者回归模型之一指定正确，上面得到的估计量就是$\tau_{\mathrm{fs}}$的相合估计。</p>
+
+<p>而我们的分层估计量也类似的可以写为加权最小二乘估计量的形式，即：</p>
+
+\[\hat{\tau}^{\text {strat }}=\sum_{j=1}^{J} q(j) \cdot \hat{\tau}^{\mathrm{dif}}(j)=\sum_{j=1}^{J} q(j) \cdot\left(\bar{Y}_{t}(j)-\bar{Y}_{c}(j)\right)\]
+
+\[=\frac{1}{N} \sum_{i=1}^{N} W_{i} \cdot Y_{i}^{\text {obs }} \cdot \lambda_{i}^{\text {strat }}-\frac{1}{N} \sum_{i=1}^{N}\left(1-W_{i}\right) \cdot Y_{i}^{\text {obs }} \cdot \lambda_{i}^{\text {strat }}\]
+
+<p>其中</p>
+
+\[\begin{aligned}
+\lambda_{i}^{\text {strat }} &amp;=\sum_{j=1}^{J} B_{i}(j) \cdot\left(\frac{1-W_{i}}{N_{\mathrm{c}}(j) / N(j)}+\frac{W_{i}}{N_{\mathrm{t}}(j) / N(j)}\right) \\
+&amp;=\left\{\begin{array}{ll}
+\sum_{j=1}^{J} B_{i}(j) \cdot \frac{N(j)}{N_{c}(j)} &amp; \text { if } W_{i}=0 \\
+\sum_{j=1}^{J} B_{i}(j) \cdot \frac{N(j)}{N_{t}(j)} &amp; \text { if } W_{i}=1
+\end{array}\right.
+\end{aligned}\]
+
+<p>由此说明，分层估计量也可以看作为加权估计量的一种特殊形式的加权估计量，只是原来加权估计量中的$e(x)$不再是用每个个体的$\hat{e}(X_i)$，而是每一层的个体共用一个<code class="language-plaintext highlighter-rouge">加粗的倾向性得分（Coarsened propensity score）估计值</code>：</p>
+
+\[\tilde{e}\left(X_{i}\right)=\sum_{j=1}^{J} B_{i}(j) \cdot \frac{N_{t}(j)}{N(j)}\]
+
+<p>使用加粗版本的倾向性得分进行加权估计有一个好处就是它对每层的倾向性得分进行了一个平滑化，避免了一些极端的权重出现，使得估计更加稳定，样本方差更小。</p>
+
+<p>需要说明的是，分层估计量相较于Horvitz-Thompson估计量来说有以下几点优点：</p>
+
+<ul>
+  <li>
+    <p>首先从估计的<strong>偏差角度</strong>来讲，尽管Horvitz-Thompson估计量在使用真实的倾向得分进行估计时是无偏的，但在观测性研究中$e(X_i)$往往未知，需要利用其估计量代替，此时<strong>由于倾向得分估计量的极端取值可能会给Horvitz-Thompson估计量带来较大的估计偏差</strong>。通常来说，对倾向得分的估计值进行一个平滑化，去除一些极端取值，会降低估计的偏差，而分层估计量作为Horvitz-Thompson估计量的一种特殊形式，即可看作<strong>对权重进行了一种平滑化处理</strong>，从而其偏差会更小。</p>
+  </li>
+  <li>
+    <p>从估计的<strong>方差角度</strong>来讲，权重的平滑化也使得分层估计量的方差会优于Horvitz-Thompson估计量的样本方差，因为它避免了一些极端的权重出现。</p>
+  </li>
+  <li>
+    <p>此外，上面我们也提到，在Horvitz-Thompson估计量的回归版本中，我们可以在加权回归模型中加入协变量进行进一步的调整，但需要注意的是，与层内的回归调整（或随机化实验中的回归调整）不同的是，<strong>前者的回归是在层内对一个协变量较为均衡的子样本进行回归，后者的回归是对全样本的回归，即用同一个回归函数对全样本进行一个近似，由于全样本中协变量的分布一般存在着较大的差异</strong>，此时回归方法得到的估计量是不够准确的。</p>
+  </li>
+</ul>
+
+<p>一般来说，当分层的层数很大，每一层中的倾向性得分变化较小或极端值较少时，这两种估计量是非常接近的。</p>
+
+<h2 id="matching-estimators">Matching Estimators</h2>
+
+<p>除了分层以外，匹配也是一种常见的估计处理效应的方法，与<a href="https://yijiaojane.github.io/2021/02/02/CI-3/#matching-to-improve-balance-in-covariate-distributions">上一篇中的匹配</a>不同的是，<strong>上一篇中匹配的目的主要是在设计阶段对样本进行一个筛选</strong>，在这一节中，我们是在样本给定的情况下，用匹配的方法对因果效应进行估计。这里我们将介绍对<code class="language-plaintext highlighter-rouge">处理组的平均因果效应</code>以及<code class="language-plaintext highlighter-rouge">全样本的平均因果效应</code>的估计方法。</p>
+
+<h4 id="the-bias-of-matching-estimators">The Bias of Matching Estimators</h4>
+
+<p>如果说分层可以近似看作为构造一个分层随机化实验的话，那么匹配就可以近似看作为构造一个配对随机化实验。但两者之间还是有一定的区别，主要包括以下两点：</p>
+
+<ul>
+  <li>
+    <p>在随机化实验中，由于分配机制可以由研究者控制，无混杂性是可以满足的。而在观测性研究中，需要假设分配机制的无混杂性成立，因为尽管样本可以精确匹配，也可能<strong>存在很多未观测到的混杂因素</strong>。</p>
+  </li>
+  <li>
+    <p><strong>匹配通常来说不是完全精确的</strong>，匹配的样本之间仍可能存在一定的差异，这也是与配对随机化实验有细微差异的。</p>
+  </li>
+</ul>
+
+<p>这里沿用上一篇中匹配部分的记号，可以对<strong>处理组的第$i$个个体</strong>的个体水平因果效应定义匹配估计量：</p>
+
+\[\hat{\tau}_{i}^{\text {match }}=Y_{i}^{\text {obs }}-Y_{m_{i}^{c}}^{\text {obs }}\]
+
+<p>上述估计量是无偏的，从而对于处理组的平均因果效应可建立如下无偏估计量：</p>
+
+\[\hat{\tau}_{\mathrm{t}}^{\mathrm{match}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \hat{\tau}_{i}^{\mathrm{match}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-Y_{\mathrm{m}_{i}^{c}}^{\mathrm{obs}}\right)=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-Y_{\mathrm{m}_{i}^{c}}(0)\right)\]
+
+<p>其样本方差的保守估计量为：</p>
+
+\[\hat{\mathbb{V}}\left(\hat{\tau}_{\mathrm{t}}^{\text {match }}\right)=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}^{\text {obs }}-Y_{m_{i}^{\mathrm{ob}}}^{\mathrm{obs}}-\hat{\tau}_{\mathrm{t}}^{\text {match }}\right)^{2}\]
+
+<p>下面我们来分析一下匹配估计量的偏差。由于观测性研究中匹配往往不是精确的，即$X_{i} \neq X_{m_{i}^{c}}$，我们可以定义<code class="language-plaintext highlighter-rouge">匹配差异（Matching discrepancy）</code>为：</p>
+
+\[D_{i}=X_{i}-X_{m_{i}^{c}}\]
+
+<p>定义在给定$X_i=x$下超总体中两种潜在结果的均值分别为：</p>
+
+\[\mu_{\mathrm{c}}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid X_{i}=x\right], \quad \text { and } \quad \mu_{\mathrm{t}}(x)=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1) \mid X_{i}=x\right]\]
+
+<p>可以求得匹配估计量的期望为：</p>
+
+\[\begin{aligned}
+\mathbb{E}_{\text {sp }}\left[\hat{\tau}_{i}^{\text {match }} \mid W_{i}=1, X_{i}, X_{m_{i}^{c}}\right] &amp;=\mathbb{E}_{\text {sp }}\left[Y_{i}(1)-Y_{m_{i}^{c}}(0) \mid X_{i}, X_{m_{i}^{c}}\right]=\mu_{\mathrm{t}}\left(X_{i}\right)-\mu_{\mathrm{c}}\left(X_{\mathrm{m}_{i}^{c}}\right) \\
+&amp;=\tau\left(X_{i}\right)+\left(\mu_{\mathrm{c}}\left(X_{i}\right)-\mu_{\mathrm{c}}\left(X_{\mathrm{m}_{i}^{c}}\right)\right)
+\end{aligned}\]
+
+<p>记上式最后一项为：</p>
+
+\[B_{i}=\mu_{\mathrm{c}}\left(X_{i}\right)-\mu_{\mathrm{c}}\left(X_{m_{i}^{c}}\right)\]
+
+<p>称其为匹配估计量在<code class="language-plaintext highlighter-rouge">个体水平上的偏差（unit-level bias）</code>。</p>
+
+<h4 id="bias-corrected-matching-estimators">Bias-Corrected Matching Estimators</h4>
+
+<p>由于匹配的不精确性，由此构造的匹配估计量往往是有偏的，下面就来介绍三种对其进行纠偏的方法。</p>
+
+<p>首先，总的来说，一个直观的想法就是，既然估计量是有偏的，偏差为$B_{i}=\mu_{\mathrm{c}}\left(X_{i}\right)-\mu_{\mathrm{c}}\left(X_{m_{i}^{c}}\right)$，那我们就想办法把$B_{i}$估计出来。用下式代替$Y_{m_{i}^{c}}(0)$对$Y_i(0)$进行估计：</p>
+
+\[\hat{Y}_{i}(0)=Y_{m_{i}^{c}}(0)+\hat{B}_{i}\]
+
+<p>从而得到调整后的匹配估计量：</p>
+
+\[\hat{\tau}_{\mathrm{t}}^{\mathrm{adj}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-\hat{Y}_{i}(0)\right)=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-Y_{m_{i}^{c}}(0)-\hat{B}_{i}\right)\]
+
+<p>下面介绍的三种方法都是基于一个<strong>简单的线性回归</strong>的思想对$B_i$进行估计，总体思路如下：</p>
+
+<p>假定控制水平下潜在结果的条件期望具有以下形式：</p>
+
+\[\mu_{\mathrm{c}}(x)=\alpha_{\mathrm{c}}+x \beta_{\mathrm{c}}\]
+
+<p>根据$B_i$的定义，我们有：</p>
+
+\[B_{i}=\left(X_{i}-X_{m_{i}^{c}}\right) \beta_{\mathrm{c}}=D_{i} \beta_{\mathrm{c}}\]
+
+<p>可以通过对$\beta_{\mathrm{c}}$进行估计得到$B_i$的估计。而下面<strong>三种方法的差别就在于它们估计$\beta_{\mathrm{c}}$的方式不同</strong>。再次说明，这部分的下标$i$均代表处理组个体。</p>
+
+<h6 id="regression-on-the-matching-discrepancy">Regression on the Matching Discrepancy</h6>
+
+<p>第一种方法指定条件期望的回归模型形式如下：</p>
+
+\[\mu_{\mathrm{c}}(x)=\alpha_{d}+x \beta_{d},  \quad \mu_{\mathrm{t}}(x)=\tau+\mu_{\mathrm{c}}(x)=\tau+\alpha_{d}+x \beta_{d}\]
+
+<p>下面我们说明，可以通过将</p>
+
+\[\hat{\tau}_{i}^{\text {match }}=Y_{i}^{\text {obs }}-Y_{m_{i}^{c}}^{\text {obs }}\]
+
+<p>对匹配差异$D_{i}=X_{i}-X_{m_{i}^{c}}$做最小二乘回归得到$\beta_{\mathrm{d}}$进的估计。</p>
+
+<p>注意到，未做调整时个体水平因果效应的匹配估计量可以写为：</p>
+
+\[\begin{aligned}
+\hat{\tau}_{i}^{\text {unadj }}=Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{c}}^{\mathrm{obs}} &amp;=\tau_{i}\left(X_{i}\right) \\
+&amp;+\left(\mu_{\mathrm{c}}\left(X_{i}\right)-\mu_{c}\left(X_{m_{i}^{c}}\right)\right) \\
+&amp;+\left(Y_{i}(1)-\mu_{t}\left(X_{i}\right)\right)-\left(Y_{m_{i}^{c}}(0)-\mu_{c}\left(X_{m_{i}^{c}}\right)\right)
+\end{aligned}\]
+
+<p>即$\hat{\tau}_{i}^{\text {unadj }}$可拆分为协变量水平为$X_i$的平均因果效应加上由于匹配不精确带来的匹配差异、再加上每一对匹配中两种处理水平观测值与对应期望值偏离程度之差，我们将其记为：</p>
+
+\[v_{i}=\left(Y_{i}(1)-\mu_{\mathrm{t}}\left(X_{i}\right)\right)-\left(Y_{m_{i}^{c}}(0)-\mu_{\mathrm{c}}\left(X_{m_{i}^{c}}\right)\right)\]
+
+<p>从而我们可以将$\hat{\tau}_{i}^{\text {unadj }}$进一步表示成：</p>
+
+\[Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{c}}^{\mathrm{obs}}=\tau+\left(X_{i}-X_{m_{i}^{c}}\right) \beta_{d}+v_{i}=\tau+D_{i} \beta_{d}+v_{i}\]
+
+<p>根据定义，$v_{i}$关于$\mathbf{X}$的条件期望为$0$，而$v_{i}$关于$\mathbf{X}$的条件期望又是$D_{i}=X_{i}-X_{m_{i}^{c}}$的函数，因此$v_{i}$关于$D_{i}$的条件期望也为$0$，这说明$v_{i}$是外生的，从而可以利用一般的最小二乘法对回归系数$\beta_{\mathrm{d}}$进行估计，即：</p>
+
+\[\hat{\beta}_{d}=\left(\sum_{i: W_{i}=1}\left(D_{i}-\bar{D}\right)^{T} \cdot\left(D_{i}-\bar{D}\right)\right)^{-1}\left(\sum_{i: W_{i}=1}\left(D_{i}-\bar{D}\right)^{T} \cdot\left(Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{c}}^{\mathrm{obs}}\right)\right)\]
+
+<p>其中$\bar{D}=\sum_{i: W_{i}=1} D_{i} / N_{t}$。</p>
+
+<p>由此我们可以用如下式子代替$Y_{m_{i}^{c}}(0)$进行估计：</p>
+
+\[\hat{Y}_{i}(0)=Y_{m_{i}^{c}}(0)+\hat{B}_{i}=Y_{m_{i}^{c}}(0)+\left(X_{i}-X_{m_{i}^{c}}\right) \hat{\beta}_{d}\]
+
+<p>从而得到调整后的匹配估计量：</p>
+
+\[\begin{aligned}
+\hat{\tau}_{\mathrm{t}}^{\mathrm{adj}, \mathrm{d}} &amp;=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-\hat{Y}_{i}(0)\right) \\
+&amp;=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-Y_{m_{i}^{c}}(0)-\left(X_{i}-X_{m_{i}^{c}}\right) \hat{\beta}_{d}\right) \\
+&amp;=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}-Y_{m_{i}^{c}}-D_{i} \hat{\beta}_{d}\right)=\hat{\tau}_{t}^{\mathrm{match}}-\bar{D} \hat{\beta}_{d}
+\end{aligned}\]
+
+<h6 id="control-regression-on-the-covariates">Control Regression on the Covariates</h6>
+<p>第二种纠偏的方法是利用控制组的个体来估计回归模型中的参数$\beta_{\mathrm{c}}$。指定回归模型为：</p>
+
+\[Y_{m_{i}^{c}}=\alpha_{c}+X_{m_{i}^{c}} \beta_{\mathrm{c}}+v_{c i}\]
+
+<p>其中$v_{c i}=Y_{m_{i}^{c}}-\mu_{c}\left(X_{m_{i}^{c}}\right)$。</p>
+
+<p>利用$N_t$个匹配的控制组个体的观测结果$Y_{m_{1}^{c}},\ldots,Y_{m_{N_t}^{c}}$以及相应的协变量$X_{m_{1}^{c}},\ldots,X_{m_{N_t}^{c}}$进行最小二乘估计，可得：</p>
+
+\[\hat{\beta}_{\mathrm{c}}=\left(\sum_{i: W_{i}=1}\left(X_{m_{i}^{c}}-\bar{X}_{m}\right)^{T} \cdot\left(X_{m_{i}^{c}}-\bar{X}_{m}\right)\right)^{-1}\left(\sum_{i: W_{i}=1}\left(X_{m_{i}^{c}}-\bar{X}_{m}\right) \cdot Y_{m_{i}^{c}}\right)\]
+
+<p>对应的调整后的匹配估计量为：</p>
+
+\[\begin{aligned}
+\hat{\tau}_{\mathrm{t}}^{\mathrm{adj}, \mathrm{c}} &amp;=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-\hat{Y}_{i}(0)\right) \\
+&amp;=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{c}}^{\mathrm{obs}}-\left(X_{i}-X_{m_{i}^{c}}\right) \hat{\beta}_{\mathrm{c}}\right)=\hat{\tau}_{t}^{\mathrm{match}}-\bar{D} \hat{\beta}_{\mathrm{c}}
+\end{aligned}\]
+
+<h6 id="parallel-regressions-on-covariates">Parallel Regressions on Covariates</h6>
+<p>第三种方法的想法在于用匹配后的$2 \cdot N_t$个样本同时对回归模型中的参数$\beta_{\mathrm{c}}$进行估计。此时将两组的结果变量、处理变量以及协变量分别记为：</p>
+
+\[\tilde{Y}_{i},\quad \tilde{W}_{i},\quad \tilde{X}_{i},\quad i=1,\ldots,2 N_t\]
+
+<p>并指定回归模型如下：</p>
+
+\[\tilde{Y}_{i}=\alpha_{p}+\tau_{p} \cdot \tilde{W}_{i}+\tilde{X}_{i} \beta_{p}+v_{i}\]
+
+<p>利用匹配样本对回归系数进行最小二乘估计并得到相应调整后的匹配估计量为：</p>
+
+\[\begin{aligned}
+\hat{\tau}_{\mathrm{t}}^{\mathrm{adj}, \mathrm{p}} &amp;=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-\hat{Y}_{i}(0)\right) \\
+&amp;=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{c}}^{\mathrm{obs}}-\left(X_{i}-X_{m_{i}^{c}}\right) \hat{\beta}_{p}\right)=\hat{\tau}_{t}^{\mathrm{match}}-\bar{D} \hat{\beta}_{p}
+\end{aligned}\]
+
+<p>注意到：</p>
+
+<ul>
+  <li>
+    <p>上述三种方法调整后得到的匹配估计量的不同之处<strong>仅在于回归系数的估计方式不同</strong>，有相关理论证明（<a href="https://www.jstor.org/stable/pdf/2529685.pdf">参见Rubin (1973b)</a>）第一种方法更好（<em>说明，原书中说的是第二种更好，即用控制组样本估计回归系数纠偏，但笔者查阅多处文献发现都是认为第一种方法更好，此处认为是原书笔误，如有错误，欢迎指正</em>）。</p>
+  </li>
+  <li>
+    <p>这里调整的方法都是简单的线性回归，如果观测到的样本数量足够多，也可以考虑加入更高阶的项进行估计。</p>
+  </li>
+  <li>
+    <p>在实际应用中，相较于具体选择哪一种方法进行纠偏这个问题来说，是否考虑对匹配估计量进行纠偏这个问题更为重要。一般来说，采用纠偏调整都会比原始的匹配估计量更好一些。</p>
+  </li>
+</ul>
+
+<h4 id="other-matching-methods">Other Matching Methods</h4>
+
+<p>上一篇中，我们也提到，除了对处理组个体进行一对一无放回的匹配方法外，还有有放回匹配、一对多无放回匹配、对全样本匹配的其他匹配方法。这里我们具体来介绍在这些匹配方法下如何构造匹配估计量。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Matching with Replacement</code></li>
+</ul>
+
+<p>这里我们还是主要关注对处理组的个体进行匹配。由于匹配是有放回的，此时匹配结果与匹配的顺序就没有关系了。为了更方便表示出这种形式下的匹配估计量，我们首先来定义一个重要的变量，即每个个体被匹配的次数，记为：</p>
+
+\[L(i)=\sum_{j=1}^{N} 1_{j \in \mathcal{M}_{i}^{c}}\]
+
+<p>为统一记号，这里$i$即可表示处理组个体（此时$L(i)=0$），也可表示控制组个体。这里假定协变量的取值没有结点。由此可以定义有放回情形下处理组平均因果效应的匹配估计量：</p>
+
+\[\begin{aligned}
+\hat{\tau}_{\mathrm{t}}^{\mathrm{repl}} &amp;=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-Y_{m_{i}^{\mathrm{c}}}^{\mathrm{obs}}\right) \\
+&amp;=\frac{1}{N_{t}} \sum_{i=1}^{N}\left(W_{i} \cdot Y_{i}^{\mathrm{obs}}-\left(1-W_{i}\right) \cdot L(i) \cdot Y_{i}^{\mathrm{obs}}\right) \\
+&amp;=\frac{1}{N_{t}} \sum_{i=1}^{N}\left(W_{i} \cdot Y_{i}(1)-\left(1-W_{i}\right) \cdot L(i) \cdot Y_{i}(0)\right)
+\end{aligned}\]
+
+<p>有放回匹配的优点在于：</p>
+
+<ol>
+  <li>
+    <p>当满足条件的匹配个体较少时，有放回方法<strong>减轻了匹配的压力</strong>。</p>
+  </li>
+  <li>
+    <p>由于控制组的个体可多次使用，处理组个体可匹配的选择增多，从而匹配更精确，<strong>匹配估计量的偏差减少</strong>。</p>
+  </li>
+</ol>
+
+<p>但也有一定的缺点：</p>
+
+<ol>
+  <li>
+    <p>由于控制组的个体可能被反复使用，从而实际使用到的控制组的个体数量减少，此时<strong>样本方差会随之增大</strong>。</p>
+  </li>
+  <li>
+    <p>由于不同的处理组个体可能使用同一个控制组个体进行匹配，配对之间存在相关性，从而使得<strong>样本方差的估计变得更困难</strong>。</p>
+  </li>
+</ol>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Matching with Multiple Matches</code></li>
+</ul>
+
+<p>通常在观测性研究中，控制组的个体数量相较于处理组会大得多，这时为了充分利用控制组样本的信息，可以考虑一对多的匹配。假定每个处理组个体可以匹配$M$个控制组的个体，则对应的匹配估计量为：</p>
+
+\[\hat{\tau}_{\mathrm{t}}^{\text {match }, M}=\frac{1}{N_{\mathrm{t}}} \sum_{i=1}^{N_{\mathrm{t}}}\left(Y_{i}(1)-\frac{1}{M} \sum_{j \in \mathcal{M}^{\mathrm{c}}(i)} Y_{j}(0)\right)\]
+
+<p>记超总体中两种处理水平下潜在结果的方差分别为$\sigma_{\mathrm{t}}^{2}$和$\sigma_{\mathrm{c}}^{2}$，则上述估计量的样本方差为：</p>
+
+\[\mathbb{V}\left(\hat{\tau}_{\mathrm{t}}^{\operatorname{match}, M}\right)=\frac{1}{N_{\mathrm{t}}}\left(\sigma_{\mathrm{t}}^{2}+\frac{\sigma_{\mathrm{c}}^{2}}{M}\right)\]
+
+<p>可见一对多的匹配可以改善（降低）估计量的样本方差，但<strong>这样的改善有限的</strong>，假定$\sigma_{\mathrm{t}}^{2}=\sigma_{\mathrm{c}}^{2}$，则方差降低比例为：</p>
+
+\[\frac{\mathbb{V}\left(\hat{\tau}_{\mathrm{t}}^{\text {match }, 1}\right)-\mathbb{V}\left(\hat{\tau}_{\mathrm{t}}^{\text {match }, M}\right)}{\mathbb{V}\left(\hat{\tau}_{\mathrm{t}}^{\text {match }, 1}\right)}=\frac{M-1}{2 M}\]
+
+<p>上式说明，当匹配个数$M$趋于无穷时，<strong>估计量的方差也最多降低为原来的$1/2$。</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Matching Estimators For The Average Treatment Effect For The Controls and For The Full Sample</code></li>
+</ul>
+
+<p>此外，我们也可以同时对控制组的个体也进行匹配，由此可以构建对于全样本的平均因果效应的估计。这里我们直接对利用回归纠偏后的匹配统计量进行讨论，调整后处理组以及控制组平均因果效应的匹配估计量如下所示：</p>
+
+\[\hat{\tau}_{\mathrm{t}}^{\mathrm{adj}}=\frac{1}{N_{t}} \sum_{i: W_{i}=1}\left(Y_{i}^{\mathrm{obs}}-Y_{\mathrm{m}_{i}^{c}}^{\mathrm{obs}}-\left(X_{i}-X_{m_{i}^{c}}\right)^{\prime} \hat{\beta}_{\mathrm{c}}\right)\]
+
+\[\hat{\tau}_{\mathrm{c}}^{\mathrm{adj}}=\frac{1}{N_{c}} \sum_{i: W_{i}=0}\left(Y_{\mathrm{m}_{i}^{t}}^{\mathrm{obs}}-Y_{i}^{\mathrm{obs}}-\left(X_{m_{i}^{t}}-X_{i}\right)^{\prime} \hat{\beta}_{\mathrm{t}}\right)\]
+
+<p>进而可由此构建全样本平均因果效应的估计量：</p>
+
+\[\hat{\tau}^{\mathrm{adj}}=\frac{N_{\mathrm{c}}}{N_{\mathrm{c}}+N_{\mathrm{t}}} \cdot \hat{\tau}_{\mathrm{c}}^{\mathrm{adj}}+\frac{N_{\mathrm{t}}}{N_{\mathrm{c}}+N_{\mathrm{t}}} \cdot \hat{\tau}_{\mathrm{t}}^{\mathrm{adj}}\]
+
+<p>到此，匹配估计量的讨论就暂告一段落了。</p>
+
+<hr />
+<h2 id="estimating-sampling-variances">Estimating Sampling Variances</h2>
+<p>上一部分我们介绍了两种常见的用于估计平均因果效应的方法，即分层和匹配。若想进一步对参数进行推断，我们还需对估计量的样本方差进行估计，并在此基础上建立置信区间。尽管上一部分在介绍估计量时也简要给出了各自样本方差的估计，但在这一部分，我们希望建立的平均因果效应样本方差估计不依赖于具体的估计量，而是<strong>将不同的估计量用同一种形式或者结构统一起来</strong>，介绍一种<code class="language-plaintext highlighter-rouge">一般化的样本方差的估计方法</code>。</p>
+
+<h4 id="choice-of-estimand">Choice of estimand</h4>
+<p>在讨论样本方差如何估计之前，我们首先应该明确的是我们关心的参数到底是当前观测到的有限样本的平均因果效应：</p>
+
+\[\tau_{\mathrm{fs}}=\frac{1}{N} \sum_{i=1}^{N}\left(Y_{i}(1)-Y_{i}(0)\right)\]
+
+<p>还是这个样本所来自的超总体的平均因果效应：</p>
+
+\[\tau_{\mathrm{sp}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)\right]=\mathbb{E}_{\mathrm{sp}}\left[\tau_{\mathrm{fs}}\right]\]
+
+<p>虽然从构造估计量的角度来说，具体关心的是哪个参数并不重要（这一点从上式的第二个等号可以看出），但是若要进一步估计这个估计量的样本方差，那么$\tau_{\mathrm{fs}}$和$\tau_{\mathrm{sp}}$的选择就重要了。因为在有限样本下，估计量$\hat{\tau}$的随机性只来自于分配机制，此时样本方差为：</p>
+
+\[\mathbb{V}_{W}(\hat{\tau})=\mathbb{E}_{W}\left[\left(\hat{\tau}-\tau_{\mathrm{fs}}\right)^{2}\right]\]
+
+<p>而在超总体下，估计量$\hat{\tau}$的随机性不仅来自于分配机制，还来自于样本的随机性，此时样本方差为：</p>
+
+\[\mathbb{V}(\hat{\tau})=\mathbb{E}\left[\left(\hat{\tau}-\tau_{\mathrm{sp}}\right)^{2}\right]\]
+
+<p>容易说明，这两者之间的差异如下：</p>
+
+\[\mathbb{V}(\hat{\tau})-\mathbb{V}_{W}(\hat{\tau}) \approx \mathbb{V}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right) / N\]
+
+<p>即超总体下估计量$\hat{\tau}$的样本方差相较于有限总体下的样本方差还<strong>多出了一部分个体水平平均因果效应的方差</strong>，关于上式具体的说明可参见<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>第19章第3节。</p>
+
+<p>在之后的部分我们将分别给出选择两个关心参数时估计量样本方差的估计形式。但需要说明是的，由于超总体往往是难以有一个确切的定义的，因此<strong>常常关心的还是有限样本下的平均因果效应</strong>。</p>
+
+<h4 id="the-common-structure-of-standard-estimators">The Common Structure of Standard Estimators</h4>
+<p>为了对之前的估计量的样本方差给出一个一般话的估计形式，这一小节我们将对这些估计量建立一个统一的结构。</p>
+
+<p>仔细观察不难发现，之前我们建立的所有平均因果效应的估计量都具有一个<strong>共同的结构</strong>，即它们<strong>均可表示成为处理组和控制组的潜在结果的加权平均的形式</strong>，即：</p>
+
+\[\hat{\tau}=\hat{\tau}\left(\mathbf{Y}^{\mathrm{obs}}, \mathbf{W}, \mathbf{X}\right)=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}\]
+
+<p>其中处理组个体的权重为$\lambda_{i} / N_{\mathrm{t}}$，控制组个体的权重为$\lambda_{i} / N_{\mathrm{c}}$。各个估计量的不同之处只在于$\lambda_{i}$的不同。而$\lambda_{i}$都具有以下性质：</p>
+
+<ol>
+  <li>
+    <p>可写为$W_{i},X_{i},{\mathbf{W}}^{(-i)}, {\mathbf{X}}^{(-i)}$的函数，即：</p>
+
+\[\lambda_{i}=\lambda\left(W_{i}, X_{i}, \mathbf{W}^{(-i)}, \mathbf{X}^{(-i)}\right)\]
+
+    <p>其中$\mathbf{W}^{(-i)}$表示处理变量构成的向量去掉第$W_i$所构成的$N-1$维向量，$\mathbf{X}^{(-i)}$表示由协变量矩阵去掉第$i$行所构成的$(N-1) \times K$维的矩阵。</p>
+  </li>
+  <li>
+    <p>这些权重求和满足：</p>
+  </li>
+</ol>
+
+\[\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i}=1, \quad \text { and } \quad \frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \lambda_{i}=1\]
+
+<p>这样的估计量具有下述三条性质，我们称之为<code class="language-plaintext highlighter-rouge">仿射一致性（affine consistency）</code>：</p>
+
+<ol>
+  <li>
+    <p>处理组观测结果值统一增加$c_t$，则估计所得平均因果效应增加$c_t$。</p>
+  </li>
+  <li>
+    <p>控制组观测结果值统一增加$c_c$，则估计所得平均因果效应减少$c_c$。</p>
+  </li>
+  <li>
+    <p>所有观测结果变为原来的$c_s$倍，则估计所得平均因果效应变为原来的$c_s$倍。</p>
+  </li>
+</ol>
+
+<p>为了更好地说明之前建立的估计量的结构一致性，在此我们都把他们表示为加权和的形式：</p>
+
+<ul>
+  <li><a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">Difference Estimator</a></li>
+</ul>
+
+\[\hat{\tau}^{\mathrm{dif}}=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}\]
+
+<p>其对应的权重为$\lambda_{i}^{\mathrm{dif}}=1$。</p>
+
+<ul>
+  <li><a href="https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods">Regression Estimator</a></li>
+</ul>
+
+\[\hat{\tau}^{\mathrm{ols}}=\frac{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right) \cdot\left(Y_{i}^{\mathrm{obs}}-\bar{Y}^{\mathrm{obs}}\right)}{\sum_{i=1}^{N}\left(W_{i}-\bar{W}\right)^{2}}, \quad \text { and } \quad \hat{\alpha}^{\mathrm{ols}}=\bar{Y}^{\mathrm{obs}}-\hat{\tau}^{\mathrm{ols}} \cdot \bar{W}\]
+
+<p>其对应的权重为：</p>
+
+\[\lambda_{i}^{\mathrm{ols}}=\bar{W}^{W_{i}} \cdot(1-\bar{W})^{1-W_{i}} \cdot \frac{S_{X}^{2}(N-1) / N-\left(\bar{X}_{t}-\bar{X}_{c}\right) \cdot\left(X_{i}-\bar{X}\right)}{S_{X}^{2}(N-1) / N-\bar{W} \cdot(1-\bar{W}) \cdot\left(\bar{X}_{t}-\bar{X}_{c}\right)^{2}}\]
+
+<p>其中$S_{X}^{2}=\sum_{i=1}^{N}\left(X_{i}-\bar{X}\right)^{2} /(N-1)$。</p>
+
+<ul>
+  <li><a href="https://yijiaojane.github.io/2021/02/04/CI-4/#weighting-estimators-and-subclassification">Weighting Estimator</a></li>
+</ul>
+
+\[\hat{\tau}^{\mathrm{ht}}=\sum_{i=1}^{N} \frac{W_{i} \cdot Y_{i}^{\mathrm{obs}}}{\hat{e}\left(X_{i}\right)} / \sum_{i=1}^{N} \frac{W_{i}}{\hat{e}\left(X_{i}\right)}-\sum_{i=1}^{N} \frac{\left(1-W_{i}\right) \cdot Y_{i}^{\mathrm{obs}}}{1-\hat{e}\left(X_{i}\right)} / \sum_{i=1}^{N} \frac{1-W_{i}}{1-\hat{e}\left(X_{i}\right)}\]
+
+<p>其对应的权重为：</p>
+
+\[\lambda_{i}^{h t}=\left\{\begin{array}{cl}
+\frac{N_{c}}{1-e\left(X_{i}\right)} / \sum_{j: W_{j}=0} \frac{1}{1-e\left(X_{j}\right)}, &amp; \text { if } W_{i}=0 \\
+\frac{N_{t}}{e\left(X_{i}\right)} / \sum_{j: W_{j}=1} \frac{1}{e\left(X_{j}\right)}, &amp; \text { if } W_{i}=1 .
+\end{array}\right.\]
+
+<ul>
+  <li><a href="https://yijiaojane.github.io/2021/02/04/CI-4/#subclassification-estimator-for-the-average-treatment-effect">Subclassification Estimator</a></li>
+</ul>
+
+\[\hat{\tau}^{\text {strat }}=\sum_{j=1}^{J} q(j) \cdot \hat{\tau}^{\mathrm{dif}}(j),\quad \text{where} \hat{\tau}^{\mathrm{dif}}(j)=\bar{Y}_{\mathrm{t}}^{\mathrm{obs}}(j)-\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}(j)\]
+
+<p>其对应的权重为：</p>
+
+\[\lambda_{i}^{\text {strat }}=\left\{\begin{array}{ll}
+\sum_{j=1}^{J} B_{i}(j) \cdot\left(N_{\mathrm{c}} / N_{\mathrm{c}}(j)\right) \cdot(N(j) / N), &amp; \text { if } W_{i}=0 \\
+\sum_{j=1}^{J} B_{i}(j) \cdot\left(N_{\mathrm{t}} / N_{\mathrm{t}}(j)\right) \cdot(N(j) / N), &amp; \text { if } W_{i}=1
+\end{array}\right.\]
+
+<ul>
+  <li><a href="https://yijiaojane.github.io/2021/02/04/CI-4/#matching-estimators">Matching Estimator</a></li>
+</ul>
+
+\[\hat{\tau}^{\text {match }}=\frac{1}{N} \sum_{i=1}^{N}\left(\hat{Y}_{i}(1)-\hat{Y}_{i}(0)\right)\]
+
+<p>其对应的权重为：</p>
+
+\[\hat{Y}_{i}(w)=\left\{\begin{array}{ll}
+Y_{i}^{\text {obs }} &amp; \text { if } W_{i}=w \\
+\sum_{j \in \mathcal{M}^{c}(i)} Y_{j}^{\text {obs }} / M &amp; \text { if } W_{i}=1, w=0 \\
+\sum_{j \in \mathcal{M}^{t}(i)} Y_{j}^{\text {obs }} / M &amp; \text { if } W_{i}=0, w=1
+\end{array}\right.\]
+
+<p>若进一步对匹配估计量或者分层估计量做回归调整，仍可保证仿射一致性，但此时的权重<strong>可能取负值</strong>。</p>
+
+<h4 id="a-general-formula-for-the-conditional-sampling-variance">A General Formula for the Conditional Sampling Variance</h4>
+
+<p>对估计量建立了一个统一的形式，下面我们就来讨论如何对其样本方差进行估计。首先考虑<strong>有限样本下</strong>估计量的样本方差。</p>
+
+<p>沿用<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#regression-methods">第二篇回归部分中的记号</a>，进一步统一记个体水平潜在结果的均值和方差为：</p>
+
+\[\begin{array}{l}
+\mu_{i}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}^{\mathrm{obs}} \mid W_{i}, X_{i}\right]=\left\{\begin{array}{ll}
+\mu_{c}\left(X_{i}\right), &amp; \text { if } W_{i}=0 \\
+\mu_{t}\left(X_{i}\right), &amp; \text { if } W_{i}=1
+\end{array}\right. \\
+\sigma_{i}^{2}=\mathbb{V}_{\mathrm{sp}}\left(Y_{i}^{\mathrm{obs}} \mid W_{i}, X_{i}\right)=\left\{\begin{array}{c}
+\sigma_{c}^{2}\left(X_{i}\right), &amp; \text { if } W_{i}=0 \\
+\sigma_{t}^{2}\left(X_{i}\right), &amp; \text { if } W_{i}=1 .
+\end{array}\right.
+\end{array}\]
+
+<p>有了上述记号，我们可以将一般形式下估计量$\hat{\tau}$关于$\tau_{\mathrm{fs}}$的偏差拆为下述两项之和：</p>
+
+\[\begin{aligned}
+\hat{\tau}-\tau_{\mathrm{fs}}=&amp; \frac{1}{N_{t}} \sum_{i: W_{i}=1} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}} - \tau_{\mathrm{fs}} \\
+=&amp;\left(\frac{1}{N_{t}} \sum_{i: W_{i}=1} \lambda_{i} \cdot \mu_{i}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot \mu_{i} - \tau_{\mathrm{fs}}\right) \\
+&amp;+\left(\frac{1}{N_{t}} \sum_{i: W_{i}=1} \lambda_{i} \cdot\left(Y_{i}^{\mathrm{obs}}-\mu_{i}\right)-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot\left(Y_{i}^{\mathrm{obs}}-\mu_{i}\right)\right)
+\end{aligned}\]
+
+<p>称第一项为该估计量的条件偏差（conditional bias），在一定条件下可证明这一项相对于第二项可忽略，具体证明参见<a href="https://economics.mit.edu/files/11867">Abadie and Imbens(2006)</a>。第二项的期望为$0$，从而$\hat{\tau}$在有限样本下的样本方差等于第二项的方差，即：</p>
+
+\[{\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}}\right)=\mathbb{V}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \sigma_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \sigma_{i}^{2}\]
+
+<p>当估计量给定时，$\lambda_{i}$的值已知，从而只需构造$\sigma_{i}^{2}$的估计量$\hat{\sigma_{i}}^{2}$，即可得上式的估计量：</p>
+
+\[\hat{\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}}\right)=\widehat{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}\]
+
+<p>下面就给出一种估计$\sigma_{i}^{2}$的方法。</p>
+
+<p>设个体$i^{\prime}$满足$W_{i^{\prime}}=W_{i}=1$，$X_{i^{\prime}}=X_{i}=x$，则：</p>
+
+\[\begin{aligned}
+\mathbb{E}_{\text {sp }} &amp;\left[Y_{i}^{\text {obs }}-Y_{i^{\prime}}^{\text {obs }} \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+&amp;=\mathbb{E}_{\text {sp }}\left[\left(\mu_{i}+\left(Y_{i}^{\text {obs }}-\mu_{i}\right)\right)-\left(\mu_{i^{\prime}}+\left(Y_{i^{\prime}}^{\text {obs }}-\mu_{i^{\prime}}\right)\right) \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+&amp;=\mathbb{E}_{\text {sp }}\left[\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(\left(Y_{i^{\prime}}^{\text {obs }}-\mu_{i^{\prime}}\right)\right) \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right]=0
+\end{aligned}\]
+
+<p>由此容易计算得：</p>
+
+\[\begin{array}{l}
+\mathbb{E}_{\text {sp }}\left[\left(Y_{i}^{\text {obs }}-Y_{i^{\prime}}^{\text {obs }}\right)^{2} \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+\qquad \begin{array}{l}
+=\mathbb{E}_{\text {sp }}\left[\left(Y_{i}^{\text {obs }}-\mu_{i}\right)^{2}+\left(Y_{i^{\prime}}^{\text {obs }}-\mu_{i^{\prime}}\right)^{2} \mid X_{i}=X_{i^{\prime}}=x, W_{i}=W_{i^{\prime}}=1\right] \\
+=\mathbb{V}_{\text {sp }}\left(Y_{i}^{\text {obs }} \mid X_{i}=x, W_{i}=1\right)+\mathbb{V}_{\text {sp }}\left(Y_{i^{\prime}}^{\text {obs }} \mid X_{i^{\prime}}=x, W_{i^{\prime}}=1\right)=2 \cdot \sigma_{t}^{2}(x),
+\end{array}
+\end{array}\]
+
+<p>因此我们可以构造$\sigma_{i}^{2}$的无偏估计：</p>
+
+\[\hat{\sigma}_{i}^{2}=\left(Y_{i}^{\mathrm{obs}}-Y_{i^{\prime}}^{\mathrm{obs}}\right)^{2} / 2\]
+
+<p>在一定条件下，由上述$\hat{\sigma}_{i}^{2}$得到的条件样本方差的估计是渐进无偏的，即：</p>
+
+\[\begin{array}{l}
+N \cdot\left(\widehat{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})-\mathbb{V}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})\right) \\
+=\frac{N}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot\left(\hat{\sigma}_{i}^{2}-\sigma_{i}^{2}\right)+\frac{N}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot\left(\hat{\sigma}_{i}^{2}-\sigma_{i}^{2}\right) \longrightarrow 0
+\end{array}\]
+
+<p>具体证明参见<a href="https://economics.mit.edu/files/11867">Abadie and Imbens(2006)</a>。</p>
+
+<p>在实际中，找了处理变量以及协变量取值完全相同的个体进行如上估计还是比较困难的，这里我们可以借鉴之前匹配的思想，<strong>在同组个体之间进行匹配</strong>，得到上述$\sigma_{i}^{2}$的估计量，具体过程在此不赘述。记每个个体的匹配结果为：</p>
+
+\[\ell_{i}=\left\{\begin{array}{ll}
+m_{i}^{t} &amp; \text { if } W_{i}=1 \\
+m_{i}^{c} &amp; \text { if } W_{i}=0
+\end{array}\right.\]
+
+<p>从而得到的$\sigma_{i}^{2}$的估计量为：</p>
+
+\[\hat{\sigma}_{i}^{2}=\left(Y_{i}^{\mathrm{obs}}-Y_{\ell_{i}}^{\mathrm{obs}}\right)^{2} / 2\]
+
+<p>此时由于匹配的不精确性，该估计量不再是无偏的了，容易求得上述估计量的偏差主要来自如下两个部分：</p>
+
+\[\mathbb{E}_{\mathrm{sp}}\left[\hat{\sigma}_{i}^{2} \mid \mathbf{X}, \mathbf{W}\right] / 2-\sigma_{i}^{2}=\left(\mu_{i}-\mu_{\ell_{i}}\right)^{2} / 2+\left(\sigma_{\ell_{i}}^{2}-\sigma_{i}^{2}\right) / 2\]
+
+<p>其中第二项可正可负，第一项始终为正，两项随着样本量的增大都趋于$0$。此外，当个体水平潜在结果的<strong>方差异质性不大</strong>时，<strong>第二项相较于第一项可以忽略</strong>，从而偏差主要来源于第一项，即匹配个体之间潜在结果条件期望的差异。为消除这部分差异，以下我们将介绍一种基于回归纠偏的方法。</p>
+
+<p>假定潜在结果变量的条件期望具有如下形式：</p>
+
+\[\mathbb{E}_{\mathrm{sp}}\left[Y_{i}^{\mathrm{obs}} \mid X_{i}, W_{i}=1\right]=X_{i} \beta_{t}, \quad \text { and } \quad \mathbb{E}_{\mathrm{sp}}\left[Y_{i}^{\mathrm{obs}} \mid X_{i}, W_{i}=0\right]=X_{i} \beta_{c}\]
+
+<p>通过对上述回归函数进行拟合，可以对拟合后的残差为：</p>
+
+\[\hat{\varepsilon}_{i}=\left\{\begin{array}{ll}
+Y_{i}^{\mathrm{obs}}-X_{i} \hat{\beta}_{c} &amp; \text { if } W_{i}=0 \\
+Y_{i}^{\mathrm{obs}}-X_{i} \hat{\beta}_{t} &amp; \text { if } W_{i}=1
+\end{array}\right.\]
+
+<p>由于<strong>拟合后的残差减去了原潜在结果中由协变量差异带来的潜在结果的差异</strong>，从而回归调整后的方差估计量为：</p>
+
+\[\hat{\sigma}_{i}^{2, \mathrm{adj}}=\left(\hat{\varepsilon}_{i}-\hat{\varepsilon}_{\ell}\right)^{2} / 2\]
+
+<p>对应调整后的平均因果效应样本方差的估计量为：</p>
+
+\[\widetilde{\mathbb{V}}_{\mathrm{sp}}(\hat{\tau} \mid \mathbf{X}, \mathbf{W})=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2, \mathrm{adj}}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2, \mathrm{adj}}\]
+
+<p>除了一对一匹配估计的方法，我们也可以对每个样本进行一对多的同组匹配，得到相应的$\sigma_{i}^{2}$的估计量为：</p>
+
+\[\hat{\sigma}_{i, M}^{2}=\frac{1}{2 \cdot M} \cdot \sum_{i^{\prime} \in \mathcal{M}_{i}^{t}}\left(Y_{i^{\prime}}^{\mathrm{obs}}-Y_{i}^{\mathrm{obs}}\right)^{2}\]
+
+<p>一般来说，$M$的选择涉及到估计量偏差与方差之间的一个权衡。$M$越大，估计量的方差越小，但匹配个体的质量随之降低，导致估计量的偏差增大，建议选择在$1$到$4$之间。</p>
+
+<p>类似地，对应处理组平均因果效应：</p>
+
+\[\tau_{\mathrm{fs}, \mathrm{t}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1}\left(Y_{i}(1)-Y_{i}(0)\right)\]
+
+<p>其对应估计量：</p>
+
+\[\hat{\tau}_{\mathrm{fs}, \mathrm{t}}=\frac{1}{N_{\mathrm{t}}} \sum_{i: W_{i}=1} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}-\frac{1}{N_{\mathrm{c}}} \sum_{i: W_{i}=0} \lambda_{i} \cdot Y_{i}^{\mathrm{obs}}\]
+
+<p>也可以利用上述方法估计有限样本下的样本方差：</p>
+
+\[\hat{\mathbb{V}}_{W}\left(\hat{\tau}_{\mathrm{fs}, \mathrm{t}}\right)=\hat{\mathbb{V}}_{\mathrm{sp}}\left(\hat{\tau}_{\mathrm{fs}, \mathrm{t}} \mid \mathbf{X}, \mathbf{W}\right)=\frac{1}{N_{\mathrm{t}}^{2}} \sum_{i: W_{i}=1} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}+\frac{1}{N_{\mathrm{c}}^{2}} \sum_{i: W_{i}=0} \lambda_{i}^{2} \cdot \hat{\sigma}_{i}^{2}\]
+
+<h4 id="sampling-variance-for-population-average-treatment-effect">Sampling Variance for Population Average Treatment Effect</h4>
+<p>介绍完了有限样本下估计量$\hat{\tau}$的样本方差的估计方法，下面我们就来看看超总体下估计量$\hat{\tau}$的样本方差如何进行估计。注意到：</p>
+
+\[\mathbb{V}(\hat{\tau}) \approx \mathbb{V}_{W}(\hat{\tau}) + \mathbb{V}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right) / N\]
+
+<p>因此，有了有限样本下样本方差的估计量后，我们只需对上述的第二项，即条件平均因果效应的方差，进行估计，即可得到超总体下样本方差的估计量。同样地，也可以用匹配的方法给出第二项的估计，对每个处理组（控制组）的个体匹配以一个控制组（处理组）的个体，记个体$i$的匹配个体的下标为$\ell(i)$，则可以用下式估计个体$i$的个体水平的因果效应：</p>
+
+\[\hat{\tau}_{i}^{\text {match }}=\hat{Y}_{i}(1)-\hat{Y}_{i}(0)\]
+
+<p>其中</p>
+
+\[\hat{Y}_{i}(0)=\left\{\begin{array}{ll}
+Y_{i}^{\text {obs }} &amp; \text { if } W_{i}=0, \\
+Y_{\ell(i)}^{\text {obs }} &amp; \text { if } W_{i}=1,
+\end{array}\right. \text { and } \hat{Y}_{i}(1)=\left\{\begin{array}{ll}
+Y_{\ell(i)}^{\text {obs }} &amp; \text { if } W_{i}=0 \\
+Y_{i}^{\text {obs }} &amp; \text { if } W_{i}=1
+\end{array}\right.\]
+
+<p>可将上述估计量写为如下形式：</p>
+
+\[\hat{\tau}_{i}^{\text {match }}=\tau_{i}+\left(2 \cdot W_{i}-1\right) \cdot\left(\mu_{i}-\mu_{\ell(i)}\right)+\left(2 \cdot W_{i}-1\right) \cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)\]
+
+<p>其中当样本量足够多时，右式第二项相较于另外两项可忽略，从而可进一步写为：</p>
+
+\[\hat{\tau}_{i}^{\text {match }} \approx \tau_{i}+\left(2 \cdot W_{i}-1\right) \cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)\]
+
+<p>假设我们可以观测到$\tau_i$，则可用下式对$\mathbb{V}\left(\tau\left(X_{i}\right)\right)$进行估计：</p>
+
+\[\hat{\mathbb{V}}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right)=\frac{1}{N-1} \sum_{i=1}^{N}\left(\tau_{i}-\frac{1}{N} \sum_{j=1}^{N} \tau_{j}\right)^{2}=\frac{1}{N-1} \sum_{i=1}^{N}\left(\tau_{i}-\tau_{\mathrm{fs}}\right)^{2}\]
+
+<p>然而由于我们并不能观测到$\tau_i$，所以是能用$\hat{\tau}_{i}^{\text {match }}$进行估计，两者之间的差异在于：</p>
+
+\[\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\tau_{\mathrm{fs}}\right)^{2}\right]=\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\tau_{i}-\tau_{\mathrm{fs}}\right)^{2}\right]+\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\tau_{i}\right)^{2}\right]\]
+
+<p>忽略带有的项，上面右式的第二项近似可写为：</p>
+
+\[\begin{aligned}
+\mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\tau_{i}\right)^{2}\right] &amp; \approx \mathbb{E}\left[\frac{1}{N} \sum_{i=1}^{N}\left(\tau_{i}+\left(2 \cdot W_{i}-1\right)\right.\right.\\
+&amp;\left.\left.\cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right)-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)-\tau_{i}\right)^{2}\right] \\
+&amp;=\frac{1}{N} \sum_{i=1}^{N} \mathbb{E}\left[\left(\left(2 \cdot W_{i}-1\right) \cdot\left(\left(Y_{i}^{\text {obs }}-\mu_{i}\right) \cdot-\left(Y_{\ell(i)}^{\text {obs }}-\mu_{\ell(i)}\right)\right)\right)^{2}\right] \\
+&amp;=\frac{1}{N} \sum_{i=1}^{N}\left(\sigma_{i}^{2}+\sigma_{\ell(i)}^{2}\right) \approx \frac{2}{N} \sum_{i=1}^{N} \sigma_{i}^{2}
+\end{aligned}\]
+
+<p>从而，可以根据上式给出$\mathbb{V}\left(\tau\left(X_{i}\right)\right)$的估计量：</p>
+
+\[\hat{\mathbb{V}}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right) \approx \frac{1}{N} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\hat{\tau}\right)^{2}-\frac{2}{N} \sum_{i=1}^{N} \hat{\sigma}_{i}^{2}\]
+
+<p>根据有限样本下和超总体下样本方差的关系，可以进一步给出超总体下$\hat{\tau}$样本方差的估计量：</p>
+
+\[\hat{\mathbb{V}}(\hat{\tau})=\hat{\mathbb{V}}_{W}(\hat{\tau})+\frac{1}{N} \cdot \hat{\mathbb{V}}_{\mathrm{sp}}\left(\tau\left(X_{i}\right)\right)=\sum_{i=1}^{N} \hat{\sigma}_{i}^{2} \cdot\left(\lambda_{i}^{2}-\frac{2}{N^{2}}\right)+ \frac{1}{N^2} \sum_{i=1}^{N}\left(\hat{\tau}_{i}^{\text {match }}-\hat{\tau}\right)^{2}\]
+
+<p>此外，还有一些估计样本方差的方法，如基于最小二乘估计量的性质对样本方差进行估计、用Bootstrap的方法估计等，详见<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>第19章第10节。</p>
+
+<hr />
+
+<p>简单小结一下，这一篇我们主要介绍了在结束了设计阶段的工作后如何具体的对因果效应进行估计，我们详细介绍了<strong>分层</strong>和<strong>匹配</strong>的方法，并对之前介绍的估计量建立了一个统一的结构，即<strong>加权和</strong>的形式，并在此基础上给出了估计样本方差的一般方法，包括有限总体下以及超总体下的样本方差甚至是子总体（如处理组所在子总体）下的样本方差。在此基础上，我们可建立估计参数的置信区间做出进一步的推断。</p>
+
+:ET

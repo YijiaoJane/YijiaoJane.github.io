@@ -1,0 +1,396 @@
+I"��<p>在上一篇中，我们对无混杂假设的合理性进行了评估，并给出了一些敏感性分析的方法，这一篇我们来讨论另一种<strong>在无混杂假设有待商榷的情况下分析因果效应的方法</strong>。为了能够允许违反无混杂假定，我们需要依赖于一些对于因果效应的额外的信息和替代性的假设。这个时候<code class="language-plaintext highlighter-rouge">工具变量</code>就要上场了。</p>
+
+<p>熟悉计量的读者可能对于工具变量方法已经耳熟能详了，其最早见于Wright(1927)、Tinbergen(1930) 和Haavelmo(1943)等工作中。顾名思义，<code class="language-plaintext highlighter-rouge">工具变量（Instrumental Variables, IV）</code>在这些方法中扮演着一个重要的角色，我们将其记为$Z_i$。它的核心特征是，其<strong>对于结果变量$Y_i$没有直接的因果效应，其对于$Y_i$的任何因果效应必然是通过对于处理变量$W_i$的因果效应间接作用到$Y_i$上的</strong>。</p>
+
+<p>这一篇我们主要集中在<code class="language-plaintext highlighter-rouge">单向不依从的完全随机化实验</code>这个简单的情形上进行工具变量方法的讨论。所谓<code class="language-plaintext highlighter-rouge">不依从（noncomliance）</code>，我们指的是有的个体被分配到接受某个特定水平的处理但不依从他们的分配方案而是选择另一种处理的情形。所谓<code class="language-plaintext highlighter-rouge">单向(one-sided)</code>，我们是指依从是不对称的，只有被分配到积极处理的个体有改变它们分配到的处理而接受控制处理的潜在可能。相反，所有被分配到控制处理的个体事实上都是依从这个分配结果的。这种不依从的情形是很常见，比如当接受积极处理的个体需要个人采取或使自己服从于某种特定的行动，如接受手术或进入职业培训计划时。在这种情况下，即使患者在随机化之前同意接受积极处理，也很难，甚至不可能强迫患者接受积极处理。 因此，假设那些接受积极处理的患者的依从性往往是有缺陷的。 相比之下，那些被分配接受控制处理的患者通常会拒绝接受积极处理，所以不依从性是单向的。在这个设定中，处理的分配方式为工具变量$Z_i$，而我们主要感兴趣的处理为实际接受的处理水平$W_i$。</p>
+
+<p>很多传统的关于不依从随机化实验的统计分析聚焦在随机分化配与感兴趣结果变量的关系上，而将关于处理的信息完全舍弃，在当前的设定中，即为忽略了$W_i$。这样的方法通常被称为<code class="language-plaintext highlighter-rouge">意向处理分析（intention-to-treat (ITT) analysis）</code>。在我们完全随机化实验的设定下，处理分配的随机性使得ITT是有效的，此处并不需要除了SUTVA之外的假定。意向处理分析的主要缺陷在于<strong>它没有回答关于接受处理本身的因果效应的问题，只是回答了关于分配处理的因果效应的问题</strong>。另外还有两种简单的分析方法。第一个是<code class="language-plaintext highlighter-rouge">按方案分析（per  protocal analyses）</code>，在该方法中被观测到不依从处理分配的个体（即$Z_i\neq W_i$的个体）被舍弃掉，而被观测到依从处理分配的个体（即$Z_i=W_i$的个体）被视为一组来自全部依从的随机化实验的数据进行分析，就是说，将观测到的不依从个体舍弃掉后，此时的分析相当于将依从的个体中的$W_i$视为随机化了的。第二种简单的替代分析方式为<code class="language-plaintext highlighter-rouge">按实际处理分析（as-treated analysis）</code>，这个方法将所有的个体被视为随机分配到他们实际接受到的处理进行分析，而忽略了分配信息$Z_i$，即简单将$W_i=1$即处理组的个体与$W_i=0$即控制组的个体进行比较，将$W_i$看作对所有个体是随机化了的。</p>
+
+<p>而在这里，我们希望寻找额外的假定使我们可以跳出ITT分析中重点关注的处理分配的全局效应，去估计感兴趣的处理变量的“局部”平均处理效应，即在个体的某些子集上的平均。</p>
+
+<p>为了找到对于接受处理的无混杂假定的替代假设，我们分别考虑不依从的性质以及处理分配到我们所称的<code class="language-plaintext highlighter-rouge">依从者（compliers）</code>和<code class="language-plaintext highlighter-rouge">不依从者（noncompliers）</code>上的因果效应，这些群组是由他们部分观察到的依从行为定义的，也可以由此定义<code class="language-plaintext highlighter-rouge">潜在分层（latent strata）</code>。一个关键的点是，<strong>尽管边际地来讲，处理的接受是有混杂的，但在这些潜在的分层中，处理的接受是无混杂的</strong>。 接着我们可以考虑使用一些假设来消去处理分配对某些组的结果的影响，但允许依从组的个体与不依从组的个体之间有一般性的差异。 除了处理分配方案的可以进行设计之外，<strong>这些假设的可信性的评估在很大程度上依赖于主观认识</strong>。</p>
+
+<p>一般来说，<strong>工具变量方法有两个关键假设</strong>。第一个是，尽管当发生不依从现象时处理的接受通常是有混杂的，但<strong>处理的分配是无混杂</strong>的。 由于处理分配是无混杂的，我们可以估计处理的分配对感兴趣的结果变量以及对处理的接受情况的影响，即两个ITT效应。在这里考虑的完全随机化实验的设定下，设计机制使得处理分配的无混杂性是满足的，尽管在IV方法的其他应用中，这一假设可能存在争议。 第二个关键假设是，<strong>对于那些处理的接受不依赖于分配方式的个体来说，处理的分配不影响最终感兴趣的结果变量</strong>。举个例子，对于那些即使分配到服药依然没有服药的人，我们假设分配本身是对最终的结果变量没有影响的。我们将这个假设称为<code class="language-plaintext highlighter-rouge">排他性约束（exclusion restriction）</code>，因为它<strong>排除了这个工具变量影响不依从者最终结果变量的可能性</strong>。这种假设可以通过实验设计来实现，例如，使用双盲实验，在这种实验中，个体和医生都不知道处理的分配方式，因此排他性约束是满足的。 这一篇的关键结论是，<strong>当排他性约束假设与无混杂假设结合起来后，我们就能够估计处理的分配对于依从者这个子总体而言在主要的结果变量$Y_i$上的因果效应</strong>，其被称为<code class="language-plaintext highlighter-rouge">局部平均处理效应（local average treatment effect, LATE）</code>或<code class="language-plaintext highlighter-rouge">依从者平均因果效应（complier average causal effect, CACE）</code>。依存者的平均处理效应这个估计量等于$Z_i$对于结果变量$Y_i$的ITT效应与$Z_i$对于处理的接受情况$W_i$的ITT效应之比。换句话说，在排他性约束这个假设下，分配对于结果变量的ITT效应完全是由那些不管处理分配方式如何其接受的处理$W_i$与其被分配的处理$Z_i$始终相同的个体带来的。在大多数情形下，我们就可以合理地将分配对于依从者的因果效应全都归因于处理的接受情况，在完全依从的完全随机化实验中，研究者们也隐晦地使用着这样的假定。</p>
+
+<p>需要在一开始就强调的是，工具变量方法的基本假设，特别是各种形式的排他性约束假设，往往是有争议的。 在恰当使用下，这些假设允许研究者做出比从ITT分析中获得的更有趣、更有力的推论。 然而，这些假设并不总是恰当的。此外，与无混杂性假设不同，排他性约束的有效性不能仅通过物理上的随机化来保证，还需要额外的双盲性。 因此，<strong>与SUTVA一样，它的有效性往往依赖于专业知识</strong>。</p>
+
+<h2 id="setup">Setup</h2>
+
+<p>首先，让我们将潜在结果的记号进行拓展使其可以适用于含有工具变量的设定。考虑到处理的分配与处理的接受之间存在的差异，潜在结果的记号会比前面几篇中的记号更加复杂。我们在这里<strong>始终保持SUTVA的假定</strong>，即（1）处理没有不同的版本；（2）一个个体的处理分配方式对于其他个体的结果不会产生因果效应。我们主要考察分配$Z_i$为二元取值的情形，$Z_i=0$代表个体$i$被分配到控制组，$Z_i=1$代表个体$i$被分配到处理组。感兴趣的处理变量记为$W_i^{\operatorname{obs}}$。考虑到这个变量扮演着一个可能受处理的分配方式$Z_i$所影响的结果变量的角色，我们假设存在两种潜在结果，$W_i(0)$和$W_i(1)$，用于描述在分配$Z_i$的两种不同可能的取值下被个体所接受的处理。因此$W_i(0)$为个体$i$在被分配到控制组，即$Z_i=0$的情况下选择接受的处理，而$W_i(1)$为个体$i$在被分配到处理组，即$Z_i=1$的情况下选择接受的处理。$W_i(0)$和$W_i(1)$都在${0,1}$中取值。对个体$i$来说，实现的或被观测到的处理，$W_i^{\operatorname{obs}}$等于</p>
+
+\[W_{i}^{\mathrm{obs}}=W_{i}\left(Z_{i}\right)= \begin{cases}W_{i}(0) &amp; \text { if } Z_{i}=0 \\ W_{i}(1) &amp; \text { if } Z_{i}=1\end{cases}\]
+
+<p>与之前相反的是，我们对这里的处理变量加上了上标$\operatorname{obs}$来区别主要处理的观测值与潜在取值，其总的来说可视为次处理$Z_i$的函数。</p>
+
+<p>在这个不依从的设定中，我们所关心的结果变量为两个“处理”，处理的分配方式$Z_i$以及处理的接受方式$W_i$。这两个变量都是二元取值的，因此总的来说，我们假设有四种潜在结果，$Y_(z,w)$，以此来描述个体$i$如果被分配到处理$z$但实际接受的处理为$w$是观测到的结果变量。对每个个体来说，只有两种潜在结果是可能被观测到的，即$Y_i(0,W_i(0))$和$Y_i(1,W_i(1))$。剩下的两个潜在结果，$Y_i(0,1-W_i(0))$和$Y_i(1,1-W_i(1))$，不管采取什么样的分配方式都是无法观测到的，因此我们将这后面两种潜在结果称为是一种<code class="language-plaintext highlighter-rouge">先验的反事实结果（priori, counterfactuals）</code>。将我们样本中观测到的结果变量记为$Y_{i}^{\mathrm{obs}}$,其表达式为</p>
+
+\[Y_{i}^{\mathrm{obs}}=Y_{i}\left(Z_{i}, W_{i}^{\mathrm{obs}}\right)=Y_{i}\left(Z_{i}, W_{i}\left(Z_{i}\right)\right)= \begin{cases}Y_{i}(0,0), &amp; \text { if } Z_{i}=0, W_{i}^{\mathrm{obs}}=0 \\ Y_{i}(1,0), &amp; \text { if } Z_{i}=1, W_{i}^{\mathrm{obs}}=0 \\ Y_{i}(1,1), &amp; \text { if } Z_{i}=1, W_{i}^{\mathrm{obs}}=1\end{cases}\]
+
+<p>注意到由于不依从性是单向的，我们观测不到形为$Y_i(0,1)$的个体。和通常情况一样，我们将观测到工具$Z_i$，接受的处理$W_i^{\operatorname{obs}}$，结果变量$Y_i^{\operatorname{obs}}$的$N$个个体，视为感兴趣的总体。</p>
+
+<p>在这里，我们同时考察（a）按接受的处理分组后的各组平均值（b）按处理分配方式分类后的各组平均值。因此有必要对这些量引入一些正式的记号。为了记号简明起见，我们用下标0和1来表示处理的分配方式，用下标c和t来表示处理的接受方式。按照处理分配方式的不同，定义子样本容量为：</p>
+
+\[N_{0}=\sum_{i=1}^{N}\left(1-Z_{i}\right), \quad N_{1}=\sum_{i=1}^{N} Z_{i},\]
+
+<p>按照接受的处理不同，定义子样本容量为：</p>
+
+\[N_{\mathrm{c}}=\sum_{i=1}^{N}\left(1-W_{i}^{\mathrm{obs}}\right), \quad \text { and } \quad N_{\mathrm{t}}=\sum_{i=1}^{N} W_{i}^{\mathrm{obs}}\]
+
+<p>以及同时按照处理分配方式以及接受的处理分类，定义子样本容量为：</p>
+
+\[N_{0 \mathrm{c}}=\sum_{i=1}^{N}\left(1-Z_{i}\right) \cdot\left(1-W_{i}^{\mathrm{obs}}\right), \quad N_{0 \mathrm{t}}=\sum_{i=1}^{N}\left(1-Z_{i}\right) \cdot W_{i}^{\mathrm{obs}},\]
+
+\[N_{\mathrm{lc}}=\sum_{i=1}^{N} Z_{\mathrm{i}} \cdot\left(1-W_{i}^{\mathrm{obs}}\right), \quad \text { and } \quad N_{\mathrm{lt}}=\sum_{i=1}^{N} Z_{i} \cdot W_{i}^{\mathrm{obs}}.\]
+
+<p>同样的，按照处理分配方式不同，定义子样本中结果变量的均值以及接受的处理变量的均值：</p>
+
+\[\bar{Y}_{0}^{\mathrm{obs}}=\frac{1}{N_{0}} \sum_{i=1}^{N}\left(1-Z_{i}\right) \cdot Y_{i}^{\mathrm{obs}}, \quad \bar{Y}_{1}^{\mathrm{obs}}=\frac{1}{N_{1}} \sum_{i=1}^{N} Z_{i} \cdot Y_{i}^{\mathrm{obs}},\]
+
+\[\bar{W}_{0}^{\mathrm{obs}}=\frac{1}{N_{0}} \sum_{i=1}^{N}\left(1-Z_{i}\right) \cdot W_{i}^{\mathrm{obs}}, \quad \bar{W}_{1}^{\mathrm{obs}}=\frac{1}{N_{1}} \sum_{i=1}^{N} Z_{i} \cdot W_{i}^{\mathrm{obs}},\]
+
+<p>按照接受的处理不同，定义子样本中结果变量的均值为：</p>
+
+\[\bar{Y}_{\mathrm{c}}^{\mathrm{obs}}=\frac{1}{N_{\mathrm{c}}} \sum_{i=1}^{N}\left(1-W_{i}^{\mathrm{obs}}\right) \cdot Y_{i}^{\mathrm{obs}}, \quad \text { and } \quad \bar{Y}_{\mathrm{t}}^{\mathrm{obs}}=\frac{1}{N_{\mathrm{t}}} \sum_{i=1}^{N} W_{i}^{\mathrm{obs}} \cdot Y_{i}^{\mathrm{obs}},\]
+
+<p>最后，同时按照处理分配方式以及接受的处理分类，定义子样本中结果变量的均值为：</p>
+
+\[\begin{aligned}
+&amp;\bar{Y}_{0 \mathrm{c}}^{\mathrm{obs}}=\frac{1}{N_{0 \mathrm{c}}} \sum_{i=1}^{N}\left(1-Z_{i}\right) \cdot\left(1-W_{i}^{\mathrm{obs}}\right) \cdot Y_{i}^{\mathrm{obs}}, \quad \bar{Y}_{0 \mathrm{t}}^{\mathrm{obs}}=\frac{1}{N_{0 \mathrm{t}}} \sum_{i=1}^{N}\left(1-Z_{i}\right) \cdot W_{i}^{\mathrm{obs}} \cdot Y_{i}^{\mathrm{obs}}, \\
+&amp;\bar{Y}_{1 \mathrm{c}}^{\mathrm{obs}}=\frac{1}{N_{1 \mathrm{c}}} \sum_{i=1}^{N} Z_{i} \cdot\left(1-W_{i}^{\mathrm{obs}}\right) \cdot Y_{i}^{\mathrm{obs}}, \quad \text { and } \quad \bar{Y}_{1 \mathrm{t}}^{\mathrm{obs}}=\frac{1}{N_{1 \mathrm{t}}} \sum_{i=1}^{N} Z_{i} \cdot W_{i}^{\mathrm{obs}} \cdot Y_{i}^{\mathrm{obs}}.
+\end{aligned}\]
+
+<p>一些$N_{\operatorname{zw}}$的取值可能为0（实际上，在本章讨论的单向不依从情形下，$N_{0t}$即为0），此时对应的$\bar Y_{\operatorname{zw}}$则没有定义。</p>
+
+<h2 id="intention-to-treat-effects">Intention-to-Treat Effects</h2>
+<p>我们讨论IV方法的第一步是研究意向处理（ITT）分析中的估计量。 正如我们在一开始提到的，ITT分析只关注$Z_i$的随机化分配和结果之间的关系，从而完全避免了不依从性的问题，因为对这种效果的推断仅依赖于分配的随机化。与许多传统的ITT分析相比，我们同时考虑以接受处理和最终结果做为结果变量进行ITT分析。</p>
+
+<h4 id="itt-estimands">ITT Estimands</h4>
+<p>首先我们来考察对于处理的接受方式的意向处理效应。个体层面上来讲，分配对于处理的接受方式的效应为</p>
+
+\[\mathrm{ITT}_{\mathrm{W}, i}=W_{i}(1)-W_{i}(0) .\]
+
+<p>对于处理接受方式的ITT效应为所有个体的平均：</p>
+
+\[\mathrm{ITT}_{\mathrm{W}}=\frac{1}{N} \sum_{i=1}^{N} \mathrm{ITT}_{\mathrm{W}, i}=\frac{1}{N} \sum_{i=1}^{N}\left(W_{i}(1)-W_{i}(0)\right) .\]
+
+<p>由于不依从性是单向的，对所有的$i$都有$W_i(0)=0$成立，从而(\ref{ITTW})简化为</p>
+
+\[\mathrm{ITT}_{\mathrm{W}}=\frac{1}{N} \sum_{i=1}^{N} W_{i}(1)\]
+
+<p>接下来，我们考察主要感兴趣的结果变量$Y_i$。个体层面的意向处理效应等于不同的$Z_i$下个体结果变量$Y_i$取值之差：</p>
+
+\[\operatorname{ITT}_{\mathrm{Y}, i}=Y_{i}\left(1, W_{i}(1)\right)-Y_{i}\left(0, W_{i}(0)\right),\]
+
+<p>其中 $i=1, \ldots, N$. 因此对于$Y$的平均ITT效应为：</p>
+
+\[\mathrm{ITT}_{\mathrm{Y}}=\frac{1}{N} \sum_{i=1}^{N} \operatorname{ITT}_{\mathrm{Y}, i}=\frac{1}{N} \sum_{i=1}^{N}\left(Y_{i}\left(1, W_{i}(1)\right)-Y_{i}\left(0, W_{i}(0)\right)\right)\]
+
+<p>识别ITT效应的关键假设就是分配机制是随机化的。（更一般地来说，我们可以允许无混杂的处理分配机制。）这里我们使用扩展后的潜在结果记号来表示这个假设，假设$Z_{i}$的分布是不依赖于所有的潜在结果的，包括两个处理接受方式的潜在结果，$W_{i}(z)$以及四种潜在结果变量$Y_{i}(z, w)$ :</p>
+
+<p><strong>假设 6.1 （$Z_{i}$的随机分配）</strong>
+\(\operatorname{Pr}\left(Z_{i}=1 \mid W_{i}(0), W_{i}(1), Y_{i}(0,0), Y_{i}(0,1), Y_{i}(1,0), Y_{i}(1,1)\right)=\operatorname{Pr}\left(Z_{i}=1\right)\)</p>
+
+<p>从超总体的角度来看，这个假设也可以用Dawid条件独立性的记号来表示，即</p>
+
+\[Z_{i} ⊥ W_{i}(0), W_{i}(1), Y_{i}(0,0), Y_{i}(0,1), Y_{i}(1,0), Y_{i}(1,1)\]
+
+<h4 id="estimating-the-itt-effect-for-the-receipt-of-treatment">Estimating the ITT Effect for the Receipt of Treatment</h4>
+<p>给定假设6.1，我们可以用前面中介绍的<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">Neyman的方法</a>来估计${\text{ITT}}<em>{\text{W}}$。分配的完全随机化意味着平均因果效应$\mathrm{ITT}</em>\mathrm{W}$的无偏估计量是存在的，其形式为接受的处理方式在不同分配状态下的平均值之差:</p>
+
+\[\widehat{\mathrm{ITT}_{\mathrm{W}}}=\bar{W}_{1}^{\mathrm{obs}}-\bar{W}_{0}^{\mathrm{obs}}=\bar{W}_{1}^{\mathrm{obs}},\]
+
+<p>这里我们用到了所有个体$W_i(0)=0$这个事实。按照<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">前面</a>的推导，$\mathrm{ITT}_\mathrm{W}$的有限样本抽样方差的（保守）估计量在随机化分布下的一般形式为</p>
+
+\[\widehat{\mathbb{V}}(\widehat{\mathrm{ITT}_\mathrm{W}})=\frac{s_{W, 0}^{2}}{N_{0}}+\frac{s_{W, 1}^{2}}{N_{1}},\]
+
+<p>其中 $s_{W, 0}^{2}$ and $s_{W, 1}^{2}$为$W_{i}(z)$在每个分配状态下的样本方差。由于 $W_{i}(0)=0$，从而有</p>
+
+<p>我们所关心的只是</p>
+
+\[s_{W, 1}^{2}=\frac{1}{N_{1}-1} \sum_{i: Z_{i}=1}\left(W_{i}^{\mathrm{obs}}-\bar{W}_{1}^{\mathrm{obs}}\right)^{2}=\frac{N_{1}}{N_{1}-1} \cdot \bar{W}_{1}^{\mathrm{obs}} \cdot\left(1-\bar{W}_{1}^{\mathrm{obs}}\right).\]
+
+<p>因此$\widehat{\mathrm{ITTW}}$的样本方差估计量简化为</p>
+
+\[\widehat{\mathbb{V}}(\widehat{\mathrm{ITT}_{\mathrm{W}}})=\frac{1}{N_{1}-1} \cdot \bar{W}_{1}^{\mathrm{obs}} \cdot\left(1-\bar{W}_{1}^{\mathrm{obs}}\right)\]
+
+<p>回想一下，在<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">前面</a>中关于随机实验的讨论中，这也是$\widehat{\mathrm{ITT}<em>{\mathrm{W}}}$在被视为超总体的平均处理效应的估计时其样本方差的一个有效估计。对该抽样分布进行正态近似，我们可以基于随机化分布构造一个$\mathrm{ITT}</em>{\mathrm{W}}$的大样本$95 \%$置信区间：</p>
+
+\[\mathrm{CI}^{0.95}(\mathrm{ITT}_\mathrm{W})=(\widehat{\mathrm{ITT}_{\mathrm{W}}}-1.96 \cdot \sqrt{\widehat{\mathbb{V}}(\widehat{\mathrm{ITT}_{\mathrm{W}}})}, \widehat{\mathrm{ITT}_{\mathrm{W}}}+1.96 \cdot \sqrt{\widehat{\mathbb{V}}(\widehat{\mathrm{ITT}_{\mathrm{W}}})}).\]
+
+<h4 id="estimating-the-itt-effect-for-the-outcome-of-interest">Estimating the ITT Effect for the Outcome of Interest</h4>
+
+<p>接下来，我们来考察主要感兴趣的结果变量$Y_{i}$。由于分配$Z_{i}$时无混杂的，我们可以无偏地估计传统的意向处理估计量，$\mathrm{ITT}_{\mathrm{Y}}$。利用<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">前面</a>关于随机化实验的分析，可以通过对分配到处理组以及控制组个体的结果变量平均值做差来得到这个ITT效应的无偏估计：</p>
+
+\[\widehat{\mathrm{ITT}_{\mathrm{Y}}}=\bar{Y}_{1}^{\mathrm{obs}}-\bar{Y}_{0}^{\mathrm{obs}},\]
+
+<p>其中$\bar{Y}<em>{1}^{\mathrm{obs}}$和$\bar{Y}</em>{0}^{\mathrm{obs}}$为上一节中定义的量. 利用<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">前面</a>的方法也同样可以对这个估计量的样本方差进行估计：</p>
+
+\[\widehat{\mathbb{V}}\left(\widehat{\mathrm{ITT}_{Y}}\right)=\frac{s_{Y, 1}^{2}}{N_{1}}+\frac{s_{Y, 0}^{2}}{N_{0}},\]
+
+<p>其中</p>
+
+\[s_{Y, 0}^{2}=\frac{1}{N_{0}-1} \sum_{i: Z_{i}=0}\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{0}^{\mathrm{obs}}\right)^{2},  \quad s_{Y, 1}^{2}=\frac{1}{N_{1}-1} \sum_{i: Z_{i}=1}\left(Y_{i}^{\mathrm{obs}}-\bar{Y}_{1}^{\mathrm{obs}}\right)^{2}.\]
+
+<h2 id="compliance-status">Compliance Status</h2>
+
+<p>在这一节讨论的分析方法中，个体的依从性行为扮演着很重要的角色。这里我们将对这个由潜在结果变量$(W_i(0),W_i(1))$捕捉到的行为进行更细化的讨论，从而继续对IV方法进行分析。我们的方法的一个重要的特征在于，我们<strong>将被分配到接受处理以及不接受处理后的依从性行为$(W_i(1))$和$(W_i(0))$视为部分观测到的个体特征信息</strong>。</p>
+
+<h4 id="compliers-and-noncompliers">Compliers and Noncompliers</h4>
+
+<p>现在让我们返回来考虑实际接受处理的两种潜在结果，$W_i(0)$和$W_i(1)$。根据单向不依从性的假设可知，所有分配到控制组的个体实际接受的处理也为控制处理，即对所有个体$i$而言都有$W_i(0)=0$成立。相反，个体$i$若被分配到接受积极处理，则其实际接受的处理$W_i(1)$取值可以为$0$或$1$。$W_i(1)=1$的个体被认为是不论分配方式如何都依从他们的分配方式，然而那些$W_i(1)=0$的个体则被认为是若被分配到$Z_i=1$则会选择不依从。因此我们将前一组标记为依从者，将后一组标记为不依从者。在完全依从的随机化实验中，对所有个体都有$W_i(z)=z$成立，因此所有的个体都是依从者。注意到这个依从状态的定义只是基于在这个实验中被分配到积极处理的个体的行为。由于所有被分配到控制处理的个体无法接受主动处理，所有被分配到$Z_i=0$的个体被观测到的都是依从行为。因此，通过观察到的数据，我们只能区分处理组中的依从者和不依从者。为了便于我们讨论，我们用一个组别指标变量$G_i\in\{\operatorname{co},\operatorname{nc}\}$来标记依从状态，其中$G_{i}=$ co代表依从者，$G_{i}=$ nc代表不依从者：</p>
+
+\[G_{i}= \begin{cases}\operatorname{co} &amp; \text { if } W_{i}(1)=1 \\ \text { nc } &amp; \text { if } W_{i}(1)=0\end{cases}\]
+
+<p>在潜在结果的记号下，实验中的依从状态实际为个体隐藏特征的这个事实变得显然。依从状态不受外界操控因素的影响（具体来讲，它不受处理分配方式$Z_i$的影响，从这个意义上来讲，它是一个个体特征，说这个特征是隐藏的，是因为我们不能观测到所有个体的依从状态的取值：也就是说，对被分配到控制组的那些个体来说，我们是无法观测到他们的依从状态的。相反，<strong>对于被分配到积极处理组的个体来说，我们确实可以观察到他们是依从者还是不依从者</strong>。因此这个<strong>隐藏的依从状态有三个主要特征</strong>：（1）<strong>其为两个（次）潜在结果的函数</strong>，这两个潜在结果描述了分配$Z_i$的不同取值下实际接受的处理情况；（2）这个特征的<strong>取值不受分配方式的影响</strong>，尽管其观测到的值是受到分配方式影响的；（3）它往往<strong>并不能从观测到的分配方式$Z_i$以及实际接受的处理$W_i^{\operatorname{obs}}$中完全推断出来</strong>。</p>
+
+<h4 id="the-itt-effect-on-the-treatment-received-by-compliance-status">The ITT Effect on the Treatment Received by Compliance Status</h4>
+
+<p>首先，我们按照依从状态的不同考虑对于次结果变量，即实际接受的处理的总体ITT效应。对于不依从者，$W_i(z)=0$ 对$z=0,1$均成立。因此</p>
+
+\[\mathrm{ITT}_{\mathrm{W}, \mathrm{nc}}=\frac{1}{N_{\mathrm{nc}}} \sum_{i: G_{i}=\mathrm{nc}}\left(W_{i}(1)-W_{i}(0)\right)=\frac{1}{N_{\mathrm{nc}}} \sum_{i: G_{i}=\mathrm{nc}} W_{i}(1)=0 .\]
+
+<p>对于依从者，$W_{i}(z)=z$对$z=0,1$均成立。因此</p>
+
+\[\operatorname{ITT}_{\mathrm{W}, \mathrm{co}}=\frac{1}{N_{\mathrm{co}}} \sum_{i: G_{i}=\mathrm{co}}\left(W_{i}(1)-W_{i}(0)\right)=\frac{1}{N_{\mathrm{co}}} \sum_{i: G_{i}=\mathrm{co}} W_{i}(1)=1 .\]
+
+<p>对实际接受的处理总的ITT效应为各依从状态子总体内ITT效应的一个加权平均，从而有</p>
+
+\[\mathrm{ITT}_{\mathrm{W}}=\pi_{\mathrm{nc}} \cdot \mathrm{ITT}_{\mathrm{W}, \mathrm{nc}}+\pi_{\mathrm{co}} \cdot \mathrm{ITT}_{\mathrm{W}, \mathrm{co}}=\pi_{\mathrm{co}},\]
+
+<p>以及$\pi_{\mathrm{nc}}=1-\mathrm{ITT}_{\mathrm{W}}$。总的来说，对于实际接受处理的ITT效应就等于依从者的总体比例。<strong>注意到这个结论不依赖于任何假定。它只是由依从行为的定义以及潜在结果的存在性得到的</strong>。</p>
+
+<h4 id="the-itt-effect-on-the-primary-outcome-by-compliance-status">The ITT Effect on the Primary Outcome by Compliance Status</h4>
+
+<p>下一步是将对于主要结果变量的意向处理效应，$\mathrm{ITT}_{\mathrm{Y}}$分解为各个依从状态内意向处理效应的加权平均。定义：</p>
+
+\[\mathrm{ITT}_{\mathrm{Y}, \mathrm{co}}=\frac{1}{N_{\mathrm{co}}} \sum_{i: G_{i}=\mathrm{co}}\left(Y_{i}\left(1, W_{i}(1)\right)-Y_{i}\left(0, W_{i}(0)\right)\right),\]
+
+<p>以及</p>
+
+\[\mathrm{ITT}_{\mathrm{Y}, \mathrm{nc}}=\frac{1}{N_{\mathrm{nc}}} \sum_{i: G_{i}=\mathrm{nc}}\left(Y_{i}\left(1, W_{i}(1)\right)-Y_{i}\left(0, W_{i}(0)\right)\right)\]
+
+<p>从而我们可以将意向处理效应写为</p>
+
+\[\begin{aligned}
+\mathrm{ITT}_{\mathrm{Y}} &amp;=\operatorname{ITT}_{\mathrm{Y}, \mathrm{co}} \cdot \pi_{\mathrm{co}}+\mathrm{ITT}_{\mathrm{Y}, \mathrm{nc}} \cdot \pi_{\mathrm{nc}} \\
+&amp;=\mathrm{ITT}_{\mathrm{Y}, \mathrm{co}} \cdot \mathrm{ITT}_{\mathrm{W}}+\mathrm{ITT}_{\mathrm{Y}, \mathrm{nc}} \cdot\left(1-\mathrm{ITT}_{\mathrm{W}}\right) .
+\end{aligned}\]
+
+<p>我们直接考虑不同依从状态下的意向处理效应$\mathrm{ITT}_{\mathrm{Y}}$。对于不依从者来说平均意向处理效应为</p>
+
+\[\mathrm{ITT}_{\mathrm{Y}, \mathrm{nc}}=\frac{1}{N_{\mathrm{nc}}} \sum_{i: G_{i}=n c}\left(Y_{i}(1,0)-Y_{i}(0,0)\right)\]
+
+<p>然而，需要注意的是，<strong>对于不依从者的ITT效应并不包含主要处理变量的因果效应的相关信息：它比较的是总是接受控制处理的子群体的两个潜在结果</strong>。</p>
+
+<p>依从者的ITT效应对于我们所关注的接受处理带来的因果效应来说更有用一些。对于依从者的平均意向处理效应为</p>
+
+\[\mathrm{ITT}_{\mathrm{Y}, \mathrm{co}}=\frac{1}{N_{\mathrm{co}}} \sum_{i: G_{i}=c}\left(Y_{i}(1,1)-Y_{i}(0,0)\right) .\]
+
+<p>这个ITT效应至少潜在地提供了主要处理变量的因果效应的相关信息，因为它比较的是依从者这个子群体中接受了积极处理和没有接受积极处理的个体的潜在结果的差异。</p>
+
+<p>按照依从状态分类得到的对于结果变量$Y$的意向处理效应，$\mathrm{ITT}<em>{\mathrm{Y}, \mathrm{co}}, \mathrm{ITT}</em>{\mathrm{Y}, \mathrm{nc}}$并不能直接从观测数据中估计得到，因为我们并不能够推断被分配到控制组的个体的潜在依从状态。</p>
+
+<p>尽管如此，由于分配方式具有无混杂性，在给定依从状态后，实际接受的处理$W_i^{\operatorname{obs}}$也是无混杂的，因此我们仍然可以在一个额外的假定：排他性约束下，将ITT效应按照依从状态进行区分。</p>
+
+<p>这里很重要的一点是，按照依从状态分类后的子群体内实际接受的处理是无混杂的。由假设6.1中$Z_i$分配的随机性以及在给定依从状态后$W_{i}^{\text {obs }}$为$Z_i$的一个确定函数可以推知。</p>
+
+<p><strong>定理6.1 （局部平均处理效应）</strong>
+假定假设6.1成立，那么，对于$g \in\{\mathrm{co}, \mathrm{nc}\}$有</p>
+
+\[\operatorname{Pr}\left(W_{i}^{\mathrm{obs}}=1 \mid Y_{i}(0,0), Y_{i}(0,1), Y_{i}(1,0), Y_{i}(1,1), G_{i}=g\right)=\operatorname{Pr}\left(W_{i}^{\mathrm{obs}}=1 \mid G_{i}=g\right)\]
+
+<p>或者</p>
+
+\[W_{i}^{\mathrm{obs}} ⊥ Y_{i}(0,0), Y_{i}(0,1), Y_{i}(1,0), Y_{i}(1,1) \mid G_{i}.\]
+
+<p>要说明这一点，可以对两个依从状态分别进行考虑。首先，对于不依从者$(G_i=\operatorname{nc})$来说，我们总是有$W_i^{\operatorname{obs}}=0$，因此无混杂性显然成立。对于依从者$(G_i=\operatorname{co})$来说，$W_i^{\operatorname{obs}}=Z_i$，因此由假设6.1中$Z_i$分配的随机性知引理6.1成立。<strong>问题在于我们还不能直接使用引理6.1中的潜在无混杂性，因为依从状态只能被部分观察到</strong>。因此我们需要一些间接的方式来利用这个潜在无混杂性的性质。</p>
+
+<h2 id="instrumental-variables">Instrumental Variables</h2>
+
+<p>在这一节中，我们讨论工具变量方法中的主要假设，并且展示最主要的一个结论，即在这个重要假设下，我们可以对依从者的平均ITT效应，$\mathrm{ITT}_{Y,\operatorname{co}}$进行估计。我们将讨论对这个ITT的效应的解释性及其与接受处理的因果效应之间的关系。接着我们将讨论两个对这个平均效应进行推断的方法。</p>
+
+<h4 id="exclusion-restriction-for-noncompliers">Exclusion Restriction for Noncompliers</h4>
+
+<p>首先，我们讨论所有工具变量分析所依据的关键假设。</p>
+
+<p><strong>假设6.2 （不依从者的排他性约束）</strong> 
+对所有的不依从者，即$G_i = \mathrm{nc}$的个体，有</p>
+
+\[Y_i(0,0)=Y_i(1,0).\]
+
+<p>这个排他性约束的假设<strong>排除了对于不依从者而言分配$Z_i$对结果变量$Y_i$的影响</strong>。它想表述的是，对于那些实际接受的处理方式不随分配方式发生改变的个体而言，分配方式的改变对于结果变量没有因果效应。</p>
+
+<p>这个排他性约束是工具变量方法中的主要假设。然而与潜在无混杂假设不同的是，<strong>分配方式的随机性并不意味着该假设的成立</strong>。相反，这是一个独立存在的假设，不一定适用于所有具有不依从性的随机实验，尽管它可以通过双盲等设计变得可信。</p>
+
+<p>对不依从者的排他性约束的一个稍弱版本的要求在超总体的分布中保持排他性约束:</p>
+
+<p><strong>假设6.3 （不依从者的随机排他性约束）</strong></p>
+
+\[Z_i⊥ Y_i(Z_i,W_i(Z_i)),\]
+
+<p>对所有的不依从者，即$Gi = \operatorname{nc}$个体成立。</p>
+
+<p>这个假设意味着对$W_i(0) = W_i(1) = 0$的不依从者来说，$Y_i(0,1)$在超总体中的分布与$Y_i(1,0)$是一样的。<strong>这种假设的一个优点是，对于存在预处理变量的情形，我们可以很自然地将其进行放松，只需要求在给定预处理变量后条件独立性成立即可</strong>。</p>
+
+<p>由于排他性约束的中心地位，我们需要适当对于这一假设的一般适用性进行一些讨论。在此之前，让我们也制定第二个排他性约束假定，这一次是针对依从者的。</p>
+
+<p><strong>假设6.4 （依从者的排他性约束）</strong>
+对所有$G_i = \mathrm{co}$的个体，即所有依从者，</p>
+
+\[Y_i(0,w)=Y_i(1,w),\]
+
+<p>对所有的处理水平$w$均成立。</p>
+
+<p>这是一个与针对不依从者的排他性约束非常不同的假设。它限制依从者的$Y_i(0,0)$等于$Y_i(1,0)$，并且限制$Y_i(0,1)$等于$Y_i(1,1)$。但是对于依从者来说，我们只能观察到$Y_i(0,0)$和$Y_i(1,1)$中的一个，而且观察不到$Y_i(0,1)$和$Y_i(1,0)$，所以无论是在当前的假设形式或随机版本的假设形式下，这些限制都没有实际的结果，这与对不依从者的排他性约束是不同的。从某种意义上说，这一限制实质上是将ITT对依从者的影响归因于接受处理的因果效应，而不是归因于处理的分配。<strong>它主要是服务于对这种ITT效应的解释，而不是服务于如何从数据中估计它</strong>。</p>
+
+<p>注意到对于依从者的排他性假定在完全服从的随机化实验中是通常以一种隐晦的方式在使用的（在这种情况下所有的个体都是依从者）。举个例子，当我们在分析完全依从的双盲随机化药物实验的结果时，人们经常隐含地假设，估计得到的效应是由于服用药物，而不是分配到服用药物带来的。因此，隐含的假设是，<code class="language-plaintext highlighter-rouge">如果该分配机制从随机化分配更换为自愿分配或者完全服用，也会有类似的个体水平的处理效应</code>。具体来说，假设一个制药公司在一个随机化实验中估计得到了一个新药物的效用。那么一个隐含的假设便是，如果在这个实验的一开始，所有的个体都被告知他们将会接受这个新药物并且没有人接受处理控制，那么观测到的结果变量与实际被分配到处理组的子样本的结果变量是近似相同的。此外，当这个药物被通过后，医师在开药的时候大概是不会采取随机化的分配方式的。同样，此时的假设是，他们的病人对开具的治疗方案的反应与随机化试验中相似的个体对可能未知的处理分配方式的反应是一样的。</p>
+
+<p>但实际上，这个假设被常常隐含地在使用并不代表这个排他性约束假设就是自然成立的。在很多实际例子中，分离掉接受处理带来的效应后，分配方式确实会带来很重大的差异。考虑到由于分配方式带来的直接影响从而引起的潜在问题，通常会在以人为对象的医疗实验中采用安慰剂单盲或者双盲设计。如果个体不知道他们的分配方式，则很难知道分配方式会如何影响他们的结果变量，除非是通过实际接受到的处理的生物学效应。但是，需要再次注意的是，接受一个已知的通过许可的药物的，与在实验中接受一个未知的的药物是并不一定相同的。</p>
+
+<h4 id="discussion-of-the-exclusion-restrictions">Discussion of the Exclusion Restrictions</h4>
+
+<p>在一些存在不依从现象的设定中，使用安慰剂或者是（双）盲可能是无法操作的。如果处理是具有侵害性的或者需要一些个体的一些主动的配合，研究者通常没有办法隐藏真实的处理水平。即使是在对接受处理的资格进行了随机化的实验设计中，也可能违反排他性约束。分配到积极处理的个人可能会拒绝接受，但在收到准入资格的通知后，他们可能会采取一些在未收到通知的情况下不会采取的行动。例如，考虑一个戒烟计划的评估项目。假设这个项目被随机提供给一组吸烟者。如果它需要大量的时间或精力，有些人可能不愿意完成这个项目。然而，作为对分配方式的回应，这些人仍然可能改变他们的生活方式，包括他们的吸烟习惯，从而影响他们随后的健康结果。在这种情况下，这些人的健康结果将因分配的不同而不同，尽管他们是不论分配方式如何都没有参加项目的不依从者。诸如此类的例子说明，<code class="language-plaintext highlighter-rouge">假设排他性约束需要仔细考虑分配方式可能影响结果的各种路径</code>。</p>
+
+<p>然而，我们也应该注意到，这些排他性约束，即假设6.2和6.4并没有从任何方面对依从性行为本身进行约束。比如，它允许这样的可能性，即个体知道他们在两种不同处理水平下的结果变量取值，然后只在被分配到积极处理对他们更有益时才选择依从。更具体地来说，假定所有满足$Y_i(1, 1) \geq Y_i(1, 0)$的个体（即那些接受处理好健康状况有所提升的个体）选择依从，而所有满足$Y_i(1, 1) \leq Y_i(1, 0)$的个体选择不依从。这样的行为意味着实际接受的处理$W_i^{\operatorname{obs}}$是有混杂的，并且通常正是这样的系统性不依从行为启发研究者们考虑利用工具变量进行分析。但是，这样的行为与排他性约束并不是不一致的，因此与这里建立的分析是兼容的。</p>
+
+<h3 id="local-average-treatment-effects">Local Average Treatment Effects</h3>
+
+<p>在这一节中，我们讨论最为重要的一个结果。考虑按照依从状态对总体的平均ITT效应进行分解：</p>
+
+\[\operatorname{ITT}_{\mathrm{Y}}=\mathrm{ITT}_{\mathrm{Y}, \mathrm{co}} \cdot \mathrm{ITT}_{\mathrm{W}}+\mathrm{ITT}_{\mathrm{Y}, \mathrm{nc}} \cdot\left(1-\mathrm{ITT}_{\mathrm{W}}\right),\quad (6.1)\]
+
+<p>利用单向不依从性的事实可知$\mathrm{ITT}<em>{\mathrm{W}}=\pi</em>{\mathrm{co}}$。对于不依从者的排他性约束意味着，对于不依从者，有$Y_{i}(0,0)=$ $Y_{i}(1,0)$成立，因此</p>
+
+\[\operatorname{ITT}_{\mathrm{Y}, \mathrm{nc}}=0 .\]
+
+<p>因此，（6.1）式中右侧的第二项为零，从而将对于结果变量的全局ITT效应简化为两个“ITT”效应的乘积，即对于依从者的结果变量的“局部”ITT效应，以及对于实际接受处理的全局“ITT”效应：</p>
+
+\[\mathrm{ITT}_{\mathrm{Y}}=\mathrm{ITT}_{\mathrm{Y}, \mathrm{co}} \cdot \mathrm{ITT}_{\mathrm{W}} .\]
+
+<p>现在我们对（6.1）式进行整理，即可得到我们正式的结论：</p>
+
+<p><strong>定理6.1 （局部平均处理效应）</strong>假定假设6.2成立，则有</p>
+
+\[\tau_{\text {late }}=\operatorname{ITT}_{\mathrm{Y}, \mathrm{co}}=\frac{\mathrm{ITT}_{\mathrm{Y}}}{\mathrm{ITT}_{\mathrm{W}}} .\]
+
+<p>换句话说，在对于不依从者的排他性约束假定下，对于结果变量的ITT效应与对于处理变量的ITT效应之比与对于依从者的ITT效应是相等的，我们也称之为<code class="language-plaintext highlighter-rouge">局部平均因果效应（Local Average Treatment Effect，LATE）</code>或<code class="language-plaintext highlighter-rouge">依从者平均因果效应（Complier Average Causal Effect，CACE）</code>。</p>
+
+<p>如果我们也倾向于假定第二个排他性约束，即假设6.4中对于依从者的排他性约束成立，我们则可以将这个局部平均处理效应解释为接受处理对于依从者的平均因果效应。因此，给定这两个排他性约束以及随机化分配的假定，我们可以学习到主要的处理变量对于依从者这个子群体的效应，因为我们可以同时对$\tau_{\text {late }}$的分子和分母进行无偏估计。</p>
+
+<p>为了对定理6.1中的结果给出一个不同的解释，我们暂时假设我们可以观测到所有个体的依从状态。因此由引理6.1，给定依从状态$G_i$，实际接受的处理是无混杂的，因此我们可以按依从者和不依从者分别对数据进行分析。在这些子总体内，我们可以比较不同处理状态之间的结果变量。对于不依从者来说，数据中没有提供处理对结果变量的效应的相关信息，因此没有不依从者接受到积极的处理方案。因此可以舍弃掉不依从者的相关数据，因为其缺少接受到积极处理的个体。对于依从者来说，其接受的处理与被分配到的处理是相同的，因此对于这个子总体我们可以对接受处理对于结果变量的因果效应进行相合地估计，这是因为，由于第二个排他性约束假设，这个效应与分配对于结果变量的ITT效应是相同的。<code class="language-plaintext highlighter-rouge">上述讨论中其中唯一缺失的一块，也是十分重要的一块是，我们并不能观测到所有个体的依从状态。</code></p>
+
+<h2 id="moment-based-intrumental-variables-estimators">Moment-based Intrumental Variables Estimators</h2>
+
+<p>对到目前为止的讨论做一些总结，总的ITT效应由两个部分，即对于依从者的ITT效应以及对于不依从者的ITT效应，按照他们所占的样本比例加权组成。对于不依从这的排他性假设意味着对于不依从者的ITT效应等于零。因此，在对不依从者的排他性约束下，总的ITT效应与依从者所占样本比例之比与对于依从者的ITT效应是相等的。</p>
+
+<p>在上一节中，我们讨论了如何对$\mathrm{ITT}<em>{\mathrm{W}}$以及$\mathrm{ITT}</em>{\mathrm{Y}}$及进行估计和推断。给定这两个参数的无偏估计量，一个简单的基于矩方法的$\tau_{\operatorname{late}}$的工具变量估计量即为这两个估计的ITT效应的比值</p>
+
+\[\hat{\tau}^{\mathrm{iv}}=\frac{\widehat{\mathrm{ITT}_{\mathrm{Y}}}}{\widehat{\mathrm{ITT}_{\mathrm{W}}}}\]
+
+<p>这样一个简单的估计量有一些缺点，<code class="language-plaintext highlighter-rouge">它不一定满足假设23.1和23.2所暗示的所有限制</code>。但是在这里我们把它作为一个简单的例子，并假设$\mathrm{ITT}<em>{\mathrm{W}}=0$。在没有依从者的情形，由于对于不依从者的排他性约束，必然有$\mathrm{ITT}</em>{\mathrm{Y}}=0$。更一般地来说，这些约束意味着数据的联合分布与$\left(Z_{i}=0, W_{i}^{\text {obs }}=0\right)$这个子总体一致<strong>都是依从者与不依从者的混合分布</strong>，并且不依从者的结果变量的分布与$\left(Z_{i}=1, W_{i}^{\mathrm{obs}}=0\right)$的个体是相同的。</p>
+
+<p>对于上述两个ITT效应的方差的计算可以分别由前面中的<a href="https://yijiaojane.github.io/2021/01/31/CI-2/#neymans-repeated-sampling-approach">Neyman方法</a>得到。这里我们将讨论拓展到对于$\hat{\tau}^{\mathrm{iv}}$的方差的计算。这里我们明确地用超总体的视角展开讨论。也就是说，我们将观察到的样本视为来自一个更大的总体的随机样本。我们考虑$\hat{\tau}^{\mathrm{iv}}-\mathrm{ITT}_{\mathrm{Y}, \text { co}}$的样本方差。根据delta方法对ITT效应比值的大样本抽样方差进行估计，可以得到的结果是，总体依从者ITT效应的估计量$\hat{\tau}^{\mathrm{iv}}$，在大样本下近似服从一个正态分布，其方差为</p>
+
+\[\begin{aligned}
+\mathbb{V}_{\mathrm{sp}}\left(\hat{\tau}^{\mathrm{iv}}\right)=&amp; \frac{1}{\mathrm{ITT}_{\mathrm{W}}^{2}} \cdot \mathbb{V}\left(\widehat{\mathrm{ITT}_{\mathrm{Y}}}\right)+\frac{\mathrm{ITT}_{\mathrm{Y}}^{2}}{\mathrm{ITT}_{\mathrm{W}}^{4}} \cdot \mathbb{V}(\widehat{\mathrm{ITT}_{\mathrm{W}}}) \\
+&amp;-2 \cdot \frac{\mathrm{ITT}_{\mathrm{Y}}}{\mathrm{ITT}_{\mathrm{W}}^{3}} \cdot \mathbb{C}\left(\widehat{\mathrm{ITT}_{\mathrm{Y}}}, \widehat{\mathrm{ITT}_{\mathrm{W}}}\right)
+\end{aligned}\]
+
+<p>其中$\mathbb{C}(\cdot, \cdot)$表示两个随机变量的协方差。该样本方差的一个简单估计量可以将通过将其中包含的样本方差由其对应的估计量替换得到。用这个样本方差的估计量构造置信区间会产生一些问题，比如方差中的分母很接近零时，用正态分布近似该估计量的抽样分布可能表现会很差。</p>
+
+<h2 id="linear-models-and-instrumental-variables">Linear Models and Instrumental Variables</h2>
+
+<p>即使是对于熟悉传统计量经济教材中的关于工具变量讨论的读者，目前也可能对我们的讨论感到陌生。在这一节中，我们讨论本书中介绍的工具变量方法于传统计量计经济中的工具变量分析方法之间的联系。对于传统计量教材中工具变量方法不熟悉的读者，可以选择跳过这一节。</p>
+
+<p>传统计量方法中对于工具变量的使用非常<strong>依赖于线性模型的参数假定</strong>，即使在有的情形在这样的假定并不重要。此外，他也是从一个超总体的视角来研究问题，即将手中的样本看作是来自于一个无限大总体的随机样本，感兴趣的估计量为总体的平均因果效应。我们同时保持对于不依从者和依从者的两个排他性约束。因此，我们可以省略掉潜在结果$Y_i(z,w)$中对于$z$的依赖性，而不引入歧义地将其记为$Y_i(w)$，即其只是实际接受到的处理的函数。为了便于讨论我们的前面介绍的工具变量与传统计量中工具变量方法之间的联系，我们首先假设处理效应为一个常数，即对所有$i$成立$Y_{i}(1)-Y_{i}(0)=\tau$。我们将在之后放松这个假定。</p>
+
+<p>定义$\alpha=E_{\mathrm{sp}}\left[Y_{i}(0)\right]$为接受到控制处理后超总体结果变量的均值，由此我们有</p>
+
+\[\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(w)\right]=\alpha+\tau \cdot w,\]
+
+<p>对$w={0,1}$成立。我们定义残差$\varepsilon_{i}=Y_{i}(0)-\alpha$为单个个体在接受控制处理后的结果变量与总体均值之间的偏差</p>
+
+\[Y_{i}(w)=\alpha+\tau \cdot w+\varepsilon_{i}\]
+
+<p>等式（\ref{lm}）即为传统计量研究中所熟知的结构或行为方程（structural or behavioral equation）：它用一个因果的方式将处理变量和结果变量联系了起来。对于一个给定的个体$i$（由此，$\epsilon_i$给定），$Y_{i}(w)$即为我们在固定$W_i=w$（用Pearl’s （2000）的术语来讲为“设定”）后所观测到的结果变量。</p>
+
+<p>然而等式（\ref{lm}）并不是一个传统的回归函数。注意到它并不是由完全观测到的量写成的。代入观测到的处理变量一个结果变量的值，我们可以将上式改写为</p>
+
+\[Y_{i}^{\mathrm{obs}}=Y_{i}\left(W_{i}^{\mathrm{obs}}\right)=Y_{i}(0)+W_{i}^{\mathrm{obs}} \cdot\left(Y_{i}(1)-Y_{i}(0)\right)=\alpha+\tau \cdot W_{i}^{\mathrm{obs}}+\varepsilon_{i}\]
+
+<p>尽管如此，正如上式中所写的，式（\ref{lm2}）仍然是一个行为方程的形式，而非一种条件期望的形式：一般来说，$\mathbb{E}\left[Y_{i}^{\text {obs }} \mid W_{i}^{\text {obs }}=w\right]=\alpha+\tau \cdot W_{i}^{\text {obs }}$并不成立。这里对于处理指标变量$W_{i}^{\text {obs }}$的回归系数$\tau$代表了处理对于结果变量的因果效应；但是他并不等于超总体下$Y_{i}^{\text {obs }}$ 和$W_{i}^{\text {obs }}$协方差和$W_{i}^{\text {obs }}$的方差之比。</p>
+
+<p>将式（\ref{lm2}）与传统的回归函数区别开来的一个关键因素在于，这里的回归变量，即$W_i^{\operatorname{obs}}$与$Y_i(0)$可能是相关的，从而其可能与残差$\epsilon_i$相关。为了说明这一点，我们首先来计算超总体中在给定$W_i^{\operatorname{obs}}$下$\epsilon_i$的条件期望。记住$\epsilon_i$定义为观测到的处理组结果变量与接受控制处理的潜在结果期望之间的插值，即$\varepsilon_{i}=Y_{i}(0)-\alpha=Y_{i}(0)-\mathbb{E}<em>{\mathrm{sp}}\left[Y</em>{i}(0)\right]$。给定$W_{i}^{\text {obs }}=1$，我们有</p>
+
+\[\begin{aligned}
+	\mathbb{E}_{\mathrm{sp}}&amp;\left[\varepsilon_{i} \mid W_{i}^{\mathrm{obs}}=1\right]=\mathbb{E}_{\mathrm{sp}}\left[\varepsilon_{i} \mid G_{i}=\mathrm{co}\right] \\
+	&amp;=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid G_{i}=\mathrm{co}\right]-\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0)\right]\\
+&amp;=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid G_{i}=\mathrm{co}\right]-\left(\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid X_{i}=\mathrm{co}\right] \cdot \pi_{\mathrm{co}}+\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid G_{i}=\mathrm{nc}\right] \cdot \pi_{\mathrm{nc}}\right) \\
+&amp;=\pi_{\mathrm{nc}} \cdot\left(\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid G_{i}=\mathrm{co}\right]-\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(0) \mid G_{i}=\mathrm{nc}\right]\right) \\
+&amp;=\pi_{\mathrm{nc}} \cdot \Delta_{\mathrm{co}, \mathrm{nc}}
+\end{aligned}\]
+
+<p>其中$\Delta_{\text {co,nc }}$定义为依从者和不依从者接受控制处理后的潜在结果均值之间的差值，即$\Delta_{\text {co,nc }}=\mathbb{E}<em>{\mathrm{sp}}\left[Y</em>{i}(0) \mid G_{i}=\operatorname{co}\right]-\mathbb{E}<em>{\mathrm{sp}}\left[Y</em>{i}(0) \mid G_{i}=\right.$ nc $]$。为了计算$\mathbb{E}<em>{\mathrm{sp}}\left[\varepsilon</em>{i} \mid W_{i}^{\mathrm{obs}}=0\right]$，首先对$\mathbb{E}<em>{\mathrm{sp}}\left[\varepsilon</em>{i}\right]=0$进行分解：</p>
+
+\[0=\mathbb{E}_{\mathrm{sp}}\left[\varepsilon_{i}\right]=\mathbb{E}_{\mathrm{sp}}\left[\varepsilon_{i} \mid W_{i}^{\mathrm{obs}}=1\right] \cdot \operatorname{Pr}\left(W_{i}^{\mathrm{obs}}=1\right)+\mathbb{E}_{\mathrm{sp}}\left[\varepsilon_{i} \mid W_{i}^{\mathrm{obs}}=0\right] \cdot \operatorname{Pr}\left(W_{i}^{\mathrm{obs}}=0\right)\]
+
+<p>给定$\operatorname{Pr}\left(W_{i}^{\text {obs }}=1\right)$等于$p_{Z} \cdot \pi_{\text {co }}$，从而有$\operatorname{Pr}\left(W_{i}^{\text {obs }}=0\right)=$ $\left(1-p_{Z} \cdot \pi_{\mathrm{co}}\right)$，由此可以得到</p>
+
+\[\mathbb{E}_{\mathrm{sp}}\left[\varepsilon_{i} \mid W_{i}^{\mathrm{obs}}=0\right]=-\frac{\pi_{\mathrm{nc}} \cdot p_{\mathrm{Z}} \cdot \pi_{\mathrm{co}}}{1-p_{\mathrm{Z}} \cdot \pi_{\mathrm{co}}} \cdot \Delta_{\mathrm{co,nc}}\]
+
+<p>这里的期望值$\mathbb{E}<em>{\mathrm{sp}}\left[\varepsilon</em>{i} \mid W_{i}^{\mathrm{obs}}=w\right]$通常以一下并不为零。在计量经济的术语中，称解释变量$W_i^{\operatorname{obs}}$为内生的（endogenous），此时最小二乘估计量并不能得到$\tau$的相合估计。</p>
+
+<p>尽管实际接受的处理，$W_{i}^{\text {obs }}$，与$\epsilon_i$并不是独立的，处理的分配方式，或者说工具变量$Z_i$与$\epsilon_i$是独立的。这一点从随机分配的假设以及由潜在结果给出的$\epsilon_i$的定义即可知晓。$Z_i$和$\epsilon_i$之间的独立性可以被利用起来帮助我们进行估计，这也是传统计量经济中熟知的两阶段最小二乘（Two-Stage-Least-Squares，TSLS）估计。首先，独立性意味着给定$Z_i$后$\epsilon_i$的条件期望是等于零的。这进一步意味着给定$Z_i$后$Y^{\operatorname{obs}}_i$的条件期望等于</p>
+
+\[\mathbb{E}_{\mathrm{sp}}\left[Y_{i}^{\mathrm{obs}} \mid Z_{i}\right]=\alpha+\tau \cdot \mathbb{E}_{\mathrm{sp}}\left[W_{i}^{\mathrm{obs}} \mid Z_{i}\right]+\mathbb{E}_{\mathrm{sp}}\left[\varepsilon_{i} \mid Z_{i}\right]=\alpha+\tau \cdot \mathbb{E}_{\mathrm{sp}}\left[W_{i}^{\mathrm{obs}} \mid Z_{i}\right]\]
+
+<p>这里给定$Z_i$后$Y^{\operatorname{obs}}<em>i$的条件期望关于$\mathbb{E}</em>{\mathrm{sp}}\left[W_{i}^{\text {obs }} \mid Z_{i}\right]$是线性的，其系数就等于我们感兴趣的处理效应$\tau$。由此我们得到</p>
+
+\[\begin{aligned}
+Y_{i}^{\mathrm{obs}} &amp;=\alpha+\tau \cdot\left(\mathbb{E}_{\mathrm{sp}}\left[W_{i}^{\mathrm{obs}} \mid Z_{i}\right]+\left(W_{i}^{\mathrm{obs}}-\mathbb{E}_{\mathrm{sp}}\left[W_{i}^{\mathrm{obs}} \mid Z_{i}\right]\right)\right)+\varepsilon_{i} \\
+&amp;=\alpha+\tau \cdot \mathbb{E}_{\mathrm{sp}}\left[W_{i}^{\mathrm{obs}} \mid Z_{i}\right]+\eta_{i}
+\end{aligned}\]
+
+<p>其中复合残差为$\eta_{i}=\tau \cdot\left(W_{i}^{\mathrm{obs}}-\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}\right]\right)+\varepsilon_{i}$。根据分配的随机化假定（假设23.1），$\varepsilon_{i}$ 和个体层面的差异$W_{i}^{\text {obs }}-\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}\right]$都是与$Z_i$不相关的。因此，这里的复合残差$\eta_i$与$Z_i$也是不相关的。这进一步意味着将$Y_{i}^{\text {obs }}$对条件期望$\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\text {obs }} \mid Z_{i}\right]$进行最小二乘回归可以得到感兴趣的处理效应，$\tau$，的一个无偏估计。</p>
+
+<p>不幸的是，这样的线性回归是不可行的，因为我们并不知道条件期望$\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\text {obs }} \mid Z_{i}\right]$的值。但是，我们可以先对这个条件期望进行估计。首先，让我们将给定$Z_i$后$W_{i}^{\text {obs }}$的条件期望写成$Z_i$的函数——对于熟悉IV的读者来说，这也就是第一步估计的回归方程：</p>
+
+\[\mathbb{E}_{\mathrm{sp}}\left[W_{i}^{\mathrm{obs}} \mid Z_{i}\right]=\pi_{0}+\pi_{1} \cdot Z_{i},\]
+
+<p>其中$\pi_{0}=\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}=0\right]$， $\pi_{1}=\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}=1\right]-\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}=0\right]$。再由单向不依从性可知，$\pi_0=0$（$Z_i=0$可以推出$W_i^{\operatorname{obs}}$），$\pi_1$等于$\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}=1\right]$，其等于超总体中依从者所占的比例，$\pi_{\mathrm{co}}$。因此$\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}\right]=\pi_{1} \cdot Z_{i}=\pi_{\text {co }} \cdot Z_{i}$</p>
+
+<p>利用这个表达式，我们可以将（\ref{lm3}）式重写为：</p>
+
+\[Y_{i}^{\mathrm{obs}}=\alpha+\gamma \cdot Z_{i}+\eta_{i}, \quad \text{where} \gamma=\tau \cdot \pi_{\mathrm{co}}\]
+
+<p>（\ref{lm4}）在计量经济学的术语中又被称为约简形式（reduced form）。这里的回归函数确实呈现为条件期望的形式，因此，其中的参数可以通过最小二乘方法得到相合估计。这里的最小二乘估计量，即$Z_{i}$与$Y_{i}^{\mathrm{obs}}$之间的协方差与$Z_i$的方差之比，就给出了这里的复合系数$\gamma=\tau \cdot \pi_{\text {co }}$的一个无偏估计。由于$Z_i$是二元取值的，这个估计量就等于不同分配方式下结果变量均值之差，即$\hat{\gamma}=\widehat{\mathrm{ITT}}=\bar{Y}<em>{1}^{\mathrm{obs}}-\bar{Y}</em>{0}^{\mathrm{obs}}$。类似地，由于$Z_i$是无混杂的，将$W_i^{\operatorname{obs}}$对$Z_i$作回归即可给出$\pi_{\operatorname{co}}$的无偏估计。同样地，由于$Z_i$是二元取值的，该估计量就等于$\hat{\pi}<em>{\mathrm{co}}=\widehat{\mathrm{ITT}</em>\mathrm{W}}=\bar{W}<em>{1}^{\mathrm{obs}}-\bar{W}</em>{0}^{\mathrm{obs}}$。</p>
+
+<p>将最小二乘估计量$\hat{\gamma}=\widehat{\mathrm{ITT}}$除以估计量$\hat{\pi}<em>{\mathrm{co}}=\widehat{\mathrm{ITT}}$，即可得到我们之前给出的工具变量估计量$\hat{\tau}^{\mathrm{iv}}=\widehat{\mathrm{ITT}</em>{Y}} / \widehat{\mathrm{ITT}<em>{W}}$。对于不依从者来说，$W</em>{i}(z)=0$对$z=0,1$均成立。因此，给定一个二元取值的分配方式和处理变量，通过指定线性参数模型可以得到一个估计量，这个估计量与潜在结果框架下通过矩方法建立的估计量是相同的。这个估计量与将$Y_i$对$\hat{\pi}<em>{\text {co }} \cdot Z</em>{i}$做回归得到的估计量也是相同的。这个两阶段的技术性步骤，即第一步将实际接受的处理对工具变量进行回归得到一个$\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \mid Z_{i}\right]$的估计，然后在第二步将感兴趣的结果变量对第一步得到的对于实际接受处理的预测进行回归，就是计量经济学中的TSLS，因为工具变量估计量也被称为TSLS估计量。</p>
+
+<p>正如我们前面所提醒过的，我们在上述的推导中假设了处理效应为常数。但是实际上在我们使用潜在结果的框架下进行讨论工具变量方法时，我们并没有这样的假设。事实证明，在这两种方法中，这个假设都不是必要的。没有这个假设，我们最后估计的就是对于依从者的平均处理效应。更准取地来说，基于线性模型的IV估计量等于两个ITT效应的比值这个事实并不依赖于处理效应为常数这个假定。为了说明这一点，我们设$\tau_{\text {late }}$为对于依从者的平均处理效应，或称为局部平均处理效应，$\tau_{\text {late }}=\mathbb{E}<em>{\mathrm{sp}}\left[Y</em>{i}(1)-Y_{i}(0) \mid G_{i}=c\right]$，并且设$\nu_i$为单个个体的处理效应$\tau_i$与平均效应$\tau_{\text {late }}$之间的差值，$\nu_{i}=Y_{i}(1)-Y_{i}(0)-\tau_{\text {late }}$。同样的，我们设$\alpha=\mathbb{E}<em>{\mathrm{sp}}\left[Y</em>{i}(0)\right]$以及 $\varepsilon_{i}=Y_{i}(0)-\alpha$。与之前相同，我们有</p>
+
+\[Y_{i}^{\mathrm{obs}}=Y_{i}(0)+W_{i}^{\mathrm{obs}} \cdot\left(Y_{i}(1)-Y_{i}(0)\right),\]
+
+<p>在这里给出的定义下，我们可以将上式改写为</p>
+
+\[Y_{i}^{\mathrm{obs}}=\alpha+W_{i}^{\mathrm{obs}} \cdot \tau_{\text {late }}+\varepsilon_{i}+W_{i}^{\mathrm{obs}} \cdot \nu_{i}\]
+
+<p>现在我们就有了一个复合的扰动项$\varepsilon_{i}+W_{i}^{\text {obs }} \cdot \nu_{i}$，同样地，他与$W_i^{\operatorname{obs}}$之间可能存在相关性。因此将$Y_{i}^{\text {obs }}$对$W_{i}^{\text {obs }}$做回归的传统最小二乘方法并不会给出一个$\tau_{\operatorname{late}}$的无偏估计。</p>
+
+<p>尽管如此，正如$\epsilon_i$与$Z_i$之间不相关一样，这里新的误差项中的第二部分，$W_{i}^{\text {obs }} \cdot v_{i}$也是与$Z_i$不相关的。为了说明这一点，分别在$Z_i=1$和$Z_i=0$的情况下考虑该项的条件期望。由于$Z_i=0$意味着$W_{i}^{\text {obs }}=0$，由于可以得到$\mathbb{E}<em>{\mathrm{sp}}\left[W</em>{i}^{\mathrm{obs}} \cdot v_{i} \mid Z_{i}=0\right]=0$。为了计算在$Z_i=1$下的期望，我们首先根据$W_i^{\operatorname{obs}}$的所有可能取值对期望进行展开：</p>
+
+\[\begin{aligned}
+\mathbb{E}_{\mathrm{sp}}\left[W_{i} \cdot \nu_{i} \mid Z_{i}=1\right]=&amp; \mathbb{E}_{\mathrm{sp}}\left[0 \cdot v_{i} \mid Z_{i}=1, W_{i}=0\right] \cdot \operatorname{Pr}\left(W_{i}=0 \mid Z_{i}=1\right) \\
+&amp;+\mathbb{E}_{\mathrm{sp}}\left[1 \cdot v_{i} \mid Z_{i}=1, W_{i}=1\right] \cdot \operatorname{Pr}\left(W_{i}=1 \mid Z_{i}=1\right) \\
+=&amp; \mathbb{E}_{\mathrm{sp}}\left[v_{i} \mid Z_{i}=1, G_{i}=c\right] \cdot \pi_{\mathrm{co}}=\mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)-\tau_{\operatorname{late}} \mid Z_{i}=1, G_{i}=c\right] \\
+=&amp; \mathbb{E}_{\mathrm{sp}}\left[Y_{i}(1)-Y_{i}(0)-\tau_{\operatorname{late}} \mid G_{i}=c\right] \cdot \pi_{\mathrm{co}}=0
+\end{aligned}\]
+
+<p>其中用到了$\tau_{\operatorname{late}}$为依从者平均因果效应的这一定义。因此，观察（\ref{lmx}）式，给定$Z_i$与误差项中的两个部分都不相关，我么可以利用与之前同样的方法求出基于矩的估计量$\hat{\tau}^{\text {iv }}$。</p>
+
+<p>具体参见<a href="https://www.cambridge.org/core/books/causal-inference-for-statistics-social-and-biomedical-sciences/71126BE90C58F1A431FE9B2DD07938AB?__cf_chl_jschl_tk__=746086eb3490e7437f5ebab71b6c6957e795f99f-1612097489-0-AfroHnta6T5V6kHnhxxA8L_YEzUd8tItBEWz83kcnei_YGQefes6VeZIYpUZ3H1es_S3mFhChABW6cTXw-pb5V5zYMoK-bio1BfV_9pLs7_AvLXJT87H0_E_fm68HmUmn_9Im_NkZR_DDlohej5RtIEry_eP9CLu1QgyHjrizSBFZtxWtV7jJ0i3MjV1Bp7keYOGhuQfHoFrauhbSPkg25FrgFXpmfpcza1NFvUa1bdjvEFZVUW4A4aFL1L0FfQzaR0P6PxnyNMh0keANZHzp-Sh2LKPJ6B2K6KSeN5YhLQydhu9cgr-m-z0eM23rckQFZaR0vFZ0Ll90po2KF8tv-mW6JCijuQ-39vCbmXlKbKN3ZJLmh-AB0urPKzNFeoyrWlz9Sl0j69N_sOlU515T_6ANAHTHhxsLJey7KQF9LdhBSbho_STVJPT-UXyRnE6bKd-57rlqpaSf5XB_TlV9-hGQIMB8FueXiIrtYRP5iW6C1vA-445R_GPTaY6AJTNXQ">原书</a>第22章第5节。</p>
+
+<hr />
+
+<p>到此为止，规则设计机制下一般的观测性研究的因果效应相关分析就暂告一段落了。但是在实际对处理进行分配时，往往会遇到<strong>不服从分配</strong>等情况，这是需要引入<strong>工具变量</strong>来进行分析和推断，下一篇将会对这一部分做一个简要的介绍。</p>
+:ET
